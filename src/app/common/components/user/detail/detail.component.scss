@@ -1,0 +1,15 @@
+div{
+  table{
+    tbody{
+      tr{
+        td:first-child{
+          text-align: start;
+        }
+        td:last-child{
+          text-align: end;
+        }
+      }
+    }
+
+  }
+}

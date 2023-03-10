@@ -1,0 +1,260 @@
+import {post} from "../../shared/services/api.service";
+import {RoleType} from "../../shared/enums/role.enum";
+import {environment} from "../../../environments/environment";
+import {ALERT_NEW} from "../../shared/actions/alert.actions";
+import {alertSuccess} from "../../shared/utils/alert.functions";
+import {Auth} from "../models/authenticate.model";
+import {IAuth} from "../interfaces/authenticate.interface";
+import {IPropsCommon} from "../../shared/interfaces/props.common.interface";
+import {IReduxDispatch} from "../../shared/interfaces/redux.type.interface";
+export const AUTH_SIGN_IN = 'AUTH_SIGN_IN';
+export const AUTH_SIGN_OUT = 'AUTH_SIGN_OUT';
+export const AUTH_SIGN_UP = 'AUTH_SIGN_UP';
+export const AUTH_IS_SIGN_IN = 'AUTH_IS_SIGN_IN';
+export const AUTH_FORGOT = 'AUTH_FORGOT';
+
+export const AUTH_ACTIVATE_ACCOUNT_VIA_EMAIL = 'AUTH_ACTIVATE_ACCOUNT_VIA_EMAIL';
+export const AUTH_SEND_ACTIVATE_ACCOUNT_VIA_EMAIL = 'AUTH_SEND_ACTIVATE_ACCOUNT_VIA_EMAIL';
+export const Auth_RESET_PASSWORD_VIA_EMAIL = 'Auth_RESET_PASSWORD_VIA_EMAIL';
+export const Auth_RESET_PASSWORD_VIA_SMS = 'Auth_RESET_PASSWORD_VIA_SMS';
+
+export const AUTH_RESET_PASSWORD_VIA_SMS = 'AUTH_RESET_PASSWORD_VIA_SMS';
+export const AUTH_RESET_PASSWORD_ACCOUNT_VIA_SMS = 'AUTH_RESET_PASSWORD_ACCOUNT_VIA_SMS';
+
+export const AUTH_ACTIVATE_ACCOUNT_VIA_SMS = 'AUTH_ACTIVATE_ACCOUNT_VIA_SMS';
+export const AUTH_SEND_ACTIVATE_ACCOUNT_VIA_SMS = 'AUTH_SEND_ACTIVATE_ACCOUNT_VIA_SMS';
+
+export async function signIn(auth: Auth, dispatch:IReduxDispatch) {
+
+    const result:IAuth = await post<IAuth>('auth/signin', auth);
+    localStorage.setItem('csrf', result.csrf!);
+    localStorage.setItem('user', JSON.stringify(result));
+
+    let address = window.location.origin;
+    let pathRedirect = '/admin/dashboard/over-view';
+    if (result.role?.name === RoleType.Member) {
+        pathRedirect = '/admin/profile';
+    }
+    if (address.search('www') !== -1) {
+        window.location.replace(environment.siteAddress.two + pathRedirect);
+    } else {
+        window.location.replace(environment.siteAddress.one + pathRedirect);
+    }
+
+    dispatch({
+        type: AUTH_SIGN_IN,
+        payload: result
+    });
+
+}
+
+export async function signOut( dispatch:IReduxDispatch) {
+
+    const result = await post<IAuth>('auth/signout',{none:''});
+    localStorage.removeItem('csrf');
+    localStorage.removeItem('user');
+    localStorage.removeItem('chatRoom');
+
+    let address = window.location.origin;
+
+    if (address.search('www') !== -1) {
+      window.location.replace(environment.siteAddress.two + '/home/sign-in');
+    } else {
+      window.location.replace(environment.siteAddress.one + '/home/sign-in');
+    }
+
+    dispatch({
+        type: AUTH_SIGN_OUT,
+        payload: {}
+    });
+    
+}
+
+
+export async function isSignIn(dispatch:IReduxDispatch) {
+    const user = JSON.parse(localStorage.getItem('user')!);
+
+    if (user != null && !(user.jwt.expire < Math.floor(new Date().getTime() / 1000))){
+        const result:any = await post<IAuth>('auth/is-signin',{none:''});
+        if (result.success === true) {
+            let address = window.location.origin;
+            let extendPath = '/admin/dashboard/over-view';
+            if (user.role?.name === 'member') {
+                extendPath = '/admin/profile';
+            }
+            if (address.search('www') !== -1) {
+                window.location.replace(environment.siteAddress.two + extendPath);
+            } else {
+                window.location.replace(environment.siteAddress.one + extendPath);
+            }
+
+        }
+    }
+
+
+    dispatch({
+        type: AUTH_IS_SIGN_IN,
+        payload: {}
+    });
+
+}
+
+
+export async function activateAccountViaEmail(auth:Auth,props:IPropsCommon,dispatch:IReduxDispatch) {
+
+    const result = await post<IAuth>('auth/activate-account-email',{none:''});
+
+    dispatch({
+        type: AUTH_ACTIVATE_ACCOUNT_VIA_EMAIL,
+        payload: {}
+    });
+    dispatch({
+        type: ALERT_NEW,
+        payload: alertSuccess(props.t('auth.messageActivate'))
+    });
+
+    setTimeout(() => {
+        props.navigate('../sign-in');
+    }, 3000);
+
+
+}
+
+
+export async function sendActivateCodeViaEmail(auth:Auth,props:IPropsCommon,dispatch:IReduxDispatch) {
+
+    const result = await post<IAuth>('auth/activate-account-email', auth);
+
+    dispatch({
+        type: AUTH_SEND_ACTIVATE_ACCOUNT_VIA_EMAIL,
+        payload: {}
+    });
+    dispatch({
+        type: ALERT_NEW,
+        payload: alertSuccess(props.t('auth.messageSendEmail'))
+    });
+
+
+}
+
+
+export async function forgot(auth:Auth,props:IPropsCommon,dispatch:IReduxDispatch) {
+
+    const result = await post<IAuth>('auth/send-activate-email', auth);
+
+    dispatch({
+        type: AUTH_FORGOT,
+        payload: {}
+    });
+    dispatch({
+        type: ALERT_NEW,
+        payload: alertSuccess(props.t('auth.messageForgot'))
+    });
+
+
+}
+export async function signUp(auth:Auth,props:IPropsCommon,dispatch:IReduxDispatch) {
+
+    const result = await post<IAuth>('auth/auth/signup',{none:''});
+
+    dispatch({
+        type: AUTH_SIGN_UP,
+        payload: {}
+    });
+
+    dispatch({
+        type: ALERT_NEW,
+        payload: alertSuccess(props.t('auth.messageRegister'))
+    });
+
+    setTimeout(() => {
+        props.navigate('../sign-in');
+    }, 3000);
+
+
+}
+
+
+
+export async function resetPasswordViaEmail(auth:Auth,props:IPropsCommon,dispatch:IReduxDispatch) {
+
+    const result = await post<IAuth>('auth/reset-password-email',{none:''});
+
+    dispatch({
+        type: AUTH_SIGN_UP,
+        payload: {}
+    });
+
+    dispatch({
+        type: ALERT_NEW,
+        payload: alertSuccess(props.t('auth.messageReset'))
+    });
+
+    setTimeout(() => {
+        props.navigate('../sign-in');
+    }, 3000);
+
+
+}
+
+
+export async function resetPasswordViaSms(auth:Auth,props:IPropsCommon,dispatch:IReduxDispatch) {
+
+    const result = await post<IAuth>('auth/reset-password-sms',{none:''});
+
+    dispatch({
+        type: AUTH_SIGN_UP,
+        payload: {}
+    });
+
+    dispatch({
+        type: ALERT_NEW,
+        payload: alertSuccess(props.t('auth.messageReset'))
+    });
+
+    setTimeout(() => {
+        props.navigate('../sign-in');
+    }, 3000);
+
+
+}
+
+export async function activateAccountViaSms(auth:Auth,props:IPropsCommon,dispatch:IReduxDispatch) {
+
+    const result = await post<IAuth>('auth/activate-account-sms',{none:''});
+
+    dispatch({
+        type: AUTH_ACTIVATE_ACCOUNT_VIA_SMS,
+        payload: {}
+    });
+    dispatch({
+        type: ALERT_NEW,
+        payload: alertSuccess(props.t('auth.messageActivate'))
+    });
+    setTimeout(() => {
+        props.navigate('../sign-in');
+    }, 3000);
+
+
+}
+
+
+export async function sendActivateCodeViaSms(auth:Auth,props:IPropsCommon,dispatch:IReduxDispatch) {
+
+    const result = await post<IAuth>('auth/activate-account-sms', auth);
+
+    dispatch({
+        type: AUTH_SEND_ACTIVATE_ACCOUNT_VIA_SMS,
+        payload: {}
+    });
+    dispatch({
+        type: ALERT_NEW,
+        payload: alertSuccess(props.t('auth.messageSendSms'))
+    });
+
+
+}
+
+
+
+
