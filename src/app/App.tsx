@@ -1,75 +1,123 @@
 import React, {Component} from 'react';
 import logo from './logo.svg';
 import './App.scss';
-import {Routes, Route, Link, Outlet} from 'react-router-dom' ;
+import {Routes, Route, Link, Outlet, redirect} from 'react-router-dom' ;
 import {connect} from "react-redux";
-import FadeLoader from "react-spinners/FadeLoader";
- import AuthComponent from "./shared/guards/auth.component";
+import AuthComponent from "./guards/auth.component";
 import {callSelect} from '../assets/js/hook';
-import {IPropsCommon} from "./shared/interfaces/props.common.interface";
-import {IStateCommon} from "./shared/interfaces/state.common.interface";
-import {IReduxDispatch, IReduxState} from "./shared/interfaces/redux.type.interface";
-import withRouter from "./shared/utils/with.router";
+import {IPropsCommon} from "./interfaces/props.common.interface";
+import {IStateCommon} from "./interfaces/state.common.interface";
+import {IReduxDispatch, IReduxState} from "./interfaces/redux.type.interface";
+import withRouter from "./utils/with.router";
+import {Spinner} from 'spin.js';
+import IndexComponent from "./components/index/index.component";
+import {environment} from "../environments/environment";
+import {GoogleReCaptchaProvider} from "react-google-recaptcha-v3";
 
 import {
     WebSiteComponent,
     AdminAreaComponent,
+
     NotFoundPageComponent,
     ForbiddenPageComponent,
+
     LoginComponent,
     ForgotComponent,
     LogoutComponent,
     SignUpComponent,
     ActivationComponent,
     ResetPasswordComponent,
+
     DashboardComponent,
     GraphComponent,
     OverViewComponent,
     ProfileComponent,
+
     SettingComponent,
     SettingListComponent,
     SettingAddComponent,
     SettingEditComponent,
     SettingDetailComponent,
+
     UserComponent,
     UserListComponent,
     UserAddComponent,
     UserEditComponent,
     UserDetailComponent,
+
     GroupComponent,
     GroupListComponent,
     GroupAddComponent,
     GroupEditComponent,
     GroupDetailComponent,
+
     PermissionComponent,
     PermissionListComponent,
     PermissionAddComponent,
     PermissionEditComponent,
     PermissionDetailComponent,
-   PermissionGroupComponent,
+
+    PermissionGroupComponent,
     PermissionGroupListComponent,
     PermissionGroupAddComponent,
     PermissionGroupEditComponent,
     PermissionGroupDetailComponent,
+
     PermissionUserComponent,
     PermissionUserListComponent,
     PermissionUserAddComponent,
     PermissionUserEditComponent,
     PermissionUserDetailComponent,
+    HomeMainComponent,
+
 } from './route.index'
+
+function one() {
+    return (<h1>ss</h1>);
+}
 
 class App extends Component<IPropsCommon, IStateCommon> {
 
-    constructor(props: IPropsCommon | Readonly<IPropsCommon> ) {
+    spinner: any
+    target: any;
+    SpinOpts = {
+        lines: 15, // The number of lines to draw
+        length: 0, // The length of each line
+        width: 17, // The line thickness
+        radius: 45, // The radius of the inner circle
+        scale: 1, // Scales overall size of the spinner
+        corners: 1, // Corner roundness (0..1)
+        speed: 1, // Rounds per second
+        rotate: 0, // The rotation offset
+        animation: 'spinner-line-shrink', // The CSS animation name for the lines
+        direction: 1, // 1: clockwise, -1: counterclockwise
+        color: '#ffffff', // CSS color or array of colors
+        fadeColor: 'transparent', // CSS color or array of colors
+        top: '50%', // Top position relative to parent
+        left: '50%', // Left position relative to parent
+        shadow: '0 0 1px transparent', // Box-shadow for the lines
+        zIndex: 2000000000, // The z-index (defaults to 2e9)
+        className: 'spinner', // The CSS class to assign to the spinner
+        position: 'absolute', // Element positioning
+    };
+
+    constructor(props: IPropsCommon | Readonly<IPropsCommon>) {
         super(props);
 
     }
 
-    componentDidUpdate(prevProps: Readonly<{}>, prevState: Readonly<{}>, snapshot?: any) {
-            callSelect();
+    componentDidMount() {
+
+        this.target = document.getElementById('spinner');
+        this.spinner = new Spinner(this.SpinOpts);
 
     }
 
+    componentDidUpdate(prevProps: Readonly<{}>, prevState: Readonly<{}>, snapshot?: any) {
+
+        this.props.spinner ? this.spinner.spin(this.target) : this.spinner.stop();
+        callSelect();
+    }
 
     render() {
         return (
@@ -77,11 +125,24 @@ class App extends Component<IPropsCommon, IStateCommon> {
                 <Routes>
                     <Route path="home" element={<WebSiteComponent/>}>
                         <Route path="sign-in" element={<LoginComponent/>}/>
-                        <Route path="forgot" element={<ForgotComponent/>}/>
+                        <Route path="forgot" element={
+                            <GoogleReCaptchaProvider reCaptchaKey={environment.captcha.siteKey}>
+                                <ForgotComponent/>
+                            </GoogleReCaptchaProvider>
+                        }/>
                         <Route path="sign-out" element={<LogoutComponent/>}/>
-                        <Route path="sign-up" element={<SignUpComponent/>}/>
+
+                        <Route path="sign-up" element={
+                            <GoogleReCaptchaProvider reCaptchaKey={environment.captcha.siteKey}>
+                                <SignUpComponent/>
+                            </GoogleReCaptchaProvider>
+                        }/>
+
                         <Route path="activation" element={<ActivationComponent/>}/>
                         <Route path="reset-password" element={<ResetPasswordComponent/>}/>
+
+                        <Route path="main" element={<HomeMainComponent/>}/>
+
                     </Route>
 
                     <Route path="admin" element={<AdminAreaComponent/>}>
@@ -131,16 +192,34 @@ class App extends Component<IPropsCommon, IStateCommon> {
                                 <Route path="edit/:id" element={<PermissionUserEditComponent/>}/>
                                 <Route path="detail/:id" element={<PermissionUserDetailComponent/>}/>
                             </Route>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                         </Route>
                     </Route>
 
+                    <Route path="/" element={<IndexComponent/>}></Route>
                     <Route path="404" element={<NotFoundPageComponent/>}></Route>
                     <Route path="403" element={<ForbiddenPageComponent/>}></Route>
-                    <Route path="*"    element={<NotFoundPageComponent/>}></Route>
+                    <Route path="*" element={<NotFoundPageComponent/>}></Route>
                 </Routes>
-
-                <div className='fixedButton'>
-                    <FadeLoader height={25} width={3}  speedMultiplier={4} loading={this.props.spinner} cssOverride={{display: "block"}}/>
+                <div className={` ${this.props.spinner ? "preloader" : ""} `}>
+                    <div id="spinner">
+                    </div>
                 </div>
 
                 <Outlet/>
@@ -150,10 +229,13 @@ class App extends Component<IPropsCommon, IStateCommon> {
     }
 }
 
-const mapStateToProps = (state:  IReduxState) => {
+
+const mapStateToProps = (state: IReduxState) => {
     return {spinner: state.spinner}
 }
-const mapDispatchToProps = (dispatch:IReduxDispatch) => {
+const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {}
 }
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(App));
+
+

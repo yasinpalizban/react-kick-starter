@@ -1,5 +1,12 @@
 {
   "filed": {
+    "icon": "Icon",
+    "plan": "Plan",
+    "groupId": "Group",
+    "stateId": "State",
+    "tagId": "Tag",
+    "salary": "Salary",
+    "contract": "Contract",
     "foodOrder": "Food Order",
     "roomNumber": "Room Number",
     "day": "Day",
@@ -316,17 +323,11 @@
       "permissions": " Permissions",
       "permissionUsers": " Users Permissions",
       "permissionGroups": " Groups Permissions",
-      "product": "Food",
-      "fastFoodPost": " Food Posts",
-      "order": "Orders",
-      "fastFoodOrder": " Food Orders",
-      "fastFoodTransaction": " Food Transaction",
-      "myActivity": "My Activity",
-      "room": "Room",
-      "hotelPost": "Room Posts",
-      "hotelOrder": "Room Orders",
-      "hotelTransaction": "Room Transaction",
-      "food": "Foods"
+      "myActivity": " My Activity",
+      "jobPost": " Job Post",
+      "jobPrice": " Job Price",
+      "jobBalance": " Job Balance",
+      "jobTransaction": " Job Transaction"
     },
     "footer": {
       "passage": "Copyright © 2021 cooladmin. All rights reserved. Template by",
@@ -355,10 +356,8 @@
     "lastWeek": "Week",
     "lastMonth": "Month",
     "chartData": "Chart Data",
-    "hotelPost": "Hotel Post",
-    "hotelOrder": "Hotel Order",
-    "foodPost": "Food Post",
-    "foodOrder": "Food Order"
+    "jobApply": "Job Apply",
+    "jobPost": "Job Post"
   },
   "request": {
     "category": {
@@ -398,200 +397,132 @@
     "edit": "Edit Group Permission",
     "table": "Groups Permissions Table"
   },
-  "fastFood": {
+  "job": {
     "category": {
-      "new": "New  Food Category",
-      "detail": "Fast  Category Detail",
-      "edit": "Edit  Food Category",
-      "table": " Food Categories Table"
+      "new": "New Job Category",
+      "detail": "Job Category Detail",
+      "edit": "Edit Job Category",
+      "table": "Job Categories Table"
+    },
+    "subCategory": {
+      "new": "New Job Sub Category",
+      "detail": "Job Sub Category Detail",
+      "edit": "Edit Job Sub Category",
+      "table": "Job Sub Categories Table"
+    },
+    "state": {
+      "new": "New Job State",
+      "detail": "Job State Detail",
+      "edit": "Edit Job State",
+      "table": "Job States Table"
     },
     "post": {
-      "new": "New Food Post",
-      "detail": " Food Post Detail",
-      "edit": "Edit  Food Post ",
-      "table": " Food Posts Table",
+      "new": "New Job Post",
+      "detail": "Job Post Detail",
+      "edit": "Edit Job Post ",
+      "table": "Job Posts Table",
       "list": "List Media",
-      "select": "Select Image",
-      "copy": "Copy Link",
-      "file": "File :",
+      "apply": "apply",
       "category": "Category",
-      "upload": "Upload File",
-      "comment": "Comments"
+      "subCategory": "Sub Category",
+      "state": "State",
+      "applyCount": "Apply Count"
     },
-    "comment": {
-      "new": "New  Food Comment",
-      "detail": " Food Comment Detail",
-      "edit": "Edit  Food Comment ",
-      "table": " Food Comment Table",
-      "comments": "Comments",
-      "newsPost": " Food Post"
+    "apply": {
+      "new": "New Job Apply",
+      "detail": "Job Apply Detail",
+      "edit": "Edit Job Apply ",
+      "table": "Job Apply Table"
     },
-    "order": {
-      "new": "New  Food Order",
-      "detail": " Food Order Detail",
-      "edit": "Edit  Food Order",
-      "table": " Food  Orders Table",
-      "orderConfirmation": "Order Confirmation"
+    "balance": {
+      "new": "New Job Order",
+      "detail": "Job Order Detail",
+      "edit": "Edit Job Order",
+      "table": "Job  Balance Table",
+      "orderConfirmation": "Order Confirmation",
+      "cancel": "Cancel Order",
+      "pay": "Pay Order"
     },
     "transaction": {
-      "new": "New  Food Transaction",
-      "detail": " Food Transaction Detail",
-      "edit": "Edit  Food Transaction",
-      "table": "Food  Transactions Table"
+      "new": "New Job Transaction",
+      "detail": "Job Transaction Detail",
+      "edit": "Edit Job Transaction",
+      "table": "Job  Transactions Table"
+    },
+    "activity": {
+      "list": "My Activity Detail",
+      "buy": "buy Balance",
+      "buyIt": "Buy It",
+      "total": "Total",
+      "name": "Name"
+    },
+    "price": {
+      "new": "New Job Price",
+      "detail": "Job Price Detail",
+      "edit": "Edit Job Price",
+      "table": "Job Price Table"
     }
-  },"hotel": {
-  "category": {
-    "new": "New Hotel Category",
-    "detail": "Hotel Category Detail",
-    "edit": "Edit Hotel Category",
-    "table": "Hotel Categories Table"
   },
-  "post": {
-    "new": "New Hotel Post",
-    "detail": "Hotel Post Detail",
-    "edit": "Edit Hotel Post ",
-    "table": "Hotel Posts Table",
-    "list": "List Media",
-    "select": "Select Image",
-    "copy": "Copy Link",
-    "file": "File :",
-    "category": "Category",
-    "upload": "Upload File",
-    "comment": "Comments"
-  },
-  "comment": {
-    "new": "New Hotel Comment",
-    "detail": "Hotel Comment Detail",
-    "edit": "Edit Hotel Comment ",
-    "table": "Hotel Comment Table",
-    "comments": "Comments",
-    "newsPost": "Hotel Post"
-  },
-  "order": {
-    "new": "New Hotel Order",
-    "detail": "Hotel Order Detail",
-    "edit": "Edit Hotel Order",
-    "table": "Hotel  Orders Table",
-    "orderConfirmation": "Order Confirmation",
-    "food": "Order food",
-    "cancel": "Cancel Order",
-    "payFood": "Pay Food Order"
-  },
-  "transaction": {
-    "new": "New Hotel Transaction",
-    "detail": "Hotel Transaction Detail",
-    "edit": "Edit Hotel Transaction",
-    "table": "Hotel  Transactions Table"
-  }
-},
   "error": {
     "selectDate": "Please select date",
     "pleaseSignIn": "Please Sign in , before purchase order ",
     "orderCancel": "Order is cancelled ",
     "orderError": "Order got error ",
-    "selectFile": "Select file please"
+    "selectFile": "Select file please",
+    "editorCanNoBeEmpty": "Text editor Body Can not be empty",
+    "youAreNotSignIn": "You Are Not Sign In",
+    "youAlreadyApply": "You Already Apply"
   },
   "website": {
     "link": {
       "home": "Home",
-      "course": "course",
       "blog": "Blog",
       "contact": "Contact",
       "signIn": "Sign In",
       "signUp": "Sign Up",
       "about": "About Us",
       "price": "Pricing",
-      "music": "Music",
-      "room": "Room",
-      "restaurant": "Restaurant"
-    },
-    "home": {
-      "recentEvent": "Recent Event",
-      "weeklyTop": "weekly top 10",
-      "singer": "Star Singer",
-      "blog": "Blog Music",
-      "lastMusic": "Last Music",
-      "songTitle": "Song Title",
-      "singerArtist": "Singer",
-      "createdAt": "Created At",
-      "language": "Change language",
-      "photo": "Photo",
-      "recentBlog": "Recent Blog",
-      "ourRoom": "Our Room",
-      "frontDesk": "25/7 Front Desk",
-      "frontDeskNote": "A small river named Duden flows by their place and supplies",
-      "restaurantBar": "Restaurant Bar",
-      "restaurantBarNote": "A small river named Duden flows by their place and supplies",
-      "transferServices": "Transfer Services",
-      "transferServicesNote": "A small river named Duden flows by their place and supplies",
-      "spaSuites": "Spa Suites",
-      "spaSuitesNote": "A small river named Duden flows by their place and supplies",
-   "wellComeI": "Welcome to Deluxe Hotel",
-   "wellComeII": "Welcome To Our Hotel",
-   "wellComeNoteI": "On her way she met a copy. The copy warned the Little Blind Text, that where it came from it would have been rewritten a thousand times and everything that was left from its origin would be the word \"and\" and the Little Blind Text should turn around and return to its own, safe country. But nothing the copy said could convince her and so it didn’t take long until a few insidious Copy Writers ambushed her, made her drunk with Longe and Parole and dragged her into their agency, where they abused her for their.",
-      "wellComeNoteII": "When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet Village and the subline of her own road, the Line Lane. Pityful a rethoric question ran over her cheek, then she continued her way.",
-      "perNight": "per night",
-        "viewRoomDetail": "Rent it"
+      "job": "job"
     },
     "other": {
-
-      "ourMenu": "Our Menu",
-      "ourRestaurant": "Our Restaurants",
-      "weAreFood": "We Are Food Lover",
-      "weAreFoodNote": "On her way she met a copy. The copy warned the Little Blind Text, that where it came from it would have been rewritten a thousand times and everything that was left from its origin would be the word \"and\" and the Little Blind Text should turn around and return to its own, safe country.",
+      "apply": "Apply",
+      "tag": "Tags",
+      "content": "Content",
+      "uploadResume": "Upload Your Resume",
+      "year": "year",
+      "quoteTitleI": "Lorem Ipsum",
+      "quoteTitleII": "Dorm Ipsum",
+      "quoteTitleIII": "Vappa Ipsum",
+      "quoteBody":"Voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident",
+      "job": "Job",
+      "buy": "Buy It",
+      "overBlog": "Our Blog",
+       "findYourDream": "Find Your Dream Job" ,
       "search": "Search",
-      "singers": "Singers",
+      "pricing": "Pricing",
       "comments": "Comments",
-      "trendingSongs": "Trending Songs",
-      "miraculousMusic": "Miraculous Music Station",
       "followUs": "Follow Us",
-      "downloadOurApp": "Download our App",
-      "goMobile": "Go Mobile with our app.\n Listen to your favourite songs at just one click. Download Now !",
       "siteMap": "Site Map",
-      "orderRegister": "Order register Successfully, your receipt ",
-      "quickView": "Quick View",
-      "added": "Added",
-      "shoppingCart": "Shopping Cart",
-      "addToCart": "Add to Cart",
       "contact": "Contact Us",
       "contactSent": "Contact Send it to admin",
       "blog": "Blog",
-      "course": "Course",
-      "ourFeature": "Our Feature",
-      "blogPost": "Blog Posts",
+      "blogDetail": "Blog Detail",
       "leaveMessage": "Leave A Message Here",
       "detail": "Contact Details",
       "message": "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
       "checkOut": "Checkout",
-      "shippingDetails": "SHIPPING DETAILS",
-      "messageShipping": "BBootstrap Team Vasant Vihar 110020 New Delhi India",
-      "paymentDetails": "PAYMENT DETAILS",
-      "purchase": "PURCHASE",
-      "yourOrder": "YOUR ORDER",
-      "editShopping": "EDIT SHOPPING BAG",
-      "subtotal": "Subtotal",
-      "shipping": "Shipping",
-      "total": "Total",
-      "item": "Item",
-      "leaveComment": "Leave A Comment",
-      "changeLanguage": "Change Language",
       "category": "Categories",
-      "courseFeatures": "Course Features",
-      "price": "Price",
-      "pricing": "Pricing",
-      "duration": "Duration",
-      "lesson": "Lessons",
-      "teacher": "Teacher",
-      "category2": "Category",
       "overView": "OverView",
-      "review": "Reviews",
-      "instructor": "Instructor",
-      "curriculum": "Curriculum",
-      "hour": "Hour",
-      "of": "Of",
-      "results": "Show",
-      "startCourse": "Start Course",
-      "share": "Share"
+      "changeLanguage": "Change Language",
+      "callToAction": "Call To Action",
+      "count": "Count",
+      "callToActionMessage": " Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+      "lastJob": "Last job available",
+      "aboutUs": "About us",
+      "aboutUsMessage": "Dolor iure expedita id fuga asperiores qui sunt consequatur minima. Quidem voluptas deleniti. Sit quia molestiae quia quas qui magnam itaque veritatis dolores. Corrupti totam ut eius incidunt reiciendis veritatis asperiores placeat. ",
+      "aboutUsHeader": "Ullamco laboris nisi ut aliquip consequat",
+      "aboutUsFooter": "Magni facilis facilis repellendus cum excepturi quaerat praesentium libre trade"
+
     }
   }
 }

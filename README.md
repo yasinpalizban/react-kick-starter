@@ -1,10 +1,10 @@
-# React Typescript for Laravel 9 RestFull Api Kick Starter
+# React Typescript Kick Starter
 
-The front-end have been written by React Typescript Template , It's used for Laravel 9 RestFull Api Kick Starter, by using component such as BootStrap and many other thing .
+The front-end have been written by React Typescript by using component such as BootStrap and many other thing .
 
-> Attention: To speed up project development , I suggest that  see back-end application with Laravel 9 ,It's  fully compatible with this project
+> Attention: To speed up project development , I suggest that  see back-end application with Laravel  ,It's  fully compatible with this project
 > </br> here is link : </br>
-> https://github.com/yasinpalizban/laravel-restful-api-kick-starter
+> https://github.com/yasinpalizban/laravel-kick-starter
 
 ### Run Application And Build
 

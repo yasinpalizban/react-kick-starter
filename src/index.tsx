@@ -1,13 +1,14 @@
 import React from 'react';
 import ReactDOM from "react-dom/client";
 import {BrowserRouter} from 'react-router-dom';
-import initStore from './app/shared/reducers/combine.reducer';
+import initStore from './app/reducers/combine.reducer';
 import {Provider} from "react-redux";
-import i18n from './app/shared/libraries/i18n';
+import i18n from './app/libraries/i18n';
 import {I18nextProvider} from 'react-i18next';
-import {AuthContextProvider} from './app/authentication/contexts/auth.context';
+import {AuthContextProvider} from './app/contexts/auth.context';
 import App from './app/App';
-import 'bootstrap/dist/css/bootstrap.min.css'
+import './assets/bootstrap/bootstrap.min.css'
+import './assets/bootstrap-icons/bootstrap-icons.css'
 import './style.scss';
 import './assets/theme/theme.css';
 // @ts-ignore
@@ -37,7 +38,8 @@ root.render(<React.StrictMode>
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 
-initStore.subscribe(() => {
-    console.log(initStore.getState());
-});
+// initStore.subscribe(() => {
+//     console.log(initStore.getState());
+// });
 export {initStore};
+
