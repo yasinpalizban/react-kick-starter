@@ -11,12 +11,13 @@ import {OverlayTrigger, Tooltip} from "react-bootstrap";
 import withRouter from "../../../utils/with.router";
 import {Formik, FieldArray, getIn, FormikState} from "formik";
 import {OperatorType} from "../../../enums/operator.enum";
-import {FunctionSearchType} from "../../../enums/function.search.enum";
+
 import {Modal} from 'react-bootstrap';
 import AlertComponent from "../../alert/alert.component";
 import {createSearchParams} from 'react-router-dom'
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsPermissionGroup, IStatePermissionGroup} from "../../../interfaces/permission.group.interface";
+import {convertSign} from "../../../utils/convert.sign";
 
 class SearchComponent extends Component <IPropsPermissionGroup,IStatePermissionGroup> {
     inputRef: React.RefObject<HTMLInputElement>;
@@ -25,7 +26,7 @@ class SearchComponent extends Component <IPropsPermissionGroup,IStatePermissionG
     private orderData: Array<{ id: string; text: string }>;
     private sortData: Array<{ id: string; text: string }>;
     private operators: string[];
-    private functions: [string, string][];
+
 
     constructor(props: IPropsPermissionGroup | Readonly<IPropsPermissionGroup>) {
         super(props);
@@ -34,7 +35,7 @@ class SearchComponent extends Component <IPropsPermissionGroup,IStatePermissionG
         this.state = {
             modalRef: false,
             initSearchFiled: {
-                _function: '',
+
                 _data: [{
                     _filed: '',
                     _sign: '',
@@ -76,7 +77,7 @@ class SearchComponent extends Component <IPropsPermissionGroup,IStatePermissionG
 
         this.operators = Object.values(OperatorType);
 
-        this.functions = Object.entries(FunctionSearchType);
+
 
 
     }
@@ -101,30 +102,15 @@ class SearchComponent extends Component <IPropsPermissionGroup,IStatePermissionG
     }
     onChangeDataTable = () => {
 
-        const search = {
-            fun: FunctionSearchType.Like,
-            sgn: '',
-            val: this.inputRef?.current?.value
-        };
-        //
-        const queryParam = new URLSearchParams();
-
-        if (this.sortValue != null) {
-            queryParam.append(this.sortValue, JSON.stringify(search));
-        }
-
-
-        const sreachParams: any = {
-            sort: this.sortValue,
-            order: this.orderValue,
-            q: queryParam,
-        }
-        const params = createSearchParams(sreachParams);
+        const queryParam= (this.inputRef?.current?.value)?  `&${this.sortValue}[lik]=${this.inputRef?.current?.value}`:'';
+        const params = createSearchParams();
+        params.set('sort',this.sortValue!);
+        params.set('order',this.orderValue!);
 
         this.props.navigate(
             {
                 pathname: "../list",
-                search: `?${params}`,
+                search: `?${params}`+queryParam,
             },
         );
 
@@ -139,37 +125,28 @@ class SearchComponent extends Component <IPropsPermissionGroup,IStatePermissionG
         this.props.navigate(path);
 
     }
-    onSubmitAdvanceSearch = async (values: { _data: string | any[]; _function: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<any>> | undefined) => void) => {
+    onSubmitAdvanceSearch = async (values: { _data: string | any[]; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<any>> | undefined) => void) => {
 
 
-        const queryParam = new URLSearchParams();
+        let queryParam: string ='';
 
         for (let i = 0; i < values._data.length; i++) {
-            const search = {
-                fun: values._function,
-                sgn: values._data[i]._sign,
-                val: values._data[i]._value,
-            };
-           queryParam.append(values._data[i]._filed, JSON.stringify(search));
+            let sign = convertSign(values._data[i]._sign);
+            queryParam+=`&${values._data[i]._filed}[${sign}]=${values._data[i]._value}`
         }
         this.setState({modalRef: false});
 
-
-        const searchParams:any={
-            page: 1,
-            sort: this.sortValue,
-            order: this.orderValue,
-            q: queryParam
-        }
-        const params = createSearchParams(searchParams);
+        const params = createSearchParams();
+        params.set('sort',this.sortValue!);
+        params.set('order',this.orderValue!);
+        params.set('page','1');
 
         this.props.navigate(
             {
                 pathname: "../list",
-                search: `?${params}`,
+                search: `?${params}`+queryParam,
             },
         );
-
 
     }
     onModalHide = () => {
@@ -195,9 +172,7 @@ class SearchComponent extends Component <IPropsPermissionGroup,IStatePermissionG
         const mode = event.currentTarget.getAttribute('data-mode');
         const index = event.currentTarget.getAttribute('data-index');
         const newState: any = Object.assign({}, this.state);
-        if (mode === 'function') {
-            newState.initSearchFiled!._function = value;
-        } else if (mode === 'sign') {
+         if (mode === 'sign') {
             newState.initSearchFiled!._data[index]._sign = value;
 
         } else if (mode === 'filed') {
@@ -349,8 +324,7 @@ class SearchComponent extends Component <IPropsPermissionGroup,IStatePermissionG
                         initialValues={this.state.initSearchFiled!}
                         enableReinitialize={true}
                         validationSchema={Yup.object().shape({
-                            _function: Yup.string()
-                                .required('required'),
+
                             _data: Yup.array().of(Yup.object().shape({
                                 _filed: Yup.string()
                                     .required('required'),
@@ -413,41 +387,6 @@ class SearchComponent extends Component <IPropsPermissionGroup,IStatePermissionG
 
                                         <div className="form-group">
                                             <AlertComponent/>
-                                        </div>
-
-                                        <div className="form-group">
-                                            <div className="input-group">
-                                                <div className="input-group-addon"><Trans
-                                                    i18nKey="common.function"></Trans></div>
-                                                <select
-                                                    id="_function"
-                                                    name="_function"
-                                                    data-mode="function"
-                                                    onChange={this.onChangeData}
-                                                    className={`form-control ${(touched._function && errors._function) ? "is-invalid" : ""} `}>
-
-                                                    {
-                                                        this.functions.map((funs, i) => {
-                                                            return (<option key={i} value={funs[0]}>{funs[1]}</option>)
-                                                        })
-                                                    }
-
-
-                                                </select>
-                                                <div className="input-group-addon">
-                                                    <FontAwesomeIcon icon={faAsterisk}/>
-                                                </div>
-                                                <div className="invalid-feedback ">
-
-                                                    {
-                                                        errors._function === 'required' ?
-                                                            <div className="pull-right"><Trans
-                                                                i18nKey="common.required"></Trans>
-                                                            </div> : ''
-                                                    }
-                                                </div>
-
-                                            </div>
                                         </div>
 
 

@@ -16,7 +16,6 @@ import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interf
 import {IPropsCommon} from "../../../interfaces/props.common.interface";
 import {IPropsPermissionUser, IStatePermissionUser} from "../../../interfaces/permission.user.interface";
 import {ISearch} from "../../../interfaces/search.interface";
-import {FunctionSearchType} from "../../../enums/function.search.enum";
 import {RoleType} from "../../../enums/role.enum";
 import * as groupActions from "../../../actions/group.actions";
 
@@ -39,18 +38,8 @@ class EditComponent extends Component <IPropsPermissionUser, IStatePermissionUse
 
         this.editId = +this.props.params.id;
         await this.props._query(this.editId);
-        const search: ISearch = {
-            fun: FunctionSearchType.Where,
-            sgn: '!=',
-            val: RoleType.Member
-        };
 
-        const queryParam = new URLSearchParams();
-        queryParam.append('name', JSON.stringify(search));
-        const params: any = {
-            q: queryParam
-        };
-        await this.props._groupQuery(params);
+        await this.props._groupQuery(null);
         await this.props._userQuery(null);
         await this.props._permissionQuery({limit: 20});
 
@@ -121,19 +110,8 @@ class EditComponent extends Component <IPropsPermissionUser, IStatePermissionUse
     }
     onChangeGroup=async (event: any)=>{
         const value = event.currentTarget.value;
-        const queryParam = new URLSearchParams();
-        const searchRule = {
-            fun: FunctionSearchType.Where,
-            sgn: '=',
-            jin: 'auth_groups',
-            val: value
-        };
-
-        queryParam.append('name', JSON.stringify(searchRule));
-        const query= {
-            q: queryParam
-        };
-        await this.props._userQuery(query);
+        const queryParam = `name[eq]=${value}`;
+        await this.props._userQuery(queryParam);
     }
     render() {
         const {permissionUserDetail, userRows, permissionRows, groupRows} = this.props;

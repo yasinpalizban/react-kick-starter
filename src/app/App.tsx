@@ -10,7 +10,7 @@ import {IStateCommon} from "./interfaces/state.common.interface";
 import {IReduxDispatch, IReduxState} from "./interfaces/redux.type.interface";
 import withRouter from "./utils/with.router";
 import {Spinner} from 'spin.js';
-import IndexComponent from "./components/index/index.component";
+import IndexComponent from "./components/home/index/index.component";
 import {environment} from "../environments/environment";
 import {GoogleReCaptchaProvider} from "react-google-recaptcha-v3";
 

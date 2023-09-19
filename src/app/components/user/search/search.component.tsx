@@ -11,15 +11,18 @@ import {OverlayTrigger, Tooltip} from "react-bootstrap";
 import withRouter from "../../../utils/with.router";
 import {Formik, FieldArray, getIn, FormikState} from "formik";
 import {OperatorType} from "../../../enums/operator.enum";
-import {FunctionSearchType} from "../../../enums/function.search.enum";
+
 import {Modal} from 'react-bootstrap';
 import AlertComponent from "../../alert/alert.component";
 import {createSearchParams} from 'react-router-dom'
 import {RoleType} from "../../../enums/role.enum";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsUser, IStateUser} from "../../../interfaces/user.interface";
+import {convertSign} from "../../../utils/convert.sign";
+import * as groupActions from "../../../actions/group.actions";
+import it from "node:test";
 
-class SearchComponent extends Component <IPropsUser,IStateUser> {
+class SearchComponent extends Component <IPropsUser, IStateUser> {
     inputRef: React.RefObject<HTMLInputElement>;
     private ruleValue: string | undefined;
     private sortValue: string | undefined;
@@ -28,7 +31,7 @@ class SearchComponent extends Component <IPropsUser,IStateUser> {
     private sortData: Array<{ id: string; text: string }>;
     private ruleData: Array<{ id: string; text: string }>;
     private operators: string[];
-    private functions: [string, string][];
+
 
     constructor(props: IPropsUser | Readonly<IPropsUser>) {
         super(props);
@@ -37,7 +40,7 @@ class SearchComponent extends Component <IPropsUser,IStateUser> {
         this.state = {
             modalRef: false,
             initSearchFiled: {
-                _function: '',
+
                 _data: [{
                     _filed: '',
                     _sign: '',
@@ -83,31 +86,22 @@ class SearchComponent extends Component <IPropsUser,IStateUser> {
 
         ];
 
-        this.ruleData = [{
-            id: RoleType.Admin,
-            text: RoleType.Admin.charAt(0).toUpperCase() + RoleType.Admin.substring(1)
-        }, {
-            id: RoleType.Coworker,
-            text: RoleType.Coworker.charAt(0).toUpperCase() + RoleType.Coworker.substring(1)
-        },
-            {
-                id: RoleType.Blogger,
-                text: RoleType.Blogger.charAt(0).toUpperCase() + RoleType.Blogger.substring(1)
-            },
-            {
-                id: RoleType.Member,
-                text: RoleType.Member.charAt(0).toUpperCase() + RoleType.Member.substring(1)
-            }];
+        this.ruleData = [];
 
         this.operators = Object.values(OperatorType);
-
-        this.functions = Object.entries(FunctionSearchType);
 
 
     }
 
-    componentDidMount() {
+    async componentDidMount() {
 
+        await this.props._groupQuery({limit: 10});
+        this.props?.groupRows?.data?.map((item) => {
+            this.ruleData.push({
+                id: item.id.toString(),
+                text: item.name.charAt(0).toUpperCase() + item.name.substring(1)
+            });
+        });
     }
 
 
@@ -130,43 +124,25 @@ class SearchComponent extends Component <IPropsUser,IStateUser> {
         this.onChangeDataTable();
     }
     onChangeDataTable = () => {
-        const searchRule = {
-            fun: FunctionSearchType.Where,
-            sgn: '=',
-            jin: 'auth_groups',
-            val: this.ruleValue
-        };
-        //
-        const queryParam = new URLSearchParams();
-        queryParam.append('name', JSON.stringify(searchRule));
-        const search = {
-            fun: FunctionSearchType.Like,
-            sgn: '',
-            val: this.inputRef?.current?.value
-        };
 
-        if (this.inputRef?.current?.value != null) {
-            queryParam.append(this.sortValue!, JSON.stringify(search));
+        const queryParam = (this.inputRef?.current?.value) ? `&${this.sortValue}[lik]=${this.inputRef?.current?.value}` : '';
+        const params = createSearchParams();
+        params.set('sort', this.sortValue!);
+        params.set('order', this.orderValue!);
+        if (this.ruleValue) {
+            params.set('foreignKey', this.ruleValue);
         }
-
-
-        const searchParams: any = {
-            sort: this.sortValue,
-            order: this.orderValue,
-            q: queryParam,
-        }
-        const params = createSearchParams(searchParams);
 
         this.props.navigate(
             {
                 pathname: "../list",
-                search: `?${params}`,
+                search: `?${params}` + queryParam,
             },
         );
 
     }
 
-    onHandleSubmit = async (values: {  key: string|any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<any>> | undefined) => void) => {
+    onHandleSubmit = async (values: { key: string | any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<any>> | undefined) => void) => {
         this.onChangeDataTable();
     }
     onNewItem = () => {
@@ -175,33 +151,26 @@ class SearchComponent extends Component <IPropsUser,IStateUser> {
         this.props.navigate(path);
 
     }
-    onSubmitAdvanceSearch = async (values: { _data: string | any[]; _function: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<any>> | undefined) => void) => {
+    onSubmitAdvanceSearch = async (values: { _data: string | any[]; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<any>> | undefined) => void) => {
 
 
-        const queryParam = new URLSearchParams();
+        let queryParam: string = '';
 
         for (let i = 0; i < values._data.length; i++) {
-            const search = {
-                fun: values._function,
-                sgn: values._data[i]._sign,
-                val: values._data[i]._value,
-            };
-           queryParam.append(values._data[i]._filed, JSON.stringify(search));
+            let sign = convertSign(values._data[i]._sign);
+            queryParam += `&${values._data[i]._filed}[${sign}]=${values._data[i]._value}`
         }
         this.setState({modalRef: false});
 
-        const searchParams:any={
-            page: 1,
-                sort: this.sortValue,
-            order: this.orderValue,
-            q: queryParam
-        }
-        const params = createSearchParams(searchParams);
+        const params = createSearchParams();
+        params.set('sort', this.sortValue!);
+        params.set('order', this.orderValue!);
+        params.set('page', '1');
 
         this.props.navigate(
             {
                 pathname: "../list",
-                search: `?${params}`,
+                search: `?${params}` + queryParam,
             },
         );
 
@@ -219,20 +188,18 @@ class SearchComponent extends Component <IPropsUser,IStateUser> {
         });
         this.setState(newState);
     }
-    onRemoveField = (event:any) => {
+    onRemoveField = (event: any) => {
         const index = event.currentTarget.getAttribute('data-value');
         const newState = Object.assign({}, this.state);
         newState.initSearchFiled!._data.splice(index, 1);
         this.setState(newState);
     }
-    onChangeData = (event:any) => {
+    onChangeData = (event: any) => {
         const value = event.target.value;
         const mode = event.currentTarget.getAttribute('data-mode');
         const index = event.currentTarget.getAttribute('data-index');
         const newState = Object.assign({}, this.state);
-        if (mode === 'function') {
-            newState.initSearchFiled!._function = value;
-        } else if (mode === 'sign') {
+        if (mode === 'sign') {
             newState.initSearchFiled!._data[index]._sign = value;
 
         } else if (mode === 'filed') {
@@ -395,8 +362,6 @@ class SearchComponent extends Component <IPropsUser,IStateUser> {
                         initialValues={this.state.initSearchFiled!}
                         enableReinitialize={true}
                         validationSchema={Yup.object().shape({
-                            _function: Yup.string()
-                                .required('required'),
                             _data: Yup.array().of(Yup.object().shape({
                                 _filed: Yup.string()
                                     .required('required'),
@@ -461,44 +426,12 @@ class SearchComponent extends Component <IPropsUser,IStateUser> {
                                             <AlertComponent/>
                                         </div>
 
-                                        <div className="form-group">
-                                            <div className="input-group">
-                                                <div className="input-group-addon"><Trans
-                                                    i18nKey="common.function"></Trans></div>
-                                                <select
-                                                    id="_function"
-                                                    name="_function"
-                                                    data-mode="function"
-                                                    onChange={this.onChangeData}
-                                                    className={`form-control ${(touched._function && errors._function) ? "is-invalid" : ""} `}>
-
-                                                    {
-                                                        this.functions.map((funs, i) => {
-                                                            return (<option key={i} value={funs[0]}>{funs[1]}</option>)
-                                                        })
-                                                    }
-
-
-                                                </select>
-                                                <div className="input-group-addon">
-                                                    <FontAwesomeIcon icon={faAsterisk}/>
-                                                </div>
-                                                <div className="invalid-feedback ">
-
-                                                    {
-                                                        errors._function === 'required' ?
-                                                            <div className="pull-right"><Trans
-                                                                i18nKey="common.required"></Trans>
-                                                            </div> : ''
-                                                    }
-                                                </div>
-
-                                            </div>
-                                        </div>
-
 
                                         <FieldArray name="_data">
-                                            {({push, remove}) => this.state.initSearchFiled!._data.map((p:any, i:number) => {
+                                            {({
+                                                  push,
+                                                  remove
+                                              }) => this.state.initSearchFiled!._data.map((p: any, i: number) => {
                                                 const sign = `_data[${i}]._sign`;
                                                 const touchedSign = getIn(touched, sign);
                                                 const errorSign = getIn(errors, sign);
@@ -672,11 +605,16 @@ class SearchComponent extends Component <IPropsUser,IStateUser> {
 }
 
 
-const mapStateToProps = (state:IReduxState) => {
-    return {}
+const mapStateToProps = (state: IReduxState) => {
+    return {
+        groupRows: state.group
+    }
 }
-const mapDispatchToProps = (dispatch:IReduxDispatch) => {
-    return {}
+const mapDispatchToProps = (dispatch: IReduxDispatch) => {
+    return {
+        _groupQuery: (argument: string | number | object | null) => groupActions.query(argument, dispatch),
+
+    }
 }
 
 

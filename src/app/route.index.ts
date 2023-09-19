@@ -55,4 +55,4 @@ export {default as PermissionUserEditComponent} from "./components/permission-us
 export {default as PermissionUserDetailComponent} from "./components/permission-user/detail/detail.component";
 
 
-export {default as HomeMainComponent} from "./components/home/home.component";
+export {default as HomeMainComponent} from "./components/home/main/home.component";

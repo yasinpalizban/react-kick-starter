@@ -2,11 +2,11 @@ import React, {Component} from 'react';
 import './home.component.scss';
 import {withTranslation} from "react-i18next";
 import {connect} from "react-redux";
-import withRouter from "../../utils/with.router";
-import {IReduxDispatch, IReduxState} from "../../interfaces/redux.type.interface";
-import {IPropsHome, IStateHome} from "../../interfaces/home.interface";
-import { settingList} from '../../actions/home.actions';
-import {environment} from "../../../environments/environment";
+import withRouter from "../../../utils/with.router";
+import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
+import {IPropsHome, IStateHome} from "../../../interfaces/home.interface";
+import { settingList} from '../../../actions/home.actions';
+import {environment} from "../../../../environments/environment";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faLanguage, faTimeline, faDesktop} from "@fortawesome/free-solid-svg-icons";
 

@@ -9,7 +9,7 @@ export interface IStateCommon {
     title?: string;
 
     initSearchFiled?: {
-        _function: string,
+
         _data: [{
             _filed: string,
             _sign: string,

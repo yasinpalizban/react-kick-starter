@@ -14,7 +14,6 @@ import ReactPaginate from 'react-paginate';
 import {createSearchParams} from "react-router-dom";
 import {newQueryArgument} from "../../../actions/query.argument.actions";
 import queryString from "query-string";
-import {FunctionSearchType} from "../../../enums/function.search.enum";
 import {RoleType} from "../../../enums/role.enum";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsUser, IStateUser} from "../../../interfaces/user.interface";
@@ -34,21 +33,11 @@ class ListComponent extends Component <IPropsUser,IStateUser> {
     }
 
     async componentDidMount() {
-        const queryParam = new URLSearchParams();
-        const searchRule = {
-            fun: FunctionSearchType.Where,
-            sgn: '=',
-            jin: 'auth_groups',
-            val: RoleType.Member
-        };
-        queryParam.append('name', JSON.stringify(searchRule));
-        const query= {
-            q: queryParam
-        };
+
         if (this.props.location.search) {
             await this.props._query(this.props.location.search);
         } else {
-            await this.props._query(query);
+            await this.props._query(null);
         }
 
 
