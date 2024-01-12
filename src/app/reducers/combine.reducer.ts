@@ -13,16 +13,17 @@ import {
     explodeLinkReducer
 } from "./header.reducer";
 import profileReducer from "./profile.reducer";
-import settingReducer from "./setting.reducer";
+import {settingReducer, settingSelectReducer} from "./setting.reducer";
 import overViewReducer from "./over.view.reducer";
 import graphReducer from "./graph.reducer";
-import groupReducer from "./group.reducer";
-import permissionReducer from "./permission.reducer";
-import permissionGroupReducer from "./permission.group.reducer";
-import permissionUserReducer from "./permission.user.reducer";
-import userReducer from "./user.reducer";
+import {groupReducer, groupSelectReducer} from "./group.reducer";
+import {permissionReducer, permissionSelectReducer} from "./permission.reducer";
+import {permissionGroupReducer, permissionGroupSelectReducer} from "./permission.group.reducer";
+import {permissionUserReducer, permissionUserSelectReducer} from "./permission.user.reducer";
+import {userReducer, userSelectReducer} from "./user.reducer";
 import shareIdReducer from "./share.id.reducer";
 import homeReducer from "./home.reducer";
+import toastReducer from "./toast.reducer";
 
 
 export default createStore(
@@ -32,19 +33,26 @@ export default createStore(
         notification: notificationReducer,
         explodeLink: explodeLinkReducer,
         alert: alertReducer,
+        toast: toastReducer,
         spinner: spinnerReducer,
         shareId: shareIdReducer,
         queryArgument: queryArgumentReducer,
         auth: authReducer,
         profile: profileReducer,
         setting: settingReducer,
+        settingSelect: settingSelectReducer,
         overView: overViewReducer,
         graph: graphReducer,
         group: groupReducer,
+        groupSelect: groupSelectReducer,
         permission: permissionReducer,
+        permissionSelect: permissionSelectReducer,
         permissionGroup: permissionGroupReducer,
+        permissionGroupSelect: permissionGroupSelectReducer,
         permissionUser: permissionUserReducer,
+        permissionUserSelect: permissionUserSelectReducer,
         user: userReducer,
+        userSelect: userSelectReducer,
         home: homeReducer
     }), applyMiddleware(thunk, reduxMiddleware)
 );

@@ -1,10 +1,12 @@
-import {GROUP_DELETE, GROUP_POST, GROUP_GET, GROUP_PUT} from "../actions/group.actions";
+import {GROUP_DELETE, GROUP_POST, GROUP_GET, GROUP_PUT, GROUP_SHOW} from "../actions/group.actions";
 import {IReduxAction} from "../interfaces/redux.type.interface";
 import {IGroup} from "../interfaces/group.interface";
+import {IResponseObject} from "../interfaces/iresponse.object";
+import {isEmpty} from "../utils/is.empty";
 
-const initialize:IGroup = {};
+const initialize: IResponseObject<IGroup[]> = {};
 
-export default function groupReducer(state = initialize, action:IReduxAction):IGroup {
+export function groupReducer(state = initialize, action: IReduxAction): IResponseObject<IGroup[]> {
     switch (action.type) {
         case GROUP_GET:
             return {
@@ -12,29 +14,27 @@ export default function groupReducer(state = initialize, action:IReduxAction):IG
                 ...action.payload
             }
         case GROUP_POST: {
-            const temp:any = [...state.data!, action.payload];
-            return {
-                ...state,
-                data: temp
-            }
+
+            const temp = isEmpty(state) || isEmpty(state.data!) ? [action.payload] : [...state?.data!, action.payload];
+            return {...state, data: temp}
+
         }
 
         case GROUP_PUT: {
-            const temp:any = state.data?.map((data:any) => {
+
+            const temp = state.data?.map((data) => {
                     if (data.id == action.payload.id) {
                         data = Object.assign({...data, ...action.payload})
                     }
                     return data;
                 }
             );
-            return {
-                ...state,
-                data: temp
-            }
+            return {...state, data: temp}
+
         }
         case
         GROUP_DELETE: {
-            const temp:any = state.data;
+            const temp: any = state.data;
             temp.splice(action.payload, 1);
             return {
                 ...state,
@@ -42,6 +42,19 @@ export default function groupReducer(state = initialize, action:IReduxAction):IG
             }
         }
 
+        default:
+            return state;
+    }
+}
+const initializeSelect: IResponseObject< IGroup> = {};
+
+export function groupSelectReducer(state = initializeSelect, action: IReduxAction): IResponseObject<IGroup> {
+    switch (action.type) {
+        case GROUP_SHOW:
+            return {
+                ...state,
+                ...action.payload
+            }
 
         default:
             return state;

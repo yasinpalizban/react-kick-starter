@@ -7,7 +7,7 @@ import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
 import {save} from "../../../actions/group.actions";
 import {connect} from "react-redux";
-import AlertComponent from '../../alert/alert.component';
+import AlertComponent from '../../../commons/alert/alert.component';
 import withRouter from "../../../utils/with.router";
 import { Group } from "../../../models/group.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";

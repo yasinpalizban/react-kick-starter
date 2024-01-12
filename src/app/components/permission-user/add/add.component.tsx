@@ -9,33 +9,25 @@ import {save} from "../../../actions/permission.user.actions";
 import * as  userActions from "../../../actions/user.actions";
 import * as permissionActions from "../../../actions/permission.actions";
 import {connect} from "react-redux";
-import AlertComponent from '../../alert/alert.component';
+import AlertComponent from '../../../commons/alert/alert.component';
 import withRouter from "../../../utils/with.router";
 import { PermissionUser } from "../../../models/permission.user.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsCommon} from "../../../interfaces/props.common.interface";
 import {IPropsPermissionUser, IStatePermissionUser} from "../../../interfaces/permission.user.interface";
 import * as groupActions from "../../../actions/group.actions";
-import {ISearch} from "../../../interfaces/search.interface";
-import {RoleType} from "../../../enums/role.enum";
-
 
 class AddComponent extends Component <IPropsPermissionUser, IStatePermissionUser> {
 
     constructor(props: IPropsPermissionUser | Readonly<IPropsPermissionUser>) {
         super(props);
-
     }
 
     async componentDidMount() {
-
-
-        await this.props._groupQuery(null);
-        await this.props._userQuery(null);
-        await this.props._permissionQuery({limit:20});
-
+        await this.props._groupRetrieve({limit:100});
+        await this.props._userRetrieve({limit:200});
+        await this.props._permissionRetrieve({limit:20});
     }
-
 
     handleSubmit = async (values: {  groupId: any;permissionId: any; userId: any; actions: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ groupId: string; permissionId: string; userId: string; actions: never[]; }>> | undefined) => void) => {
         let combineAction = '';
@@ -44,21 +36,19 @@ class AddComponent extends Component <IPropsPermissionUser, IStatePermissionUser
             permissionId: values.permissionId,
             userId: values.userId,
             actions: combineAction
-
         };
 
         const permissionUser = new PermissionUser(permission);
-
         await this.props._save(permissionUser, this.props);
 
     }
     onChangeGroup=async (event: any)=>{
         const value = event.currentTarget.value;
         const queryParam = `name[eq]=${value}`;
-        await this.props._userQuery(queryParam);
+        await this.props._userRetrieve(queryParam);
     }
     render() {
-        const {userRows, permissionRows, groupRows} = this.props;
+        const {userList, permissionList, groupList} = this.props;
 
         return (
             <Formik
@@ -97,7 +87,7 @@ class AddComponent extends Component <IPropsPermissionUser, IStatePermissionUser
                                         <option disabled selected
                                         >{this.props.t('common.selectInputMessage')}</option>
                                         {
-                                            groupRows?.data?.map((item, i: number) => <option
+                                            groupList?.data?.map((item, i: number) => <option
                                                 value={item.name}>{item.name} </option>)
                                         }
                                     </select>
@@ -126,7 +116,7 @@ class AddComponent extends Component <IPropsPermissionUser, IStatePermissionUser
                                         <option disabled selected
                                                 >{this.props.t('common.selectInputMessage')}</option>
                                         {
-                                            userRows?.data?.map((item, i:number) => <option
+                                            userList?.data?.map((item, i:number) => <option
                                                 value={item.id}>{item.username + ' (' + item.firstName + '  ' + item.lastName + ')'} </option>)
                                         }
                                     </select>
@@ -156,7 +146,7 @@ class AddComponent extends Component <IPropsPermissionUser, IStatePermissionUser
                                         <option disabled selected
                                                 >{this.props.t('common.selectInputMessage')}</option>
                                         {
-                                            permissionRows?.data?.map((item, i: number) => <option
+                                            permissionList?.data?.map((item, i: number) => <option
                                                 value={item.id}>{item.name} </option>)
                                         }
                                     </select>
@@ -252,17 +242,17 @@ class AddComponent extends Component <IPropsPermissionUser, IStatePermissionUser
 
 const mapStateToProps = (state: IReduxState) => {
     return {
-        userRows: state.user,
-        permissionRows: state.permission,
-        groupRows: state.group,
+        userList: state.user,
+        permissionList: state.permission,
+        groupList: state.group,
     }
 }
 const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
         _save: (permissionUser: PermissionUser, props: IPropsCommon) => save(permissionUser, props, dispatch),
-        _userQuery: (argument: number | string | object|null) => userActions.query(argument, dispatch),
-        _permissionQuery: (argument: number | string | object|null) => permissionActions.query(argument, dispatch),
-        _groupQuery: (argument: number | string | object|null) => groupActions.query(argument, dispatch),
+        _userRetrieve: (argument: number | string | object|null) => userActions.retrieve(argument, dispatch),
+        _permissionRetrieve: (argument: number | string | object|null) => permissionActions.retrieve(argument, dispatch),
+        _groupRetrieve: (argument: number | string | object|null) => groupActions.retrieve(argument, dispatch),
     }
 }
 

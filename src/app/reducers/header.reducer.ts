@@ -46,12 +46,8 @@ export function explodeLinkReducer(state = initializeExplodeLink, action: IRedux
 export function notificationReducer(state = initializeNewNotification, action: IReduxAction): Array<INotification> {
     switch (action.type) {
         case NOTIFICATION: {
-
-
             let flag = true;
-
             state?.map((notify) => {
-
                 if (notify.type == action.payload.type && notify.date == action.payload.date) {
                     flag = false;
                 } else if (notify.type == action.payload.type && notify.date != action.payload.date) {
@@ -65,17 +61,10 @@ export function notificationReducer(state = initializeNewNotification, action: I
             });
 
             if (!flag) {
-
                 return state;
 
             } else {
-
-                return [
-                    {
-                        ...action.payload
-                    },
-                    ...state,
-                ];
+                return [{...action.payload}, ...state];
             }
 
         }

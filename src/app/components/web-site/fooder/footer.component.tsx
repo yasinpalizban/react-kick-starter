@@ -80,16 +80,16 @@ class FooterComponent extends Component <IPropsHome, IStateHome> {
                             <div className="col-lg-2 col-6 footer-links">
                                 <h4>{this.props.t('website.other.siteMap')}</h4>
                                 <ul>
-                                    <li><a href="src/app/components/web-site/fooder/footer.component#" onClick={(event) => {
+                                    <li><a href="#" onClick={(event) => {
                                         this.props.navigate('/home/main')
                                     }} className="active">{this.props.t('website.link.home')}</a></li>
-                                    <li><a href="src/app/components/web-site/fooder/footer.component#" onClick={(event) => {
+                                    <li><a href="#" onClick={(event) => {
                                         this.props.navigate('/home/recruitment')
                                     }}>{this.props.t('website.link.job')}</a></li>
-                                    <li><a href="src/app/components/web-site/fooder/footer.component#" onClick={(event) => {
+                                    <li><a href="#" onClick={(event) => {
                                         this.props.navigate('/home/blog')
                                     }}>{this.props.t('website.link.blog')}</a></li>
-                                    <li><a href="src/app/components/web-site/fooder/footer.component#" onClick={(event) => {
+                                    <li><a href="#" onClick={(event) => {
                                         this.props.navigate('/home/contact-us')
                                     }}>{this.props.t('website.link.contact')}</a></li>
 
@@ -101,7 +101,7 @@ class FooterComponent extends Component <IPropsHome, IStateHome> {
                                 <h4></h4>
                                 <ul>
                                     <li></li>
-                                    <li><a href="src/app/components/web-site/fooder/footer.component#" onClick={(event) => {
+                                    <li><a href="#" onClick={(event) => {
                                         this.props.navigate('/home/sign-in')
                                     }}>{this.props.t('website.link.signIn')}</a></li>
                                     <li><a style={{cursor: "pointer"}}
@@ -126,7 +126,7 @@ class FooterComponent extends Component <IPropsHome, IStateHome> {
                     </div>
                 </footer>
 
-                <a href="src/app/components/web-site/fooder/footer.component#" className="scroll-top d-flex align-items-center justify-content-center"><i
+                <a href="#" className="scroll-top d-flex align-items-center justify-content-center"><i
                     className="bi bi-arrow-up-short"></i></a>
             </>
         );

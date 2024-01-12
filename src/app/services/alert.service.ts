@@ -1,7 +1,7 @@
 import {AlertType} from '../enums/alert.enum';
 import { newAlert, removeAlert} from "../actions/alert.actions";
 import {initStore} from "../../index";
-import {IAlert} from "../interfaces/alert.interface";
+import {IAlert} from "../interfaces/ialert";
 import {Alert} from "../models/alert.model";
 import {IReduxDispatch} from "../interfaces/redux.type.interface";
 

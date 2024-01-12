@@ -2,28 +2,25 @@ import React, {Component} from 'react';
 import './detail.component.scss';
 import {Trans, withTranslation} from "react-i18next";
 import moment from "moment";
-import {query} from "../../../actions/setting.actions";
+import {detail} from "../../../actions/setting.actions";
 import {connect} from "react-redux";
 import withRouter from '../../../utils/with.router';
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsSetting, IStateSetting} from "../../../interfaces/setting.interface";
 
 class DetailComponent extends Component <IPropsSetting, IStateSetting> {
-    id: number;
 
     constructor(props: IPropsSetting | Readonly<IPropsSetting>) {
         super(props);
-        this.id = 0;
     }
 
     async componentDidMount() {
-        this.id = +this.props.params.id;
-        await this.props._query(this.id);
+        await this.props._detail(+this.props.params.id);
     }
 
 
     render() {
-        const {settingDetail} = this.props;
+        const {setting} = this.props;
         return (
 
             <div className="table-responsive">
@@ -33,11 +30,11 @@ class DetailComponent extends Component <IPropsSetting, IStateSetting> {
                         <td>
                             <Trans i18nKey="filed.key"></Trans>
                         </td>
-                        <td>{settingDetail.data![0].key}</td>
+                        <td>{setting.data?.key}</td>
                     </tr>
                     <tr>
                         <td><Trans i18nKey="filed.value"></Trans></td>
-                        <td>{settingDetail.data![0].value}</td>
+                        <td>{setting.data?.value}</td>
                     </tr>
                     <tr>
                         <td>
@@ -46,7 +43,7 @@ class DetailComponent extends Component <IPropsSetting, IStateSetting> {
                         <td>
                             {
 
-                                settingDetail.data![0].status ?
+                                setting.data?.status ?
                                     <span className="status--process"><Trans
                                         i18nKey="filed.activate"></Trans>  </span> :
                                     <span className="status--denied"> <Trans i18nKey="filed.deActivate"></Trans> </span>
@@ -59,20 +56,20 @@ class DetailComponent extends Component <IPropsSetting, IStateSetting> {
                         <td>
                             <Trans i18nKey="filed.description"></Trans>
                         </td>
-                        <td>{settingDetail.data![0].description}</td>
+                        <td>{setting.data?.description}</td>
                     </tr>
 
                     <tr>
                         <td><Trans i18nKey="filed.create"></Trans>
                         </td>
-                        <td>{moment(settingDetail.data![0].createdAt).format('YYYY-MM-DD')}</td>
+                        <td>{moment(setting.data?.createdAt).format('YYYY-MM-DD')}</td>
                     </tr>
 
                     <tr>
                         <td>
                             <Trans i18nKey="filed.update"></Trans>
                         </td>
-                        <td>{moment(settingDetail.data![0].updatedAt).format('YYYY-MM-DD')}</td>
+                        <td>{moment(setting.data?.updatedAt).format('YYYY-MM-DD')}</td>
                     </tr>
                     </tbody>
                 </table>
@@ -86,12 +83,12 @@ class DetailComponent extends Component <IPropsSetting, IStateSetting> {
 
 const mapStateToProps = (state: IReduxState) => {
     return {
-        settingDetail: state.setting
+        setting: state.settingSelect
     }
 }
 const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
-        _query: (argument: string | number | object | null) => query(argument, dispatch),
+        _detail: (argument: number | null) => detail(argument, dispatch),
     }
 }
 

@@ -5,9 +5,9 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Trans, withTranslation} from "react-i18next";
 import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
-import {query, update} from "../../../actions/permission.user.actions";
+import {detail, update} from "../../../actions/permission.user.actions";
 import {connect} from "react-redux";
-import AlertComponent from '../../alert/alert.component';
+import AlertComponent from '../../../commons/alert/alert.component';
 import withRouter from "../../../utils/with.router";
 import * as  userActions from "../../../actions/user.actions";
 import * as permissionActions from "../../../actions/permission.actions";
@@ -15,12 +15,9 @@ import {PermissionUser} from "../../../models/permission.user.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsCommon} from "../../../interfaces/props.common.interface";
 import {IPropsPermissionUser, IStatePermissionUser} from "../../../interfaces/permission.user.interface";
-import {ISearch} from "../../../interfaces/search.interface";
-import {RoleType} from "../../../enums/role.enum";
 import * as groupActions from "../../../actions/group.actions";
 
 class EditComponent extends Component <IPropsPermissionUser, IStatePermissionUser> {
-    editId: number;
 
     constructor(props: IPropsPermissionUser | Readonly<IPropsPermissionUser>) {
         super(props);
@@ -31,19 +28,16 @@ class EditComponent extends Component <IPropsPermissionUser, IStatePermissionUse
             isPut: false,
             isCheck: false
         }
-        this.editId = 0;
     }
 
     async componentDidMount() {
+        await this.props._retrieve(+this.props.params.id);
 
-        this.editId = +this.props.params.id;
-        await this.props._query(this.editId);
+        await this.props._groupRetrieve({limit: 100});
+        await this.props._userRetrieve({limit: 200});
+        await this.props._permissionRetrieve({limit: 20});
 
-        await this.props._groupQuery(null);
-        await this.props._userQuery(null);
-        await this.props._permissionQuery({limit: 20});
-
-        this.props.permissionUserDetail.data![0].actions.split("-").forEach((value: string) => {
+        this.props.permissionUser.data?.actions.split("-").forEach((value: string) => {
 
             if (value === "get")
                 this.setState({isGet: true});
@@ -93,7 +87,7 @@ class EditComponent extends Component <IPropsPermissionUser, IStatePermissionUse
         if (this.state.isCheck) {
             combineAction = (this.state.isGet ? '-get' : '') + (this.state.isPost ? '-post' : '') + (this.state.isPut ? '-put' : '') + (this.state.isDelete ? '-delete' : '');
         } else {
-            combineAction = this.props.permissionUserDetail.data![0]?.actions;
+            combineAction = this.props.permissionUser.data?.actions!;
         }
 
         const permission = {
@@ -111,17 +105,17 @@ class EditComponent extends Component <IPropsPermissionUser, IStatePermissionUse
     onChangeGroup=async (event: any)=>{
         const value = event.currentTarget.value;
         const queryParam = `name[eq]=${value}`;
-        await this.props._userQuery(queryParam);
+        await this.props._userRetrieve(queryParam);
     }
     render() {
-        const {permissionUserDetail, userRows, permissionRows, groupRows} = this.props;
+        const {permissionUser, userList, permissionList, groupList} = this.props;
 
         return (
             <Formik
                 initialValues={{
                     groupId:'',
-                    permissionId: permissionUserDetail.data![0].permissionId,
-                    userId: permissionUserDetail.data![0].userId,
+                    permissionId: permissionUser.data?.permissionId,
+                    userId: permissionUser.data?.userId,
                     actions: [],
 
                 }}
@@ -153,7 +147,7 @@ class EditComponent extends Component <IPropsPermissionUser, IStatePermissionUse
                                         <option disabled selected
                                         >{this.props.t('common.selectInputMessage')}</option>
                                         {
-                                            groupRows?.data?.map((item, i: number) => <option
+                                            groupList?.data?.map((item, i: number) => <option
                                                 value={item.name}>{item.name} </option>)
                                         }
                                     </select>
@@ -182,7 +176,7 @@ class EditComponent extends Component <IPropsPermissionUser, IStatePermissionUse
                                         <option disabled selected
                                         >{this.props.t('common.selectInputMessage')}</option>
                                         {
-                                            userRows?.data?.map((item, i: number) => <option
+                                            userList?.data?.map((item, i: number) => <option
                                                 value={item.id}>{item.username + ' (' + item.firstName + '  ' + item.lastName + ')'} </option>)
                                         }
                                     </select>
@@ -212,7 +206,7 @@ class EditComponent extends Component <IPropsPermissionUser, IStatePermissionUse
                                         <option disabled selected
                                         >{this.props.t('common.selectInputMessage')}</option>
                                         {
-                                            permissionRows?.data?.map((item, i: number) => <option
+                                            permissionList?.data?.map((item, i: number) => <option
                                                 value={item.id}>{item.name} </option>)
                                         }
                                     </select>
@@ -311,20 +305,20 @@ class EditComponent extends Component <IPropsPermissionUser, IStatePermissionUse
 
 const mapStateToProps = (state: IReduxState) => {
     return {
-        permissionUserDetail: state.permissionUser,
-        userRows: state.user,
-        permissionRows: state.permission,
+        permissionUser: state.permissionUserSelect,
+        userList: state.user,
+        permissionList: state.permission,
         queryArgument: state.queryArgument,
-        groupRows:state.group
+        groupList:state.group
     }
 }
 const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
         _update: (permissionUser: PermissionUser, props: IPropsCommon) => update(permissionUser, props, dispatch),
-        _query: (argument: string | number | object | null) => query(argument, dispatch),
-        _userQuery: (argument: number | string | object | null) => userActions.query(argument, dispatch),
-        _permissionQuery: (argument: number | string | object | null) => permissionActions.query(argument, dispatch),
-        _groupQuery: (argument: number | string | object|null) => groupActions.query(argument, dispatch),
+        _detail: (argument:  number |  null) => detail(argument, dispatch),
+        _userRetrieve: (argument: number | string | object | null) => userActions.retrieve(argument, dispatch),
+        _permissionRetrieve: (argument: number | string | object | null) => permissionActions.retrieve(argument, dispatch),
+        _groupRetrieve: (argument: number | string | object|null) => groupActions.retrieve(argument, dispatch),
     }
 }
 

@@ -1,11 +1,10 @@
 import {IPropsCommon} from "./props.common.interface";
 import {IStateCommon} from "./state.common.interface";
 import {Profile} from "../models/profile.model";
+import {IResponseObject} from "./iresponse.object";
+import {IBasic} from "./ibasic";
 
-export interface IProfile {
-
-  data?: {
-    id: string,
+export interface IProfile  extends  IBasic{
     username: string,
     email: string,
     firstName: string,
@@ -21,16 +20,16 @@ export interface IProfile {
     createdAt:Date
     updatedAt: Date,
     deletedAt:  Date,
-  };
+
 }
 
 
 
 export interface IPropsProfile extends IPropsCommon {
-  _query: (argument: string | number | object | null) => Promise<void>;
+  _retrieve: () => Promise<void>;
   _save: (profile: Profile|FormData, props:IPropsCommon) => Promise<void>;
   _resetAlert:()=>void;
-  profileDetail: IProfile;
+  profile: IResponseObject<IProfile>;
 
 }
 

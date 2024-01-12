@@ -1,28 +1,25 @@
 import React, {Component} from 'react';
 import './detail.component.scss';
 import {Trans, withTranslation} from "react-i18next";
-import {query} from "../../../actions/permission..group.actions";
+import {retrieve} from "../../../actions/permission..group.actions";
 import {connect} from "react-redux";
 import withRouter from '../../../utils/with.router';
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsPermissionGroup, IStatePermissionGroup} from "../../../interfaces/permission.group.interface";
 
 class DetailComponent extends Component <IPropsPermissionGroup, IStatePermissionGroup> {
-    id: number;
 
     constructor(props: IPropsPermissionGroup | Readonly<IPropsPermissionGroup>) {
         super(props);
-        this.id = 0;
     }
 
     async componentDidMount() {
-        this.id = +this.props.params.id;
-        await this.props._query(this.id);
+        await this.props._retrieve(+this.props.params.id);
     }
 
 
     render() {
-        const {permissionGroupDetail} = this.props;
+        const {permissionGroup} = this.props;
         return (
 
             <div className="table-responsive">
@@ -32,16 +29,16 @@ class DetailComponent extends Component <IPropsPermissionGroup, IStatePermission
                         <td>
                             <Trans i18nKey="filed.permissionId"></Trans>
                         </td>
-                        <td>{permissionGroupDetail.data![0].permission}</td>
+                        <td>{permissionGroup.data?.permission}</td>
                     </tr>
                     <tr>
                         <td><Trans i18nKey="filed.group"></Trans></td>
-                        <td>{permissionGroupDetail.data![0].group}</td>
+                        <td>{permissionGroup.data?.group}</td>
                     </tr>
 
                     <tr>
                         <td><Trans i18nKey="filed.actions"></Trans></td>
-                        <td>{permissionGroupDetail.data![0].actions}</td>
+                        <td>{permissionGroup.data?.actions}</td>
                     </tr>
 
                     </tbody>
@@ -56,12 +53,12 @@ class DetailComponent extends Component <IPropsPermissionGroup, IStatePermission
 
 const mapStateToProps = (state: IReduxState) => {
     return {
-        permissionGroupDetail: state.permissionGroup
+        permissionGroupList: state.permissionGroupSelect
     }
 }
 const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
-        _query: (argument: any) => query(argument, dispatch),
+        _query: (argument: any) => retrieve(argument, dispatch),
     }
 }
 

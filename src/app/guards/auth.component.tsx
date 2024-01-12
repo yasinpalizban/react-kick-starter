@@ -3,12 +3,13 @@ import withRouter from "../utils/with.router";
 import {Outlet} from "react-router-dom";
 import {AuthContext} from "../contexts/auth.context";
 import {isEmpty} from "../utils/is.empty";
-import {RoleRouteService} from "../services/role.route.service";
 import {IPropsCommon} from "../interfaces/props.common.interface";
 import {IStateCommon} from "../interfaces/state.common.interface";
+import {isValidToPassAuth} from "../utils/is.valid.to.pass.auth";
+import getPermission from "../utils/get.permissionType";
 
 
-class AuthComponent extends Component<IPropsCommon,IStateCommon> {
+class AuthComponent extends Component<IPropsCommon, IStateCommon> {
     static contextType = AuthContext;
 
     constructor(props: IPropsCommon | Readonly<IPropsCommon>) {
@@ -26,55 +27,18 @@ class AuthComponent extends Component<IPropsCommon,IStateCommon> {
     }
 
     checkAuth = () => {
-
         // @ts-ignore
         if (isEmpty(this.context)) {
-            this.props.navigate('/home/sign-in',{replace: true});
+            this.props.navigate('/home/sign-in', {replace: true});
         } else {
-
-            const roleRouteService = new RoleRouteService();
-            const explodeLink = window.location.pathname.split('/');
-            const length = explodeLink.length;
-            let controller = ''
-            let view = ''
-            const regularExpression = new RegExp(/^\d+$/);
-
-            if (regularExpression.exec(explodeLink[length - 1])) {
-                controller = explodeLink[length - 3];
-                view = explodeLink[length - 2];
-            } else if (explodeLink[length - 1].toLowerCase() == 'add') {
-                controller = explodeLink[length - 2];
-                view = explodeLink[length - 1];
-            } else if (
-                explodeLink[length - 1].toLowerCase() == 'over-view' ||
-                explodeLink[length - 1].toLowerCase() == 'graph' ||
-                explodeLink[length - 1].toLowerCase() == 'profile'||
-                explodeLink[length - 1].toLowerCase() == 'job-activity'
-            ) {
-                controller = explodeLink[length - 1];
-                view = explodeLink[length - 1];
-
-            } else if (explodeLink[length - 1].toLowerCase() == 'private' || explodeLink[length - 1].toLowerCase() == 'room' || explodeLink[length - 1].toLowerCase() == 'contact'
-                && explodeLink[length - 2].toLowerCase() == 'chat') {
-                controller = explodeLink[length - 2] + explodeLink[length - 1];
-                view = explodeLink[length - 1];
-            } else {
-                controller = explodeLink[length - 2];
-                view = explodeLink[length - 1];
-            }
-
-            if (controller.includes('-')) {
-                controller = controller.split('-').join('').toLowerCase();
-            }
-            const roles = roleRouteService.getRoleAccess(controller);
-            const permission = roleRouteService.getPermission(view);
-            const permissionName = roleRouteService.getPermissionName(controller);
-          //  console.log( JSON.parse(localStorage.getItem('user')!))
-          //  console.log( this.context);
-          //  console.log({c: controller, v: view});
-         //   console.log({p: permission, r: roles, pn: permissionName,v:roleRouteService.isValid(this.context!, roles, permissionName!, permission)});
-            if (!roleRouteService.isValid(this.context!, roles, permissionName!, permission)) {
-                this.props.navigate('/403',{replace: true});
+            const explodeLink = window.location.pathname.replace('/admin/', '').
+            replace('dashboard/', '').replaceAll(/[0-9]/g, '')
+                .split('/').filter(item => item != '');
+            let controller = explodeLink[0].replaceAll('-', '').toLowerCase();
+            const permissionType = (explodeLink.length > 1) ? getPermission(explodeLink[explodeLink.length-1]) : explodeLink[0];
+            const permissionName = controller.replaceAll('-', '').toLowerCase();
+            if (!isValidToPassAuth(permissionName, permissionType, this.context!)) {
+                this.props.navigate('/403', {replace: true});
             }
         }
     }

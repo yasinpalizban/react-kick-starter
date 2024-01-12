@@ -2,28 +2,27 @@ import React, {Component} from 'react';
 import './detail.component.scss';
 import {Trans, withTranslation} from "react-i18next";
 import moment from "moment";
-import {query} from "../../../actions/user.actions";
+import {detail} from "../../../actions/user.actions";
 import {connect} from "react-redux";
 import withRouter from '../../../utils/with.router';
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsUser, IStateUser} from "../../../interfaces/user.interface";
 
 class DetailComponent extends Component <IPropsUser, IStateUser> {
-    id: number;
+
 
     constructor(props: IPropsUser | Readonly<IPropsUser>) {
         super(props);
-        this.id = 0;
     }
 
     async componentDidMount() {
-        this.id = +this.props.params.id;
-        await this.props._query(this.id);
+        await this.props._detail(this.props.params.id);
     }
 
 
     render() {
-        const {userDetail} = this.props;
+        const { user } = this.props;
+
         return (
 
             <div className="table-responsive">
@@ -33,49 +32,49 @@ class DetailComponent extends Component <IPropsUser, IStateUser> {
                         <td>
                             <Trans i18nKey="filed.userName"></Trans>
                         </td>
-                        <td>{userDetail.data![0].username}</td>
+                        <td>{user.data?.username}</td>
                     </tr>
 
                     <tr>
                         <td><Trans i18nKey="filed.email"></Trans></td>
-                        <td>{userDetail.data![0].email}</td>
+                        <td>{user.data?.email}</td>
                     </tr>
 
                     <tr>
                         <td><Trans i18nKey="filed.phone"></Trans></td>
-                        <td>{userDetail.data![0].phone}</td>
+                        <td>{user.data?.phone}</td>
                     </tr>
 
                     <tr>
                         <td><Trans i18nKey="filed.firstName"></Trans></td>
-                        <td>{userDetail.data![0].firstName}</td>
+                        <td>{user.data?.firstName}</td>
                     </tr>
 
                     <tr>
                         <td><Trans i18nKey="filed.lastName"></Trans></td>
-                        <td>{userDetail.data![0].lastName}</td>
+                        <td>{user.data?.lastName}</td>
                     </tr>
                     <tr>
                         <td><Trans i18nKey="filed.group"></Trans></td>
-                        <td>{userDetail.data![0].group}</td>
+                        <td>{user.data?.group}</td>
                     </tr>
                     <tr>
                         <td><Trans i18nKey="filed.gender"></Trans></td>
-                        <td>{userDetail.data![0].gender}</td>
+                        <td>{user.data?.gender}</td>
                     </tr>
 
                     <tr>
                         <td><Trans i18nKey="filed.country"></Trans></td>
-                        <td>{userDetail.data![0].country}</td>
+                        <td>{user.data?.country}</td>
                     </tr>
 
                     <tr>
                         <td><Trans i18nKey="filed.city"></Trans></td>
-                        <td>{userDetail.data![0].city}</td>
+                        <td>{user.data?.city}</td>
                     </tr>
                     <tr>
                         <td><Trans i18nKey="filed.address"></Trans></td>
-                        <td>{userDetail.data![0].address}</td>
+                        <td>{user.data?.address}</td>
                     </tr>
 
                     <tr>
@@ -85,7 +84,7 @@ class DetailComponent extends Component <IPropsUser, IStateUser> {
                         <td>
                             {
 
-                                userDetail.data![0].active ?
+                                user.data?.active ?
                                     <span className="status--process"><Trans
                                         i18nKey="filed.activate"></Trans>  </span> :
                                     <span className="status--denied"> <Trans i18nKey="filed.deActivate"></Trans> </span>
@@ -101,7 +100,7 @@ class DetailComponent extends Component <IPropsUser, IStateUser> {
                         <td>
                             {
 
-                                userDetail.data![0].status ?
+                                user.data?.status ?
                                     <span className="status--process"><Trans
                                         i18nKey="filed.activate"></Trans>  </span> :
                                     <span className="status--denied"> <Trans i18nKey="filed.deActivate"></Trans> </span>
@@ -114,14 +113,14 @@ class DetailComponent extends Component <IPropsUser, IStateUser> {
                     <tr>
                         <td><Trans i18nKey="filed.create"></Trans>
                         </td>
-                        <td>{moment(userDetail.data![0].createdAt).format('YYYY-MM-DD')}</td>
+                        <td>{moment(user.data?.createdAt).format('YYYY-MM-DD')}</td>
                     </tr>
 
                     <tr>
                         <td>
                             <Trans i18nKey="filed.update"></Trans>
                         </td>
-                        <td>{moment(userDetail.data![0]?.updatedAt).format('YYYY-MM-DD')}</td>
+                        <td>{moment(user.data?.updatedAt).format('YYYY-MM-DD')}</td>
                     </tr>
                     </tbody>
                 </table>
@@ -135,12 +134,12 @@ class DetailComponent extends Component <IPropsUser, IStateUser> {
 
 const mapStateToProps = (state: IReduxState) => {
     return {
-        userDetail: state.user
+        user: state.userSelect
     }
 }
 const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
-        _query: (argument: string | number | object | null) => query(argument, dispatch),
+        _detail: (argument: number ) => detail(argument, dispatch),
     }
 }
 

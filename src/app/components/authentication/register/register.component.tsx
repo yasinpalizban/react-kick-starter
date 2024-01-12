@@ -6,7 +6,7 @@ import {Trans, withTranslation} from 'react-i18next';
 import {connect} from 'react-redux'
 import {signUp} from '../../../actions/auth.actions';
 import withRouter from "../../../utils/with.router";
-import AlertComponent from "../../alert/alert.component";
+import AlertComponent from "../../../commons/alert/alert.component";
 import {GoogleReCaptchaProvider, IWithGoogleReCaptchaProps, withGoogleReCaptcha} from 'react-google-recaptcha-v3';
 import {environment} from "../../../../environments/environment";
 import {Auth} from "../../../interfaces/authenticate.model";

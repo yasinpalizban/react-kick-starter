@@ -11,8 +11,8 @@ import {
     faStickyNote
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import AlertComponent from '../../alert/alert.component';
-import {query, save} from "../../../actions/profile.actions";
+import AlertComponent from '../../../commons/alert/alert.component';
+import {retrieve, save} from "../../../actions/profile.actions";
 import {connect} from "react-redux";
 import avatar from '../../../../assets/images/icon/default-avatar.jpg';
 import {Profile} from "../../../models/profile.model";
@@ -44,13 +44,10 @@ class UserInfoComponent extends Component <IPropsProfile, IStateProfile> {
             bio: values.bio,
             title:values.title
         });
-
        await this.props._save(profile, this.props)
-
         if (this.isNewImage) {
             await this.props._save(this.formData, this.props)
         }
-
 
     }
 
@@ -69,18 +66,18 @@ class UserInfoComponent extends Component <IPropsProfile, IStateProfile> {
     }
 
     render() {
-        const {profileDetail} = this.props;
+        const {profile} = this.props;
         return (
             <Formik
                 initialValues={{
-                    username: profileDetail?.data?.username,
-                    phone: profileDetail?.data?.phone,
-                    email: profileDetail?.data?.email,
-                    firstName: profileDetail?.data?.firstName,
-                    lastName: profileDetail?.data?.lastName,
-                    gender: profileDetail?.data?.gender,
-                    title: profileDetail?.data?.title,
-                    bio: profileDetail?.data?.bio,
+                    username: profile?.data?.username,
+                    phone: profile?.data?.phone,
+                    email: profile?.data?.email,
+                    firstName: profile?.data?.firstName,
+                    lastName: profile?.data?.lastName,
+                    gender: profile?.data?.gender,
+                    title: profile?.data?.title,
+                    bio: profile?.data?.bio,
 
                 }}
                 enableReinitialize={true}
@@ -347,13 +344,13 @@ class UserInfoComponent extends Component <IPropsProfile, IStateProfile> {
 
 const mapStateToProps = (state: IReduxState) => {
     return {
-        profileDetail: state.profile
+        profile: state.profile
     }
 }
 const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
         _save: (profile: Profile|FormData,props:IPropsCommon) => save(profile, props,dispatch),
-        _query: (argument: string | number | object | null) => query(argument, dispatch),
+        _retrieve: (argument: string | number | object | null) => retrieve(argument, dispatch),
     }
 }
 

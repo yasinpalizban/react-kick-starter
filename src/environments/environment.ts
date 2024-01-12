@@ -1,14 +1,14 @@
 export const environment = {
     production: true,
-     // baseUrl: 'http://localhost:8000/api/',
-     // siteUrl: 'http://localhost:8000/',
-    baseUrl: 'https://jobseeker-api.testprototype.ir/public/api/',
-    siteUrl: 'https://jobseeker-api.testprototype.ir/',
+      baseUrl: 'http://localhost:8000/api/',
+      siteUrl: 'http://localhost:8000/',
+    //baseUrl: 'https://jobseeker-api.testprototype.ir/public/api/',
+  //  siteUrl: 'https://jobseeker-api.testprototype.ir/',
     siteAddress: {
-      //   one: 'http://localhost:4200',
-       // two: 'http://localhost:4200',
-        one: 'https://jobseeker.testprototype.ir',
-        two: 'https://www.jobseeker.testprototype.ir',
+         one: 'http://localhost:4200',
+        two: 'http://localhost:4200',
+       // one: 'https://jobseeker.testprototype.ir',
+      //  two: 'https://www.jobseeker.testprototype.ir',
     },
     logger: true,
     pusher: {

@@ -1,10 +1,18 @@
-import {USER_PERMISSION_DELETE, USER_PERMISSION_POST, USER_PERMISSION_GET, USER_PERMISSION_PUT} from "../actions/permission.user.actions";
+import {
+    USER_PERMISSION_DELETE,
+    USER_PERMISSION_POST,
+    USER_PERMISSION_GET,
+    USER_PERMISSION_PUT,
+    USER_PERMISSION_SHOW
+} from "../actions/permission.user.actions";
 import {IReduxAction} from "../interfaces/redux.type.interface";
 import {IPermissionUser} from "../interfaces/permission.user.interface";
+import {IResponseObject} from "../interfaces/iresponse.object";
+import {isEmpty} from "../utils/is.empty";
 
-const initialize:IPermissionUser = {};
+const initialize:IResponseObject<IPermissionUser[]> = {};
 
-export default function permissionUserReducer(state = initialize, action: IReduxAction):IPermissionUser {
+export  function permissionUserReducer(state = initialize, action: IReduxAction):IResponseObject<IPermissionUser[]> {
     switch (action.type) {
         case USER_PERMISSION_GET:
             return {
@@ -12,25 +20,23 @@ export default function permissionUserReducer(state = initialize, action: IRedux
                 ...action.payload
             }
         case USER_PERMISSION_POST: {
-            const temp:any = [...state.data!, action.payload];
-            return {
-                ...state,
-                data: temp
-            }
+
+                const temp = isEmpty(state) || isEmpty(state.data!) ? [action.payload] : [...state?.data!, action.payload];
+                return {...state, data: temp}
+
         }
 
         case USER_PERMISSION_PUT: {
-            const temp:any = state.data?.map((data:any) => {
-                    if (data.id == action.payload.id) {
-                        data = Object.assign({...data, ...action.payload})
+
+                const temp = state.data?.map((data) => {
+                        if (data.id == action.payload.id) {
+                            data = Object.assign({...data, ...action.payload})
+                        }
+                        return data;
                     }
-                    return data;
-                }
-            );
-            return {
-                ...state,
-                data: temp
-            }
+                );
+                return {...state, data: temp}
+
         }
         case
         USER_PERMISSION_DELETE: {
@@ -48,3 +54,17 @@ export default function permissionUserReducer(state = initialize, action: IRedux
     }
 }
 
+const initializeSelect:IResponseObject<IPermissionUser> = {};
+
+export  function permissionUserSelectReducer(state = initializeSelect, action: IReduxAction):IResponseObject<IPermissionUser> {
+    switch (action.type) {
+        case USER_PERMISSION_SHOW:
+            return {
+                ...state,
+                ...action.payload
+            }
+
+        default:
+            return state;
+    }
+}

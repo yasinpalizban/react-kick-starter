@@ -9,7 +9,7 @@ import {save} from "../../../actions/permission..group.actions";
 import * as groupActions from "../../../actions/group.actions";
 import * as permissionActions from "../../../actions/permission.actions";
 import {connect} from "react-redux";
-import AlertComponent from '../../alert/alert.component';
+import AlertComponent from '../../../commons/alert/alert.component';
 import withRouter from "../../../utils/with.router";
 import {PermissionGroup} from "../../../models/permission.group.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
@@ -25,8 +25,8 @@ class AddComponent extends Component <IPropsPermissionGroup, IStatePermissionGro
     }
 
     async componentDidMount() {
-        await this.props._groupQuery(null);
-        await this.props._permissionQuery({limit:20});
+        await this.props._groupRetrieve(null);
+        await this.props._permissionRetrieve({limit:20});
 
     }
 
@@ -48,7 +48,7 @@ class AddComponent extends Component <IPropsPermissionGroup, IStatePermissionGro
     }
 
     render() {
-        const {groupRows, permissionRows} = this.props;
+        const {groupList, permissionList} = this.props;
         return (
             <Formik
                 initialValues={{
@@ -82,7 +82,7 @@ class AddComponent extends Component <IPropsPermissionGroup, IStatePermissionGro
                                         <option disabled selected
                                         >{this.props.t('common.selectInputMessage')}</option>
                                         {
-                                            groupRows?.data?.map((item, i: number) => <option
+                                            groupList?.data?.map((item, i: number) => <option
                                                 value={item.id}>{item.name} </option>)
                                         }
                                     </select>
@@ -112,7 +112,7 @@ class AddComponent extends Component <IPropsPermissionGroup, IStatePermissionGro
                                         <option disabled selected
                                         >{this.props.t('common.selectInputMessage')}</option>
                                         {
-                                            permissionRows?.data?.map((item, i: number) => <option
+                                            permissionList?.data?.map((item, i: number) => <option
                                                 value={item.id}>{item.name} </option>)
                                         }
                                     </select>
@@ -208,15 +208,15 @@ class AddComponent extends Component <IPropsPermissionGroup, IStatePermissionGro
 
 const mapStateToProps = (state: IReduxState) => {
     return {
-        groupRows: state.group,
-        permissionRows: state.permission
+        groupList: state.group,
+        permissionList: state.permission
     }
 }
 const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
         _save: (permissionGroup: PermissionGroup, props: IPropsCommon) => save(permissionGroup, props, dispatch),
-        _groupQuery: (argument: number | string | object|null) => groupActions.query(argument, dispatch),
-        _permissionQuery: (argument: number | string | object|null) => permissionActions.query(argument, dispatch),
+        _groupRetrieve: (argument: number | string | object|null) => groupActions.retrieve(argument, dispatch),
+        _permissionRetrieve: (argument: number | string | object|null) => permissionActions.retrieve(argument, dispatch),
     }
 }
 

@@ -1,13 +1,10 @@
-import {IPagination} from "./pagination.interface";
 import {IPropsCommon} from "./props.common.interface";
 import {IStateCommon} from "./state.common.interface";
 import {Setting} from "../models/setting.model";
+import {IResponseObject} from "./iresponse.object";
+import {IBasic} from "./ibasic";
 
-export interface ISetting {
-
-  pager?:IPagination;
-  data?: [{
-    id: number,
+export interface ISetting  extends  IBasic{
     key: string,
     value: string,
     description: string,
@@ -15,19 +12,18 @@ export interface ISetting {
     createdAt: Date,
     updatedAt: Date,
     deletedAt: Date,
-  }];
-
 }
 
 
 export interface IPropsSetting extends IPropsCommon {
-  _query: (argument: string | number | object | null) => Promise<void>;
+  _retrieve: (argument: string | number | object | null) => Promise<void>;
+  _detail: (argument: number) => Promise<void>;
   _save: (setting: Setting, props: IPropsCommon) => Promise<void>;
   _update: (setting: Setting, props: IPropsCommon) => Promise<void>;
   _remove: (id: number, index: number) => Promise<void>;
   _newQueryArgument: (queryArgument: any) => void;
-  settingDetail: ISetting;
-  settingRows: ISetting;
+  setting: IResponseObject<ISetting>;
+  settingList: IResponseObject<ISetting[]>;
 }
 
 export interface IStateSetting extends  IStateCommon{

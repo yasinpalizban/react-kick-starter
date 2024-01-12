@@ -27,20 +27,41 @@ import {GlobalConstants} from "../../../configs/global-constants";
 import * as urlPathComponent from "../../../utils/url-path";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsAdminHeader, IStateAdminHeader} from "../../../interfaces/header.interface";
+import {IMenuLink} from "../../../interfaces/imenu.link";
+import AuthMenuComponent from "../../../guards/auth.menu.component";
+import AuthActionComponent from "../../../guards/auth.action.component";
+import {PermissionType} from "../../../enums/permission.enum";
 
 class HeaderComponent extends Component<IPropsAdminHeader, IStateAdminHeader> {
     private headerService: HeaderService;
     static contextType = AuthContext;
+    private permissionType = PermissionType;
     private url: any;
     private pathLink: string;
     private explodeLink: string[];
-    private links: { request: string;
-        userPermission: string; profile: string;
-        permission: string; viewOption: string; graph: string; users: string;
-        setting: string; newsPost: string; overView: string;
-        chat: string; contact: string; advertisement: string;  visitor: string;
-        group: string; groupPermission: string; jobPost:string; jobBalance:string;jobTransaction:string;
-        activity:string; jobPrice:string;};
+    private links: IMenuLink = {
+        overView: '/admin/dashboard/over-view',
+        graph: '/admin/dashboard/graph',
+        profile: '/admin/profile',
+        setting: '/admin/setting/list',
+        group: '/admin/group/list',
+        users: '/admin/user/list',
+        newsPost: '/admin/news-post/list',
+        advertisement: '/admin/advertisement/list',
+        contact: '/admin/contact/list',
+        viewOption: '/admin/view-option/list',
+        visitor: '/admin/visitor/list',
+        chat: '/admin/chat/contact',
+        request: '/admin/request-post/list',
+        permission: '/admin/permission/list',
+        userPermission: '/admin/permission-user/list',
+        groupPermission: '/admin/permission-group/list',
+        jobPost: '/admin/job-post/list',
+        jobPrice: '/admin/job-price/list',
+        jobTransaction: '/admin/job-transaction/list',
+        jobBalance: '/admin/job-balance/list',
+        activity: '/admin/job-activity',
+    };
     private image: string | undefined;
     private userName: string | undefined;
     private fullName: string | undefined;
@@ -61,7 +82,7 @@ class HeaderComponent extends Component<IPropsAdminHeader, IStateAdminHeader> {
                 setting: true,
                 product: true,
                 room: true,
-                job:true
+                job: true
             },
             isRightSidebar: false,
             isLeftSidebar: false,
@@ -73,29 +94,6 @@ class HeaderComponent extends Component<IPropsAdminHeader, IStateAdminHeader> {
             image: AvatarDefault,
             notify: []
         }
-        this.links = {
-            overView: '/admin/dashboard/over-view',
-            graph: '/admin/dashboard/graph',
-            profile: '/admin/profile',
-            setting: '/admin/setting/list',
-            group: '/admin/group/list',
-            users: '/admin/user/list',
-            newsPost: '/admin/news-post/list',
-            advertisement: '/admin/advertisement/list',
-            contact: '/admin/contact/list',
-            viewOption: '/admin/view-option/list',
-            visitor: '/admin/visitor/list',
-            chat: '/admin/chat/contact',
-            request: '/admin/request-post/list',
-            permission: '/admin/permission/list',
-            userPermission: '/admin/permission-user/list',
-            groupPermission: '/admin/permission-group/list',
-            jobPost: '/admin/job-post/list',
-            jobPrice: '/admin/job-price/list',
-            jobTransaction: '/admin/job-transaction/list',
-            jobBalance: '/admin/job-balance/list',
-            activity: '/admin/job-activity',
-        };
         this.headerService = new HeaderService();
         this.headerService.checkNotification();
 
@@ -111,7 +109,7 @@ class HeaderComponent extends Component<IPropsAdminHeader, IStateAdminHeader> {
 
     }
 
-    componentDidMount() {
+    async componentDidMount() {
 
 
         const newState: any = Object.assign({}, this.state);
@@ -135,7 +133,7 @@ class HeaderComponent extends Component<IPropsAdminHeader, IStateAdminHeader> {
             // @ts-ignore
             newState.userRole = this.context.role.name;
         } else {
-            this.props._profileQuery();
+            await this.props._profileRetrieve();
 
             const {profile} = this.props;
 
@@ -152,7 +150,6 @@ class HeaderComponent extends Component<IPropsAdminHeader, IStateAdminHeader> {
         headerService.checkNotification();
         this.setState(newState);
     }
-
 
 
     onMenuDropDown = (event: any) => {
@@ -267,29 +264,13 @@ class HeaderComponent extends Component<IPropsAdminHeader, IStateAdminHeader> {
         }
     }
 
-    limitUserMenuLink = (key: string) => {
-
-        const value = this.limitUserMenu[key];
-
-        for (let i = 0; i < value.length; i++) {
-            if (value[i] == this.state.userRole) {
-                return true;
-            }
-
-        }
-
-
-        return false;
-    }
-
-
     render() {
         return (
             <>
                 <aside className="menu-sidebar2">
                     <div className="logo">
-                        <a href="src/app/components/admin-area/header/header.component#" onClick={()=>{
-                            this.props.navigate('/home/main',{replace:true});
+                        <a href="src/app/components/admin-area/header/header.component#" onClick={() => {
+                            this.props.navigate('/home/main', {replace: true});
                         }}>
                             <img src={LogWhite} alt="Cool Admin"/>
                         </a>
@@ -304,8 +285,8 @@ class HeaderComponent extends Component<IPropsAdminHeader, IStateAdminHeader> {
                         </div>
                         <nav className="navbar-sidebar2">
                             <ul className="list-unstyled navbar__list">
-                                {
-                                    this.limitUserMenuLink('dashboard') ? <li className="active has-sub">
+                                <AuthMenuComponent category="dashboard">
+                                    <li className="active has-sub">
                                         <a className={`js-arrow ${this.state.isLeftArrow.dashboard ? '' : ' open'} `}
                                            data-value="dashboard"
                                            onClick={this.onMenuDropDown}
@@ -323,24 +304,31 @@ class HeaderComponent extends Component<IPropsAdminHeader, IStateAdminHeader> {
                                             className="list-unstyled navbar__sub-list js-sub-list "
                                             style={{display: this.state.isLeftArrow.dashboard ? 'none' : 'block'}}
                                         >
+                                            <AuthActionComponent permissionType={this.permissionType.Get}
+                                                                 permissionName='overView'>
+                                                <li>
+                                                    <Link to={this.links.overView}>
+                                                        <FontAwesomeIcon icon={faList}/>
+                                                        <Trans i18nKey="layout.header.overView"></Trans>
+                                                    </Link>
+                                                </li>
+                                            </AuthActionComponent>
+                                            <AuthActionComponent permissionType={this.permissionType.Get}
+                                                                 permissionName='graph'>
+                                                <li>
+                                                    <Link to={this.links.graph}>
+                                                        <FontAwesomeIcon icon={faChartArea}/>
+                                                        <Trans i18nKey="layout.header.graph"></Trans>
+                                                    </Link>
+                                                </li>
+                                            </AuthActionComponent>
 
-                                            <li>
-                                                <Link to={this.links.overView}>
-                                                    <FontAwesomeIcon icon={faList}/>
-                                                    <Trans i18nKey="layout.header.overView"></Trans>
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link to={this.links.graph}>
-                                                    <FontAwesomeIcon icon={faChartArea}/>
-                                                    <Trans i18nKey="layout.header.graph"></Trans>
-                                                </Link>
-                                            </li>
                                         </ul>
-                                    </li> : ''
-                                }
-                                {
-                                    this.limitUserMenuLink('account') ? <li className=" has-sub">
+                                    </li>
+
+                                </AuthMenuComponent>
+                                <AuthMenuComponent category="account">
+                                    <li className=" has-sub">
                                         <a className={`js-arrow  `}
                                            data-value="account"
                                            onClick={this.onMenuDropDown}
@@ -359,191 +347,58 @@ class HeaderComponent extends Component<IPropsAdminHeader, IStateAdminHeader> {
 
                                             style={{display: this.state.isLeftArrow.account ? 'none' : 'block'}}
                                         >
+                                            <AuthActionComponent permissionType={this.permissionType.Get}
+                                                                 permissionName='group'>
+                                                <li>
+                                                    <Link to={this.links.group}>
+                                                        <FontAwesomeIcon icon={faUserFriends}/>
+                                                        <Trans i18nKey="layout.header.groups"></Trans>
+                                                    </Link>
+                                                </li>
+                                            </AuthActionComponent>
+                                            <AuthActionComponent permissionType={this.permissionType.Get}
+                                                                 permissionName='user'>
+                                                <li>
+                                                    <Link to={this.links.users}>
+                                                        <FontAwesomeIcon icon={faUserFriends}/>
+                                                        <Trans i18nKey="layout.header.users"></Trans>
+                                                    </Link>
+                                                </li>
+                                            </AuthActionComponent>
+                                            <AuthActionComponent permissionType={this.permissionType.Get}
+                                                                 permissionName='permission'>
+                                                <li>
+                                                    <Link to={this.links.permission}>
+                                                        <FontAwesomeIcon icon={faEye}/>
+                                                        <Trans i18nKey="layout.header.permissions"></Trans>
+                                                    </Link>
+                                                </li>
+                                            </AuthActionComponent>
 
-                                            <li>
-                                                <Link to={this.links.group}>
-                                                    <FontAwesomeIcon icon={faUserFriends}/>
-                                                    <Trans i18nKey="layout.header.groups"></Trans>
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link to={this.links.users}>
-                                                    <FontAwesomeIcon icon={faUserFriends}/>
-                                                    <Trans i18nKey="layout.header.users"></Trans>
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link to={this.links.permission}>
-                                                    <FontAwesomeIcon icon={faEye}/>
-                                                    <Trans i18nKey="layout.header.permissions"></Trans>
-                                                </Link>
-                                            </li>
+                                            <AuthActionComponent permissionType={this.permissionType.Get}
+                                                                 permissionName='permissionGroup'>
+                                                <li>
+                                                    <Link to={this.links.groupPermission}>
+                                                        <FontAwesomeIcon icon={faRandom}/>
+                                                        <Trans i18nKey="layout.header.permissionGroups"></Trans>
+                                                    </Link>
+                                                </li>
+                                            </AuthActionComponent>
+                                            <AuthActionComponent permissionType={this.permissionType.Get}
+                                                                 permissionName='permissionUser'>
+                                                <li>
+                                                    <Link to={this.links.userPermission}>
+                                                        <FontAwesomeIcon icon={faRetweet}/>
+                                                        <Trans i18nKey="layout.header.permissionUsers"></Trans>
+                                                    </Link>
+                                                </li>
+                                            </AuthActionComponent>
 
-                                            <li>
-                                                <Link to={this.links.groupPermission}>
-                                                    <FontAwesomeIcon icon={faRandom}/>
-                                                    <Trans i18nKey="layout.header.permissionGroups"></Trans>
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link to={this.links.userPermission}>
-                                                    <FontAwesomeIcon icon={faRetweet}/>
-                                                    <Trans i18nKey="layout.header.permissionUsers"></Trans>
-                                                </Link>
-                                            </li>
 
                                         </ul>
-                                    </li> : ''
-                                }
-                                {this.limitUserMenuLink('blog') ? <li className=" has-sub">
-                                    <a className={`js-arrow  `}
-                                       data-value="news"
-                                       onClick={this.onMenuDropDown}
-                                       aria-expanded={!this.state.isLeftArrow.news} aria-controls="collapseLeftArrow2"
-                                    >
-                                        <FontAwesomeIcon icon={faBlog}/>
-                                        <Trans i18nKey="layout.header.news"></Trans>
-                                        {this.state.isLeftArrow.news}
-                                        <span className={`arrow ${this.state.isLeftArrow.news ? '' : ' up'} `}>
-                                            <FontAwesomeIcon icon={faAngleDown}/>
-                                        </span>
-                                    </a>
-                                    <ul id="collapseLeftArrow1" className="list-unstyled navbar__sub-list js-sub-list "
+                                    </li>
+                                </AuthMenuComponent>
 
-                                        style={{display: this.state.isLeftArrow.news ? 'none' : 'block'}}
-                                    >
-
-                                        <li>
-                                            <Link to={this.links.newsPost}>
-                                                <FontAwesomeIcon icon={faNewspaper}/>
-                                                <Trans i18nKey="layout.header.news"></Trans>
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link to={this.links.advertisement}>
-                                                <FontAwesomeIcon icon={faShoppingCart}/>
-                                                <Trans i18nKey="layout.header.advertisement"></Trans>
-                                            </Link>
-                                        </li>
-
-
-                                    </ul>
-                                </li> : ''}
-
-                                {this.limitUserMenuLink('firstPage') ? <li>
-                                    <Link to={this.links.viewOption}>
-                                        <FontAwesomeIcon icon={faDesktop}/>
-                                        <Trans i18nKey="layout.header.firstPage"></Trans>
-                                    </Link>
-                                </li> : ''}
-                                {
-                                    this.limitUserMenuLink('communicate') ? <li className=" has-sub">
-                                        <a className={`js-arrow  `}
-                                           data-value="communication"
-                                           onClick={this.onMenuDropDown}
-                                           aria-expanded={!this.state.isLeftArrow.communication}
-                                           aria-controls="collapseLeftArrow3"
-                                        >
-                                            <FontAwesomeIcon icon={faInbox}/>
-                                            <Trans i18nKey="layout.header.communication"></Trans>
-                                            {this.state.isLeftArrow.communication}
-                                            <span
-                                                className={`arrow ${this.state.isLeftArrow.communication ? '' : ' up'} `}>
-                                            <FontAwesomeIcon icon={faAngleDown}/>
-                                        </span>
-                                        </a>
-                                        <ul id="collapseLeftArrow3"
-                                            className="list-unstyled navbar__sub-list js-sub-list "
-
-                                            style={{display: this.state.isLeftArrow.communication ? 'none' : 'block'}}
-                                        >
-                                            <li>
-                                                <Link to={this.links.chat}>
-                                                    <FontAwesomeIcon icon={faComments}/>
-                                                    <Trans i18nKey="layout.header.chat"></Trans>
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link to={this.links.contact}>
-                                                    <FontAwesomeIcon icon={faEnvelope}/>
-                                                    <Trans i18nKey="layout.header.contact"></Trans>
-                                                </Link>
-                                            </li>
-
-                                        </ul>
-                                    </li> : ''
-                                }
-
-
-                                {
-                                    this.limitUserMenuLink('request') ? <li>
-                                        <Link to={this.links.request}>
-                                            <FontAwesomeIcon icon={faBookmark}/>
-                                            <Trans i18nKey="layout.header.request"></Trans>
-                                        </Link>
-                                    </li> : ''
-                                }
-                                {
-                                    this.limitUserMenuLink('jobPost') ? <li className=" has-sub">
-                                        <a className={`js-arrow  `}
-                                           data-value="job"
-                                           onClick={this.onMenuDropDown}
-                                           aria-expanded={!this.state.isLeftArrow.job}
-                                           aria-controls="collapseLeftArrow3"
-                                        >
-                                            <FontAwesomeIcon icon={faTasks}/>
-                                            <Trans i18nKey="layout.header.jobPost"></Trans>
-                                            {this.state.isLeftArrow.job}
-                                            <span
-                                                className={`arrow ${this.state.isLeftArrow.job ? '' : ' up'} `}>
-                                            <FontAwesomeIcon icon={faAngleDown}/>
-                                        </span>
-                                        </a>
-                                        <ul id="collapseLeftArrow3"
-                                            className="list-unstyled navbar__sub-list js-sub-list "
-
-                                            style={{display: this.state.isLeftArrow.job ? 'none' : 'block'}}
-                                        >
-                                            <li>
-                                                <Link to={this.links.jobPost}>
-                                                    <FontAwesomeIcon icon={faShoppingBasket}/>
-                                                    <Trans i18nKey="layout.header.jobPost"></Trans>
-                                                </Link>
-                                            </li>
-
-                                            <li>
-
-                                                <Link to={this.links.jobTransaction}>
-                                                    <FontAwesomeIcon icon={faMoneyBill}/>
-                                                    <Trans i18nKey="layout.header.jobTransaction"></Trans>
-                                                </Link>
-                                            </li>
-
-                                            <li>
-
-                                                <Link to={this.links.jobBalance}>
-                                                    <FontAwesomeIcon icon={faShoppingBag}/>
-                                                    <Trans i18nKey="layout.header.jobBalance"></Trans>
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link to={this.links.jobPrice}>
-                                                    <FontAwesomeIcon icon={faList}/>
-                                                    <Trans i18nKey="layout.header.jobPrice"></Trans>
-                                                </Link>
-                                            </li>
-                                        </ul>
-                                    </li> : ''
-                                }
-
-                                {
-                                    this.limitUserMenuLink('activity') ? <li>
-                                        <Link to={this.links.activity}>
-                                            <FontAwesomeIcon icon={faTable}/>
-                                            <Trans i18nKey="layout.header.myActivity"></Trans>
-                                        </Link>
-                                    </li> : ''
-                                }
 
                             </ul>
                         </nav>
@@ -627,13 +482,16 @@ class HeaderComponent extends Component<IPropsAdminHeader, IStateAdminHeader> {
                                                     <Trans i18nKey="layout.header.profile"></Trans>
                                                 </Link>
                                             </div>
-                                            {this.limitUserMenuLink('setting') ?
+
+                                            <AuthActionComponent permissionType={this.permissionType.Get}
+                                                                 permissionName="setting">
                                                 <div className="account-dropdown__item">
                                                     <Link to={this.links.setting}>
                                                         <FontAwesomeIcon icon={faTools}/>
                                                         <Trans i18nKey="layout.header.setting"></Trans>
                                                     </Link>
-                                                </div> : ''}
+                                                </div>
+                                            </AuthActionComponent>
 
 
                                             <div className="account-dropdown__item">
@@ -644,16 +502,17 @@ class HeaderComponent extends Component<IPropsAdminHeader, IStateAdminHeader> {
                                             </div>
                                         </div>
                                         <div className="account-dropdown__body">
-                                            {this.limitUserMenuLink('setting') ?
+
+                                            <AuthActionComponent permissionType={this.permissionType.Get}
+                                                                 permissionName="setting">
                                                 <div className="account-dropdown__item">
                                                     <Link to={this.links.visitor}>
                                                         <FontAwesomeIcon icon={faGlobe}/>
                                                         <Trans i18nKey="layout.header.visitor"></Trans>
-
                                                     </Link>
-                                                </div> : ''}
+                                                </div>
 
-
+                                            </AuthActionComponent>
                                             <div className="account-dropdown__item">
                                                 <a style={{cursor: 'pointer'}} onClick={this.onChangeLanguage}>
                                                     <FontAwesomeIcon icon={faLanguage}/>
@@ -717,13 +576,17 @@ class HeaderComponent extends Component<IPropsAdminHeader, IStateAdminHeader> {
                                                 <Trans i18nKey="layout.header.profile"></Trans>
                                             </Link>
                                         </li>
-                                        {this.limitUserMenuLink('setting') ? <li>
 
-                                            <Link to={this.links.setting}>
-                                                <FontAwesomeIcon icon={faCog}/>
-                                                <Trans i18nKey="layout.header.setting"></Trans>
-                                            </Link>
-                                        </li> : ''}
+                                        <AuthActionComponent permissionType={this.permissionType.Get}
+                                                             permissionName="setting">
+                                            <li>
+                                                <Link to={this.links.setting}>
+                                                    <FontAwesomeIcon icon={faCog}/>
+                                                    <Trans i18nKey="layout.header.setting"></Trans>
+                                                </Link>
+                                            </li>
+
+                                        </AuthActionComponent>
 
                                         <li>
 
@@ -733,13 +596,7 @@ class HeaderComponent extends Component<IPropsAdminHeader, IStateAdminHeader> {
                                             </a>
 
                                         </li>
-                                        {this.limitUserMenuLink('setting') ? <li>
 
-                                            <Link to={this.links.visitor}>
-                                                <FontAwesomeIcon icon={faGlobe}/>
-                                                <Trans i18nKey="layout.header.visitor"></Trans>
-                                            </Link>
-                                        </li> : ''}
 
                                         <li>
                                             <a style={{cursor: 'pointer'}} onClick={this.onChangeLanguage}>
@@ -750,249 +607,122 @@ class HeaderComponent extends Component<IPropsAdminHeader, IStateAdminHeader> {
                                         </li>
                                     </ul>
                                 </li>
-
-                                {this.limitUserMenuLink('dashboard') ? <li className="active has-sub">
-                                    <a className={`js-arrow  `}
-                                       data-value="dashboard"
-                                       onClick={this.onMenuDropDown}
-                                       aria-expanded={!this.state.isLeftArrow.dashboard}
-                                       aria-controls="collapseLeftArrow0"
-                                    >
-                                        <FontAwesomeIcon icon={faTachometerAlt}/>
-                                        <Trans i18nKey="layout.header.dashboard"></Trans>
-                                        {this.state.isLeftArrow.dashboard}
-                                        <span className={`arrow ${this.state.isLeftArrow.dashboard ? '' : ' up'} `}>
-                                            <FontAwesomeIcon icon={faAngleDown}/>
-                                        </span>
-                                    </a>
-                                    <ul id="collapseLeftArrow0" className="list-unstyled navbar__sub-list js-sub-list "
-
-                                        style={{display: this.state.isLeftArrow.dashboard ? 'none' : 'block'}}
-                                    >
-
-                                        <li>
-                                            <Link to={this.links.overView}>
-                                                <FontAwesomeIcon icon={faList}/>
-                                                <Trans i18nKey="layout.header.overView"></Trans>
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link to={this.links.graph}>
-                                                <FontAwesomeIcon icon={faChartArea}/>
-                                                <Trans i18nKey="layout.header.graph"></Trans>
-                                            </Link>
-                                        </li>
-                                    </ul>
-                                </li> : ''}
-
-                                {this.limitUserMenuLink('account') ? <li className=" has-sub">
-                                    <a className={`js-arrow  `}
-                                       data-value="account"
-                                       onClick={this.onMenuDropDown}
-                                       aria-expanded={!this.state.isLeftArrow.account}
-                                       aria-controls="collapseLeftArrow1"
-                                    >
-                                        <FontAwesomeIcon icon={faUsers}/>
-                                        <Trans i18nKey="layout.header.accounts"></Trans>
-                                        {this.state.isLeftArrow.account}
-                                        <span className={`arrow ${this.state.isLeftArrow.account ? '' : ' up'} `}>
-                                            <FontAwesomeIcon icon={faAngleDown}/>
-                                        </span>
-                                    </a>
-                                    <ul id="collapseLeftArrow1" className="list-unstyled navbar__sub-list js-sub-list "
-
-                                        style={{display: this.state.isLeftArrow.account ? 'none' : 'block'}}
-                                    >
-
-                                        <li>
-                                            <Link to={this.links.group}>
-                                                <FontAwesomeIcon icon={faUserFriends}/>
-                                                <Trans i18nKey="layout.header.groups"></Trans>
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link to={this.links.users}>
-                                                <FontAwesomeIcon icon={faUserFriends}/>
-                                                <Trans i18nKey="layout.header.users"></Trans>
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link to={this.links.permission}>
-                                                <FontAwesomeIcon icon={faEye}/>
-                                                <Trans i18nKey="layout.header.permissions"></Trans>
-                                            </Link>
-                                        </li>
-
-                                        <li>
-                                            <Link to={this.links.groupPermission}>
-                                                <FontAwesomeIcon icon={faRandom}/>
-                                                <Trans i18nKey="layout.header.permissionGroups"></Trans>
-                                            </Link>
-                                        </li>
-                                        <li>
-                                            <Link to={this.links.userPermission}>
-                                                <FontAwesomeIcon icon={faRetweet}/>
-                                                <Trans i18nKey="layout.header.permissionUsers"></Trans>
-                                            </Link>
-                                        </li>
-
-                                    </ul>
-                                </li> : ''}
-                                {
-                                    this.limitUserMenuLink('blog') ? <li className=" has-sub">
+                                <AuthMenuComponent category="dashboard">
+                                    <li className="active has-sub">
                                         <a className={`js-arrow  `}
-                                           data-value="news"
+                                           data-value="dashboard"
                                            onClick={this.onMenuDropDown}
-                                           aria-expanded={!this.state.isLeftArrow.news}
-                                           aria-controls="collapseLeftArrow2"
+                                           aria-expanded={!this.state.isLeftArrow.dashboard}
+                                           aria-controls="collapseLeftArrow0"
                                         >
-                                            <FontAwesomeIcon icon={faBlog}/>
-                                            <Trans i18nKey="layout.header.news"></Trans>
-                                            {this.state.isLeftArrow.news}
-                                            <span className={`arrow ${this.state.isLeftArrow.news ? '' : ' up'} `}>
+                                            <FontAwesomeIcon icon={faTachometerAlt}/>
+                                            <Trans i18nKey="layout.header.dashboard"></Trans>
+                                            {this.state.isLeftArrow.dashboard}
+                                            <span className={`arrow ${this.state.isLeftArrow.dashboard ? '' : ' up'} `}>
+                                            <FontAwesomeIcon icon={faAngleDown}/>
+                                        </span>
+                                        </a>
+                                        <ul id="collapseLeftArrow0"
+                                            className="list-unstyled navbar__sub-list js-sub-list "
+
+                                            style={{display: this.state.isLeftArrow.dashboard ? 'none' : 'block'}}
+                                        >
+                                            <AuthActionComponent permissionType={this.permissionType.Get}
+                                                                 permissionName='overView'>
+                                                <li>
+                                                    <Link to={this.links.overView}>
+                                                        <FontAwesomeIcon icon={faList}/>
+                                                        <Trans i18nKey="layout.header.overView"></Trans>
+                                                    </Link>
+                                                </li>
+                                            </AuthActionComponent>
+                                            <AuthActionComponent permissionType={this.permissionType.Get}
+                                                                 permissionName='graph'>
+                                                <li>
+                                                    <Link to={this.links.graph}>
+                                                        <FontAwesomeIcon icon={faChartArea}/>
+                                                        <Trans i18nKey="layout.header.graph"></Trans>
+                                                    </Link>
+                                                </li>
+                                            </AuthActionComponent>
+                                        </ul>
+                                    </li>
+                                </AuthMenuComponent>
+
+                                <AuthMenuComponent category="account">
+                                    <li className=" has-sub">
+                                        <a className={`js-arrow  `}
+                                           data-value="account"
+                                           onClick={this.onMenuDropDown}
+                                           aria-expanded={!this.state.isLeftArrow.account}
+                                           aria-controls="collapseLeftArrow1"
+                                        >
+                                            <FontAwesomeIcon icon={faUsers}/>
+                                            <Trans i18nKey="layout.header.accounts"></Trans>
+                                            {this.state.isLeftArrow.account}
+                                            <span className={`arrow ${this.state.isLeftArrow.account ? '' : ' up'} `}>
                                             <FontAwesomeIcon icon={faAngleDown}/>
                                         </span>
                                         </a>
                                         <ul id="collapseLeftArrow1"
                                             className="list-unstyled navbar__sub-list js-sub-list "
 
-                                            style={{display: this.state.isLeftArrow.news ? 'none' : 'block'}}
+                                            style={{display: this.state.isLeftArrow.account ? 'none' : 'block'}}
                                         >
 
-                                            <li>
-                                                <Link to={this.links.newsPost}>
-                                                    <FontAwesomeIcon icon={faNewspaper}/>
-                                                    <Trans i18nKey="layout.header.news"></Trans>
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link to={this.links.advertisement}>
-                                                    <FontAwesomeIcon icon={faShoppingCart}/>
-                                                    <Trans i18nKey="layout.header.advertisement"></Trans>
-                                                </Link>
-                                            </li>
+                                            <AuthActionComponent permissionType={this.permissionType.Get}
+                                                                 permissionName='group'>
+                                                <li>
+                                                    <Link to={this.links.group}>
+                                                        <FontAwesomeIcon icon={faUserFriends}/>
+                                                        <Trans i18nKey="layout.header.groups"></Trans>
+                                                    </Link>
+                                                </li>
+                                            </AuthActionComponent>
+                                            <AuthActionComponent permissionType={this.permissionType.Get}
+                                                                 permissionName='user'>
+                                                <li>
+                                                    <Link to={this.links.users}>
+                                                        <FontAwesomeIcon icon={faUserFriends}/>
+                                                        <Trans i18nKey="layout.header.users"></Trans>
+                                                    </Link>
+                                                </li>
+                                            </AuthActionComponent>
+                                            <AuthActionComponent permissionType={this.permissionType.Get}
+                                                                 permissionName='permission'>
+                                                <li>
+                                                    <Link to={this.links.permission}>
+                                                        <FontAwesomeIcon icon={faEye}/>
+                                                        <Trans i18nKey="layout.header.permissions"></Trans>
+                                                    </Link>
+                                                </li>
+                                            </AuthActionComponent>
+
+                                            <AuthActionComponent permissionType={this.permissionType.Get}
+                                                                 permissionName='permissionGroup'>
+                                                <li>
+                                                    <Link to={this.links.groupPermission}>
+                                                        <FontAwesomeIcon icon={faRandom}/>
+                                                        <Trans i18nKey="layout.header.permissionGroups"></Trans>
+                                                    </Link>
+                                                </li>
+                                            </AuthActionComponent>
+                                            <AuthActionComponent permissionType={this.permissionType.Get}
+                                                                 permissionName='permissionUser'>
+                                                <li>
+                                                    <Link to={this.links.userPermission}>
+                                                        <FontAwesomeIcon icon={faRetweet}/>
+                                                        <Trans i18nKey="layout.header.permissionUsers"></Trans>
+                                                    </Link>
+                                                </li>
+                                            </AuthActionComponent>
+
 
                                         </ul>
-                                    </li> : ''}
+                                    </li>
 
-                                {
-                                    this.limitUserMenuLink('firstPage') ? <li>
-                                        <Link to={this.links.viewOption}>
-                                            <FontAwesomeIcon icon={faDesktop}/>
-                                            <Trans i18nKey="layout.header.firstPage"></Trans>
-                                        </Link>
-                                    </li> : ''
-                                }
-                                {
-                                    this.limitUserMenuLink('communicate') ? <li className=" has-sub">
-                                        <a className={`js-arrow  `}
-                                           data-value="communication"
-                                           onClick={this.onMenuDropDown}
-                                           aria-expanded={!this.state.isLeftArrow.communication}
-                                           aria-controls="collapseLeftArrow3"
-                                        >
-                                            <FontAwesomeIcon icon={faInbox}/>
-                                            <Trans i18nKey="layout.header.communication"></Trans>
-                                            {this.state.isLeftArrow.communication}
-                                            <span
-                                                className={`arrow ${this.state.isLeftArrow.communication ? '' : ' up'} `}>
-                                            <FontAwesomeIcon icon={faAngleDown}/>
-                                        </span>
-                                        </a>
-                                        <ul id="collapseLeftArrow3"
-                                            className="list-unstyled navbar__sub-list js-sub-list "
+                                </AuthMenuComponent>
 
-                                            style={{display: this.state.isLeftArrow.communication ? 'none' : 'block'}}
-                                        >
-                                            <li>
-                                                <Link to={this.links.chat}>
-                                                    <FontAwesomeIcon icon={faComments}/>
-                                                    <Trans i18nKey="layout.header.chat"></Trans>
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link to={this.links.contact}>
-                                                    <FontAwesomeIcon icon={faEnvelope}/>
-                                                    <Trans i18nKey="layout.header.contact"></Trans>
-                                                </Link>
-                                            </li>
-
-                                        </ul>
-                                    </li> : ''
-                                }
-                                {
-                                    this.limitUserMenuLink('request') ? <li>
-                                        <Link to={this.links.request}>
-                                            <FontAwesomeIcon icon={faBookmark}/>
-                                            <Trans i18nKey="layout.header.request"></Trans>
-                                        </Link>
-                                    </li> : ''
-                                }
-
-                                {
-                                    this.limitUserMenuLink('jobPost') ? <li className=" has-sub">
-                                        <a className={`js-arrow  `}
-                                           data-value="job"
-                                           onClick={this.onMenuDropDown}
-                                           aria-expanded={!this.state.isLeftArrow.job}
-                                           aria-controls="collapseLeftArrow3"
-                                        >
-                                            <FontAwesomeIcon icon={faTasks}/>
-                                            <Trans i18nKey="layout.header.jobPost"></Trans>
-                                            {this.state.isLeftArrow.job}
-                                            <span
-                                                className={`arrow ${this.state.isLeftArrow.job ? '' : ' up'} `}>
-                                            <FontAwesomeIcon icon={faAngleDown}/>
-                                        </span>
-                                        </a>
-                                        <ul id="collapseLeftArrow3"
-                                            className="list-unstyled navbar__sub-list js-sub-list "
-
-                                            style={{display: this.state.isLeftArrow.job ? 'none' : 'block'}}
-                                        >
-
-                                            <li>
-                                                <Link to={this.links.jobPrice}>
-                                                    <FontAwesomeIcon icon={faList}/>
-                                                    <Trans i18nKey="layout.header.jobPrice"></Trans>
-                                                </Link>
-                                            </li>
-
-
-                                            <li>
-                                                <Link to={this.links.jobPost}>
-                                                    <FontAwesomeIcon icon={faShoppingBasket}/>
-                                                    <Trans i18nKey="layout.header.jobPost"></Trans>
-                                                </Link>
-                                            </li>
-                                            <li>
-
-                                                <Link to={this.links.jobTransaction}>
-                                                    <FontAwesomeIcon icon={faMoneyBill}/>
-                                                    <Trans i18nKey="layout.header.jobTransaction"></Trans>
-                                                </Link>
-                                            </li>
-
-                                            <li>
-
-                                                <Link to={this.links.jobBalance}>
-                                                    <FontAwesomeIcon icon={faShoppingBag}/>
-                                                    <Trans i18nKey="layout.header.jobBalance"></Trans>
-                                                </Link>
-                                            </li>
-
-                                        </ul>
-                                    </li> : ''
-                                }
-
-                                {
-                                    this.limitUserMenuLink('activity') ? <li>
-                                        <Link to={this.links.activity}>
-                                            <FontAwesomeIcon icon={faTable}/>
-                                            <Trans i18nKey="layout.header.myActivity"></Trans>
-                                        </Link>
-                                    </li> : ''
-                                }
                             </ul>
 
                         </nav>
@@ -1051,7 +781,7 @@ const mapDispatchToProps = (dispatch: IReduxDispatch) => {
         _language: (lang: string) => language(lang, dispatch),
         _explodeLink: (url: string[]) => explodeLink(url, dispatch),
         _notification: (notify: any) => notification(notify, dispatch),
-        _profileQuery: () => profileActions.query(null, dispatch),
+        _profileRetrieve: () => profileActions.retrieve(null, dispatch),
         _signOut: () => signOut(true, dispatch)
     }
 }

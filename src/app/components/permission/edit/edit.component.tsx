@@ -5,10 +5,9 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Trans, withTranslation} from "react-i18next";
 import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
-import {query, update} from "../../../actions/permission.actions";
+import {detail, update} from "../../../actions/permission.actions";
 import {connect} from "react-redux";
-
-import AlertComponent from '../../alert/alert.component';
+import AlertComponent from '../../../commons/alert/alert.component';
 import withRouter from "../../../utils/with.router";
 import { Permission } from "../../../models/permission.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
@@ -16,42 +15,35 @@ import {IPropsCommon} from "../../../interfaces/props.common.interface";
 import {IPropsPermission, IStatePermission} from "../../../interfaces/permission.interface";
 
 class EditComponent extends Component <IPropsPermission, IStatePermission> {
-  editId:number;
     constructor(props: IPropsPermission | Readonly<IPropsPermission>) {
         super(props);
-this.editId=0;
     }
 
     async componentDidMount() {
-
-        this.editId = +this.props.params.id;
-        await this.props._query(this.editId);
-
+        await this.props._detail(+this.props.params.id);
     }
 
 
     handleSubmit = async (values: { name?: any; description?: any; active?: any;  }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ name: any; description: any; active: any; }>> | undefined) => void) => {
 
         const permission = new Permission({
-            id: this.editId,
+            id: +this.props.params.id,
             name: values.name.toLowerCase(),
             description: values.description,
             active: values.active==1,
-
         });
         await this.props._update(permission, this.props);
 
     }
 
     render() {
-        const {permissionDetail} = this.props;
+        const {permission} = this.props;
         return (
             <Formik
                 initialValues={{
-
-                    name: permissionDetail.data![0].name,
-                    description: permissionDetail.data![0].description,
-                    active: permissionDetail.data![0].active
+                    name: permission.data?.name,
+                    description: permission.data?.description,
+                    active: permission.data?.active
                 }}
                 enableReinitialize={true}
                 validationSchema={Yup.object().shape({
@@ -168,14 +160,14 @@ this.editId=0;
 
 const mapStateToProps = (state: IReduxState) => {
     return {
-        permissionDetail: state.permission,
+        permission: state.permissionSelect,
         queryArgument: state.queryArgument
     }
 }
 const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
         _update: (permission: Permission, props: IPropsCommon) => update(permission, props, dispatch),
-        _query: (argument: string | number | object | null) => query(argument, dispatch),
+        _detail: (argument:  number  | null) => detail(argument, dispatch),
     }
 }
 

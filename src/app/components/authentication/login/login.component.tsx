@@ -6,7 +6,7 @@ import {Trans, withTranslation} from 'react-i18next';
 import {connect} from 'react-redux'
 import {signIn,isSignIn} from '../../../actions/auth.actions';
 import withRouter from "../../../utils/with.router";
-import AlertComponent from "../../alert/alert.component";
+import AlertComponent from "../../../commons/alert/alert.component";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {Auth} from "../../../interfaces/authenticate.model";
 import {IPropsAuth, IStateAuth} from "../../../interfaces/authenticate.interface";

@@ -8,7 +8,7 @@ import {
     resetPasswordViaEmail, resetPasswordViaSms
 } from '../../../actions/auth.actions';
 import withRouter from "../../../utils/with.router";
-import AlertComponent from "../../alert/alert.component";
+import AlertComponent from "../../../commons/alert/alert.component";
 import {resetAlert} from "../../../actions/alert.actions";
 import {Auth} from '../../../interfaces/authenticate.model';
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";

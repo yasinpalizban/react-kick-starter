@@ -1,8 +1,8 @@
 import {AlertType} from '../enums/alert.enum';
+import {BasicModel} from "./basic.model";
 
 
-export class Alert {
-  id: string | undefined;
+export class Alert extends BasicModel {
   type: AlertType | undefined;
   message: string | undefined;
   autoClose: boolean | undefined;
@@ -11,6 +11,7 @@ export class Alert {
   body:string[]=[];
 
   constructor(init?: Partial<Alert>) {
+    super();
     Object.assign(this, init);
   }
 

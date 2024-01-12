@@ -1,5 +1,5 @@
 import {get, post} from "../services/api.service";
-import {IHome} from "../interfaces/home.interface";
+import {IHomeSetting} from "../interfaces/home.interface";
 import {IReduxDispatch} from "../interfaces/redux.type.interface";
 import {IPropsCommon} from "../interfaces/props.common.interface";
 import {ALERT_NEW} from "./alert.actions";
@@ -25,11 +25,11 @@ export const HOME_JOB_SHOW_GET = 'HOME_JOB_SHOW_GET';
 export const HOME_JOB_PRICE_GET = 'HOME_JOB_PRICE_GET';
 
 export async function settingList(argument: number | string | object|null, dispatch:IReduxDispatch): Promise<void> {
-    const result = await get<IHome>('home/setting-list', argument);
+    const result = await get<IHomeSetting>('home/setting-list', argument);
 
     dispatch({
         type: HOME_SETTING_GET,
-        payload: result.settingPost
+        payload: result
     });
 
 

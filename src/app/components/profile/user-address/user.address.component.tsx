@@ -5,10 +5,10 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Trans, withTranslation} from "react-i18next";
 import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
-import {query, save} from "../../../actions/profile.actions";
+import {retrieve, save} from "../../../actions/profile.actions";
 import {connect} from "react-redux";
 
-import AlertComponent from '../../alert/alert.component';
+import AlertComponent from '../../../commons/alert/alert.component';
 import {Profile} from "../../../models/profile.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsProfile, IStateProfile} from "../../../interfaces/profile.interface";
@@ -19,16 +19,10 @@ class UserAddressComponent extends Component <IPropsProfile, IStateProfile> {
 
     constructor(props: IPropsProfile | Readonly<IPropsProfile>) {
         super(props);
-
-
     }
 
     async componentDidMount() {
-        await this.props._query(null);
-
-    }
-
-    componentWillUnmount() {
+        await this.props._retrieve();
 
     }
 
@@ -40,13 +34,13 @@ class UserAddressComponent extends Component <IPropsProfile, IStateProfile> {
     }
 
     render() {
-        const {profileDetail} = this.props;
+        const {profile} = this.props;
         return (
             <Formik
                 initialValues={{
-                    country: profileDetail?.data?.country,
-                    city: profileDetail?.data?.city,
-                    address: profileDetail?.data?.address
+                    country: profile?.data?.country,
+                    city: profile?.data?.city,
+                    address: profile?.data?.address
                 }}
                 enableReinitialize={true}
                 validationSchema={Yup.object().shape({
@@ -162,13 +156,13 @@ class UserAddressComponent extends Component <IPropsProfile, IStateProfile> {
 
 const mapStateToProps = (state: IReduxState) => {
     return {
-        profileDetail: state.profile
+        profile: state.profile
     }
 }
 const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
         _save: (profile: Profile|FormData,props:IPropsCommon) => save(profile, props,dispatch),
-        _query: (argument: string | number | object | null) => query(argument, dispatch),
+        _retrieve: (argument: string | number | object | null) => retrieve(argument, dispatch),
     }
 }
 

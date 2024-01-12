@@ -4,7 +4,7 @@ import {IStateCommon} from "./state.common.interface";
 
 
 
-export interface IHome {
+export interface IHomeSetting {
     settingPost?: {
         twitter: {
             id: number,
@@ -112,7 +112,7 @@ export interface IPropsHome extends IPropsCommon {
     _settingList: () => Promise<void>;
     _language: (lang: string) => void;
     _alert:(error:any) => void;
-    home: IHome,
+    home: IHomeSetting,
 }
 
 export interface IStateHome extends IStateCommon {

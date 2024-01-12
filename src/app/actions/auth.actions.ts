@@ -8,6 +8,7 @@ import {IAuth} from "../interfaces/authenticate.interface";
 import {IPropsCommon} from "../interfaces/props.common.interface";
 import {IReduxDispatch} from "../interfaces/redux.type.interface";
 import {isEmpty} from "../utils/is.empty";
+import {AUTH_SERVICE} from "../configs/path.constants";
 
 export const AUTH_SIGN_IN = 'AUTH_SIGN_IN';
 export const AUTH_SIGN_OUT = 'AUTH_SIGN_OUT';
@@ -27,14 +28,14 @@ export const AUTH_ACTIVATE_ACCOUNT_VIA_SMS = 'AUTH_ACTIVATE_ACCOUNT_VIA_SMS';
 export const AUTH_SEND_ACTIVATE_ACCOUNT_VIA_SMS = 'AUTH_SEND_ACTIVATE_ACCOUNT_VIA_SMS';
 
 export async function signIn(auth: Auth, dispatch: IReduxDispatch) {
+    const result= await post<IAuth>('auth/signin', auth);
 
-    const result: IAuth = await post<IAuth>('auth/signin', auth);
-    localStorage.setItem('csrf', result.csrf!);
-    localStorage.setItem('user', JSON.stringify(result));
+    localStorage.setItem('csrf', result.data?.csrf!);
+    localStorage.setItem('user', JSON.stringify(result.data));
 
     let address = window.location.origin;
     let pathRedirect = '/admin/dashboard/over-view';
-    if (result.role?.name === RoleType.Member ||RoleType.Contractor) {
+    if (result.data?.role?.name === RoleType.Member) {
         pathRedirect = '/admin/profile';
     }
     if (address.search('www') !== -1) {
@@ -78,14 +79,10 @@ export async function signOut(flag:boolean, dispatch: IReduxDispatch) {
 
 export async function isSignIn(dispatch: IReduxDispatch) {
     const user = JSON.parse(localStorage.getItem('user')!);
-
     if (!isEmpty(user) && !(user.jwt.expire < Math.floor(new Date().getTime() / 1000))) {
-
-        const result: any = await get<IAuth>('auth/is-signin',null);
-        if (result.success === true) {
             let address = window.location.origin;
             let extendPath = '/admin/dashboard/over-view';
-            if (result.role?.name === RoleType.Member ||RoleType.Contractor) {
+            if (user.role?.name === RoleType.Member ||RoleType.Contractor) {
                 extendPath = '/admin/profile';
             }
             if (address.search('www') !== -1) {
@@ -93,8 +90,6 @@ export async function isSignIn(dispatch: IReduxDispatch) {
             } else {
                 window.location.replace(environment.siteAddress.one + extendPath);
             }
-
-        }
     }
 
 

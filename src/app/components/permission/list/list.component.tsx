@@ -3,98 +3,87 @@ import React, {Component} from 'react';
 import './list.component.scss';
 import {Trans, withTranslation} from "react-i18next";
 import {connect} from "react-redux";
-import {query, remove} from '../../../actions/permission.actions';
+import {retrieve, remove} from '../../../actions/permission.actions';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Tooltip, OverlayTrigger} from 'react-bootstrap';
-import SearchComponent from "../search/search.component";
 import withRouter from '../../../utils/with.router';
-import {Modal} from 'react-bootstrap';
 import ReactPaginate from 'react-paginate';
 import {createSearchParams} from "react-router-dom";
 import {newQueryArgument} from "../../../actions/query.argument.actions";
 import queryString from "query-string";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsPermission, IStatePermission} from "../../../interfaces/permission.interface";
+import ModalComponent from "../../../commons/modal/modal.component";
+import SearchingFiledComponent from "../../../commons/search-field/searching.filed.component";
+import BasicListComponent from "../../../abstracts/basic.list";
+import AuthCommonComponent from "../../../guards/auth.common.component";
 
-class ListComponent extends Component <IPropsPermission,IStatePermission> {
-    sizePage: number;
+class ListComponent extends BasicListComponent <IPropsPermission, IStatePermission> {
+
+    sortData = [
+        {id: 'id', text: 'Id',},
+        {id: 'name', text: 'Name',},
+        {id: 'active', text: 'Active',}
+    ];
 
     constructor(props: IPropsPermission | Readonly<IPropsPermission>) {
         super(props);
-        this.sizePage = 10;
-        this.state = {
-            modalRef: false,
-            deleteId: 0,
-            deleteIndex: 0,
-            deleteItem: ''
-        };
     }
 
     async componentDidMount() {
 
         if (this.props.location.search) {
-
-            await this.props._query(this.props.location.search);
+            await this.props._retrieve(this.props.location.search);
         } else {
-            await this.props._query(null);
+            await this.props._retrieve(null);
         }
-
-
     }
 
- async   componentDidUpdate(prevProps: { location: string; }, prevState: any, snapshot: any) {
-
+    async componentDidUpdate(prevProps: { location: string; }, prevState: any, snapshot: any) {
 
         if (this.props.location.search !== '' && prevProps.location.search !== this.props.location.search) {
             if (this.props.location.search) {
-
-            await    this.props._query(this.props.location.search);
+                await this.props._retrieve(this.props.location.search);
             } else {
-              await  this.props._query(null);
+                await this.props._retrieve(null);
             }
         }
-
     }
 
 
-    onEditItem = (event:any) => {
+    onEditItem = (event: any) => {
         const id = event.currentTarget.getAttribute('data-value');
         const path = '../edit/' + id;
         const queryArgument = queryString.parse(this.props.location.search);
         this.props._newQueryArgument(queryArgument);
         this.props.navigate(path);
-
-
     }
-    onDetailItem = (event:any) => {
+    onDetailItem = (event: any) => {
         const id = event.currentTarget.getAttribute('data-value');
         const path = '../detail/' + id;
         this.props.navigate(path);
-
     }
 
 
-    onOpenModal = (event:any) => {
+    onOpenModal = (event: any) => {
         const id = event.currentTarget.getAttribute('data-value');
         const index = event.currentTarget.getAttribute('data-index');
         this.setState({
             modalRef: true,
             deleteId: id,
             deleteIndex: index,
-            deleteItem: this.props.permissionRows.data![index].name
+            deleteItem: this.props.permissionList.data![index].name
         });
-
-    }
-    onModalHide = () => {
-        this.setState({modalRef: false});
 
     }
     onModalConfirm = async () => {
         await this.props._remove(this.state.deleteId!, this.state.deleteIndex!);
+        this.setState({
+            modalRef: false,
+        });
 
-        this.setState({modalRef: false});
     }
-    onChangePaginate = (event:any) => {
+    onChangePaginate = (event: any) => {
         const params = {
             page: event.selected + 1,
         };
@@ -109,17 +98,15 @@ class ListComponent extends Component <IPropsPermission,IStatePermission> {
     }
 
     render() {
-        const {permissionRows} = this.props;
+        const {permissionList} = this.props;
 
         return (<>
 
 
             <div className="table-responsive table-responsive-data2">
 
-                <div>
-                    <SearchComponent/>
+                <SearchingFiledComponent sortData={this.sortData}/>
 
-                </div>
                 <table className="table table-data2">
                     <thead>
                     <tr>
@@ -132,11 +119,11 @@ class ListComponent extends Component <IPropsPermission,IStatePermission> {
                     </thead>
                     <tbody>
                     {
-                        permissionRows?.data?.map((item, i:number) => {
+                        permissionList?.data?.map((item, i: number) => {
 
                             return (
                                 <>
-                                    <tr key={i+'permission1'} className="tr-shadow">
+                                    <tr key={i + 'permission1'} className="tr-shadow">
 
                                         <td>{i + 1}</td>
                                         <td>
@@ -157,55 +144,22 @@ class ListComponent extends Component <IPropsPermission,IStatePermission> {
                                         <td>
                                             <div className="table-data-feature">
 
-                                                <OverlayTrigger
-                                                    delay={{hide: 300, show: 200}}
-                                                    overlay={(props) => (
-                                                        <Tooltip {...props}>
-                                                            {this.props.t('common.edit')}
-                                                        </Tooltip>
-                                                    )}
-                                                    placement="top">
-                                                    <button data-value={item.id}
-                                                            onClick={this.onEditItem} className="item">
-                                                        <FontAwesomeIcon icon={faEdit}/>
-                                                    </button>
-                                                </OverlayTrigger>
+                                                <AuthCommonComponent onClick={this.onEditItem} index={i} id={item.id} label={this.props.t('common.edit')} permissionName={this.permissionName}
+                                                                     permissionType={this.permissionType.Put}>
+                                                </AuthCommonComponent>
 
-                                                <OverlayTrigger
-                                                    delay={{hide: 300, show: 200}}
-                                                    overlay={(props) => (
-                                                        <Tooltip {...props}>
-                                                            {this.props.t('common.remove')}
-                                                        </Tooltip>
-                                                    )}
-                                                    placement="top">
-                                                    <button
-                                                        onClick={this.onOpenModal} className="item" data-value={item.id}
-                                                        data-index={i}>
-
-                                                        <FontAwesomeIcon icon={faTrash}/>
-                                                    </button>
-                                                </OverlayTrigger>
-
-                                                <OverlayTrigger
-                                                    delay={{hide: 300, show: 200}}
-                                                    overlay={(props) => (
-                                                        <Tooltip {...props}>
-                                                            {this.props.t('common.detail')}
-                                                        </Tooltip>
-                                                    )}
-                                                    placement="top">
-                                                    <button data-value={item.id}
-                                                            onClick={this.onDetailItem} className="item">
-                                                        <FontAwesomeIcon icon={faEnvelopeOpen}/>
-                                                    </button>
-                                                </OverlayTrigger>
+                                                <AuthCommonComponent onClick={this.onOpenModal} index={i} id={item.id} label={this.props.t('common.remove')} permissionName={this.permissionName}
+                                                                     permissionType={this.permissionType.Delete}>
+                                                </AuthCommonComponent>
+                                                <AuthCommonComponent onClick={this.onDetailItem} index={i} id={item.id} label={this.props.t('common.detail')} permissionName={this.permissionName}
+                                                                     permissionType={this.permissionType.Get}>
+                                                </AuthCommonComponent>
 
 
                                             </div>
                                         </td>
                                     </tr>
-                                    <tr key={i+'permission2'} className="spacer"></tr>
+                                    <tr key={i + 'permission2'} className="spacer"></tr>
                                 </>
 
 
@@ -228,7 +182,7 @@ class ListComponent extends Component <IPropsPermission,IStatePermission> {
                         nextLabel={this.props.t('common.next')}
                         onPageChange={this.onChangePaginate}
                         pageRangeDisplayed={this.sizePage}
-                        pageCount={permissionRows.pager?.pageCount!}
+                        pageCount={permissionList.pager?.pageCount!}
                         previousLabel={this.props.t('common.previous')}
                         activeClassName="page-item active"
 
@@ -236,29 +190,10 @@ class ListComponent extends Component <IPropsPermission,IStatePermission> {
                 </div>
             </div>
 
-            <Modal show={this.state.modalRef}>
-                <div className="modal-header align-items-center">
-                    <FontAwesomeIcon icon={faTrash}/> &nbsp;&nbsp;
-                    <h4 className="modal-title pull-left"><Trans i18nKey="common.remove"></Trans></h4>
-
-                    <button type="button" className="close pull-right" aria-label="Close" onClick={this.onModalHide}>
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div className="modal-body">
-                    <p><Trans i18nKey="common.doYouWantDelete"></Trans> <strong
-                        className="text-danger">{this.state.deleteItem}</strong></p>
-
-                </div>
-
-                <div className="modal-footer">
-                    <button type="button" className="btn btn-secondary" onClick={this.onModalHide}><Trans
-                        i18nKey="common.cancel"></Trans></button>
-                    <button type="button" className="btn btn-primary" onClick={this.onModalConfirm}><Trans
-                        i18nKey="common.confirm"></Trans></button>
-                </div>
-
-            </Modal>
+            <ModalComponent show={this.state.modalRef}
+                            title={this.state.deleteItem}
+                            onClickConfirm={this.onModalConfirm}
+            />
 
         </>)
             ;
@@ -266,12 +201,12 @@ class ListComponent extends Component <IPropsPermission,IStatePermission> {
 }
 
 
-const mapStateToProps = (state:IReduxState) => {
-    return {permissionRows: state.permission}
+const mapStateToProps = (state: IReduxState) => {
+    return {permissionList: state.permission}
 }
-const mapDispatchToProps = (dispatch:IReduxDispatch) => {
+const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
-        _query: (argument: string | number | object | null) => query(argument, dispatch),
+        _retrieve: (argument: string | number | object | null) => retrieve(argument, dispatch),
         _remove: (id: number, index: number) => remove(id, index, dispatch),
         _newQueryArgument: (queryArgument: any) => newQueryArgument(queryArgument, dispatch)
 

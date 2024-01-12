@@ -8,7 +8,7 @@ import * as Yup from 'yup';
 import {save} from "../../../actions/permission.actions";
 import {connect} from "react-redux";
 
-import AlertComponent from '../../alert/alert.component';
+import AlertComponent from '../../../commons/alert/alert.component';
 import withRouter from "../../../utils/with.router";
 import { Permission } from "../../../models/permission.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";

@@ -1,10 +1,18 @@
-import {GROUP_PERMISSION_DELETE, GROUP_PERMISSION_POST, GROUP_PERMISSION_GET, GROUP_PERMISSION_PUT} from "../actions/permission..group.actions";
+import {
+    GROUP_PERMISSION_DELETE,
+    GROUP_PERMISSION_POST,
+    GROUP_PERMISSION_GET,
+    GROUP_PERMISSION_PUT,
+    GROUP_PERMISSION_SHOW
+} from "../actions/permission..group.actions";
 import {IReduxAction} from "../interfaces/redux.type.interface";
 import {IPermissionGroup} from "../interfaces/permission.group.interface";
+import {IResponseObject} from "../interfaces/iresponse.object";
+import {isEmpty} from "../utils/is.empty";
 
-const initialize:IPermissionGroup = {};
+const initialize:IResponseObject<IPermissionGroup[]> = {};
 
-export default function permissionGroupReducer(state = initialize, action:IReduxAction): IPermissionGroup{
+export function permissionGroupReducer(state = initialize, action:IReduxAction): IResponseObject<IPermissionGroup[]>{
     switch (action.type) {
         case GROUP_PERMISSION_GET:
             return {
@@ -12,25 +20,22 @@ export default function permissionGroupReducer(state = initialize, action:IRedux
                 ...action.payload
             }
         case GROUP_PERMISSION_POST: {
-            const temp:any = [...state.data!, action.payload];
-            return {
-                ...state,
-                data: temp
-            }
+
+            const temp = isEmpty(state) || isEmpty(state.data!) ? [action.payload] : [...state?.data!, action.payload];
+            return {...state, data: temp}
         }
 
         case GROUP_PERMISSION_PUT: {
-            const temp:any = state.data?.map((data:any) => {
-                    if (data.id == action.payload.id) {
-                        data = Object.assign({...data, ...action.payload})
+
+                const temp = state.data?.map((data) => {
+                        if (data.id == action.payload.id) {
+                            data = Object.assign({...data, ...action.payload})
+                        }
+                        return data;
                     }
-                    return data;
-                }
-            );
-            return {
-                ...state,
-                data: temp
-            }
+                );
+                return {...state, data: temp}
+
         }
         case
         GROUP_PERMISSION_DELETE: {
@@ -48,3 +53,17 @@ export default function permissionGroupReducer(state = initialize, action:IRedux
     }
 }
 
+const initializeSelect:IResponseObject<IPermissionGroup> = {};
+
+export function permissionGroupSelectReducer(state = initializeSelect, action:IReduxAction): IResponseObject< IPermissionGroup>{
+    switch (action.type) {
+        case GROUP_PERMISSION_SHOW:
+            return {
+                ...state,
+                ...action.payload
+            }
+
+        default:
+            return state;
+    }
+}

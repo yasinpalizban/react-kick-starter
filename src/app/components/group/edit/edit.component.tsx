@@ -5,10 +5,10 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Trans, withTranslation} from "react-i18next";
 import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
-import {query, update} from "../../../actions/group.actions";
+import {detail, update} from "../../../actions/group.actions";
 import {connect} from "react-redux";
 
-import AlertComponent from '../../alert/alert.component';
+import AlertComponent from '../../../commons/alert/alert.component';
 import withRouter from "../../../utils/with.router";
 import {Group} from "../../../models/group.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
@@ -16,42 +16,34 @@ import {IPropsCommon} from "../../../interfaces/props.common.interface";
 import {IPropsGroup, IStateGroup} from "../../../interfaces/group.interface";
 
 class EditComponent extends Component <IPropsGroup, IStateGroup> {
-    editId: number;
 
     constructor(props: IPropsGroup | Readonly<IPropsGroup>) {
         super(props);
-        this.editId = 0;
     }
 
     async componentDidMount() {
-
-        this.editId = +this.props.params.id;
-        await this.props._query(this.editId);
-
+        await this.props._detail(+this.props.params.id);
     }
 
 
     handleSubmit = async (values: { name?: any; description?: any;  }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ name: any; description: any; }>> | undefined) => void) => {
 
         const group = new Group({
-            id: this.editId,
+            id: +this.props.params.id,
             name: values.name.toLowerCase(),
             description: values.description,
-
         });
         await this.props._update(group, this.props);
 
     }
 
     render() {
-        const {groupDetail} = this.props;
+        const {group} = this.props;
         return (
             <Formik
                 initialValues={{
-
-                    name: groupDetail.data![0].name,
-                    description: groupDetail.data![0].description,
-
+                    name: group.data?.name,
+                    description: group.data?.description,
                 }}
                 enableReinitialize={true}
                 validationSchema={Yup.object().shape({
@@ -142,14 +134,14 @@ class EditComponent extends Component <IPropsGroup, IStateGroup> {
 
 const mapStateToProps = (state: IReduxState) => {
     return {
-        groupDetail: state.group,
+        group: state.groupSelect,
         queryArgument: state.queryArgument
     }
 }
 const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
         _update: (group: Group, props: IPropsCommon) => update(group, props, dispatch),
-        _query: (argument: string | number | object | null) => query(argument, dispatch),
+        _detail: (argument:  number | null) => detail(argument, dispatch),
     }
 }
 

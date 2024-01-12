@@ -5,10 +5,9 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Trans, withTranslation} from "react-i18next";
 import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
-import {query, update} from "../../../actions/setting.actions";
+import {detail, update} from "../../../actions/setting.actions";
 import {connect} from "react-redux";
-
-import AlertComponent from '../../alert/alert.component';
+import AlertComponent from '../../../commons/alert/alert.component';
 import withRouter from "../../../utils/with.router";
 import {Setting} from "../../../models/setting.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
@@ -16,25 +15,20 @@ import {IPropsCommon} from "../../../interfaces/props.common.interface";
 import {IPropsSetting, IStateSetting} from "../../../interfaces/setting.interface";
 
 class EditComponent extends Component <IPropsSetting, IStateSetting> {
-    editId: number;
 
     constructor(props: IPropsSetting | Readonly<IPropsSetting>) {
         super(props);
-        this.editId = 0;
     }
 
     async componentDidMount() {
-
-        this.editId = +this.props.params.id;
-        await this.props._query(this.editId);
-
+        await this.props._detail(+this.props.params.id);
     }
 
 
     handleSubmit = async (values: { key?: any; value?: any; description?: any; status?: any;  }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ key: any; value: any; description: any; status: any; }>> | undefined) => void) => {
 
         const setting = new Setting({
-            id: this.editId,
+            id: +this.props.params.id,
             value:values.value.toUpperCase(),
             description: values.description,
             status: values.status==1,
@@ -44,15 +38,14 @@ class EditComponent extends Component <IPropsSetting, IStateSetting> {
     }
 
     render() {
-        const {settingDetail} = this.props;
+        const {setting} = this.props;
         return (
             <Formik
                 initialValues={{
-
-                    key: settingDetail.data![0].key,
-                    value: settingDetail.data![0].value,
-                    description: settingDetail.data![0].description,
-                    status: settingDetail.data![0].status
+                    key: setting.data?.key,
+                    value: setting.data?.value,
+                    description: setting.data?.description,
+                    status: setting.data?.status
                 }}
                 enableReinitialize={true}
                 validationSchema={Yup.object().shape({
@@ -198,7 +191,7 @@ class EditComponent extends Component <IPropsSetting, IStateSetting> {
 
 const mapStateToProps = (state: IReduxState) => {
     return {
-        settingDetail: state.setting,
+        setting: state.settingSelect,
         queryArgument: state.queryArgument
     }
 }
@@ -206,7 +199,7 @@ const mapDispatchToProps = (dispatch: IReduxDispatch) => {
 
     return {
         _update: (setting: Setting, props: IPropsCommon) => update(setting, props, dispatch),
-        _query: (argument: string | number | object | null) => query(argument, dispatch),
+        _detail: (argument:  number | null) => detail(argument, dispatch),
     }
 }
 

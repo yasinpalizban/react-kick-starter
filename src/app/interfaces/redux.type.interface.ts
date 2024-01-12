@@ -10,7 +10,8 @@ import {IProfile} from "./profile.interface";
 import {IAuth} from "./authenticate.interface";
 import {Action, AnyAction} from "redux";
 import {INotification} from "./notification.interface";
-import {IHome} from "./home.interface";
+import {IHomeSetting} from "./home.interface";
+import {IResponseObject} from "./iresponse.object";
 
 export interface IReduxState {
     urlPath: string;
@@ -19,19 +20,26 @@ export interface IReduxState {
     notification: Array<INotification>;
     explodeLink: string[];
     alert: any[];
+    toast: any;
     shareId: number;
     queryArgument: any[];
-    auth: IAuth;
-    profile: IProfile;
-    setting: ISetting;
-    overView: IOverView;
-    graph: IGraph;
-    group: IGroup;
-    permission: IPermission;
-    permissionGroup: IPermissionGroup;
-    permissionUser: IPermissionUser;
-    user: IUser;
-    home:IHome
+    auth: IResponseObject<IAuth>;
+    profile: IResponseObject<IProfile>;
+    setting: IResponseObject<ISetting[]>;
+    settingSelect: IResponseObject<ISetting>;
+    overView: IResponseObject<IOverView>;
+    graph: IResponseObject<IGraph[]>;
+    group: IResponseObject<IGroup[]>;
+    groupSelect: IResponseObject<IGroup>;
+    permission: IResponseObject<IPermission>;
+    permissionSelect: IResponseObject<IPermission>;
+    permissionGroup: IResponseObject<IPermissionGroup[]>;
+    permissionGroupSelect: IResponseObject<IPermissionGroup>;
+    permissionUser: IResponseObject<IPermissionUser[]>;
+    permissionUserSelect: IResponseObject<IPermissionUser>;
+    user: IResponseObject<IUser[]>;
+    userSelect: IResponseObject<IUser>;
+    home:IResponseObject<IHomeSetting>
 }
 
 export interface IReduxAction {

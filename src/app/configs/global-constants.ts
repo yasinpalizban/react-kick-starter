@@ -1,4 +1,3 @@
-import {RoleType} from "../enums/role.enum";
 
 export class GlobalConstants {
     public static links: {
@@ -24,15 +23,8 @@ export class GlobalConstants {
     public static limitUserMenu: {
         [key: string]: string[]
     } = {
-        account: [RoleType.Admin],
-        firstPage: [RoleType.Admin, RoleType.Coworker],
-        blog: [RoleType.Admin, RoleType.Blogger, RoleType.Coworker],
-        communicate: [RoleType.Admin, RoleType.Coworker],
-        dashboard: [RoleType.Admin, RoleType.Coworker, RoleType.Blogger],
-        request: [RoleType.Admin, RoleType.Coworker, RoleType.Member,RoleType.Contractor],
-        setting: [RoleType.Admin, RoleType.Blogger, RoleType.Coworker],
-        activity: [RoleType.Member, RoleType.Contractor],
-        jobPost: [RoleType.Admin, RoleType.Coworker],
+        account: ['user','graph','user', 'permission','permissionUser','permissionGroup'],
+        dashboard: ['overView','graph'],
     };
 
 }

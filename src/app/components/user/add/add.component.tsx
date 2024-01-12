@@ -8,7 +8,7 @@ import * as Yup from 'yup';
 import {save} from "../../../actions/user.actions";
 import * as groupActions from "../../../actions/group.actions";
 import {connect} from "react-redux";
-import AlertComponent from '../../alert/alert.component';
+import AlertComponent from '../../../commons/alert/alert.component';
 import withRouter from "../../../utils/with.router";
 import { User } from "../../../models/user.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
@@ -23,7 +23,7 @@ class AddComponent extends Component <IPropsUser,IStateUser> {
     }
 
     async componentDidMount() {
-        await this.props._groupQuery(null);
+        await this.props._groupRetrieve(null);
     }
 
     handleSubmit = async (values: { email: string; phone: string; username: string; firstName: string; lastName: string; groupId: string; password:string;  }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ email: string; phone: string; username: string; firstName: string; lastName: string; groupId: string;password:string;  }>> | undefined) => void) => {
@@ -33,7 +33,7 @@ class AddComponent extends Component <IPropsUser,IStateUser> {
     }
 
     render() {
-        const {groupRows} = this.props;
+        const {groupList} = this.props;
         return (
             <Formik
                 initialValues={{
@@ -211,7 +211,7 @@ class AddComponent extends Component <IPropsUser,IStateUser> {
                                         >{this.props.t('common.selectInputMessage')}</option>
 
                                         {
-                                            groupRows.data?.map((key:any) => <option value={key.id}>{key.name} </option>)
+                                            groupList.data?.map((key:any) => <option value={key.id}>{key.name} </option>)
                                         }
                                     </select>
                                     <div className="input-group-addon">
@@ -272,7 +272,7 @@ const mapStateToProps = (state:IReduxState) => {
 const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
         _save: (user: User, props: IPropsCommon) => save(user, props, dispatch),
-        _groupQuery: (argument: string | number | object | null) => groupActions.query(argument, dispatch)
+        _groupQuery: (argument: string | number | object | null) => groupActions.retrieve(argument, dispatch)
     }
 }
 

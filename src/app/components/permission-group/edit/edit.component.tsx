@@ -5,10 +5,9 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Trans, withTranslation} from "react-i18next";
 import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
-import {query, update} from "../../../actions/permission..group.actions";
+import { detail, update} from "../../../actions/permission..group.actions";
 import {connect} from "react-redux";
-
-import AlertComponent from '../../alert/alert.component';
+import AlertComponent from '../../../commons/alert/alert.component';
 import withRouter from "../../../utils/with.router";
 import * as groupActions from "../../../actions/group.actions";
 import * as permissionActions from "../../../actions/permission.actions";
@@ -35,12 +34,11 @@ class EditComponent extends Component <IPropsPermissionGroup, IStatePermissionGr
 
     async componentDidMount() {
 
-        this.editId = +this.props.params.id;
-        await this.props._query(this.editId);
-        await this.props._groupQuery(null);
-        await this.props._permissionQuery({limit: 20});
+        await this.props._retrieve(+this.props.params.id);
+        await this.props._groupRetrieve({limit: 20});
+        await this.props._permissionRetrieve({limit: 20});
 
-        this.props.permissionGroupDetail.data![0].actions.split("-").forEach((value: string) => {
+        this.props.permissionGroup.data?.actions.split("-").forEach((value: string) => {
 
             if (value === "get")
                 this.setState({isGet: true});
@@ -90,7 +88,7 @@ class EditComponent extends Component <IPropsPermissionGroup, IStatePermissionGr
         if (this.state.isCheck) {
             combineAction = (this.state.isGet ? '-get' : '') + (this.state.isPost ? '-post' : '') + (this.state.isPut ? '-put' : '') + (this.state.isDelete ? '-delete' : '');
         } else {
-            combineAction = this.props.permissionGroupDetail.data![0]?.actions;
+            combineAction = this.props.permissionGroup.data?.actions!;
         }
 
         const permission = {
@@ -107,13 +105,13 @@ class EditComponent extends Component <IPropsPermissionGroup, IStatePermissionGr
     }
 
     render() {
-        const {permissionGroupDetail, groupRows, permissionRows} = this.props;
+        const {permissionGroup, groupList, permissionList} = this.props;
 
         return (
             <Formik
                 initialValues={{
-                    permissionId: permissionGroupDetail.data![0].permissionId,
-                    groupId: permissionGroupDetail.data![0].groupId,
+                    permissionId: permissionGroup.data?.permissionId,
+                    groupId: permissionGroup.data?.groupId,
                     actions: [],
 
                 }}
@@ -142,7 +140,7 @@ class EditComponent extends Component <IPropsPermissionGroup, IStatePermissionGr
                                         <option disabled selected
                                         >{this.props.t('common.selectInputMessage')}</option>
                                         {
-                                            groupRows?.data?.map((item, i: number) => <option
+                                            groupList?.data?.map((item, i: number) => <option
                                                 value={item.id}>{item.name} </option>)
                                         }
                                     </select>
@@ -172,7 +170,7 @@ class EditComponent extends Component <IPropsPermissionGroup, IStatePermissionGr
                                         <option disabled selected
                                         >{this.props.t('common.selectInputMessage')}</option>
                                         {
-                                            permissionRows?.data?.map((item, i: number) => <option
+                                            permissionList?.data?.map((item, i: number) => <option
                                                 value={item.id}>{item.name} </option>)
                                         }
                                     </select>
@@ -271,7 +269,7 @@ class EditComponent extends Component <IPropsPermissionGroup, IStatePermissionGr
 
 const mapStateToProps = (state: IReduxState) => {
     return {
-        permissionGroupDetail: state.permissionGroup,
+        permissionGroupDetail: state.permissionGroupSelect,
         groupRows: state.group,
         permissionRows: state.permission,
         queryArgument: state.queryArgument
@@ -280,9 +278,9 @@ const mapStateToProps = (state: IReduxState) => {
 const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
         _update: (permissionGroup: PermissionGroup, props: IPropsCommon) => update(permissionGroup, props, dispatch),
-        _query: (argument: string | number | object | null) => query(argument, dispatch),
-        _groupQuery: (argument: number | string | object | null) => groupActions.query(argument, dispatch),
-        _permissionQuery: (argument: number | string | object | null) => permissionActions.query(argument, dispatch),
+        _detail: (argument:  number |  null) => detail(argument, dispatch),
+        _groupRetrieve: (argument: number | string | object | null) => groupActions.retrieve(argument, dispatch),
+        _permissionRetrieve: (argument: number | string | object | null) => permissionActions.retrieve(argument, dispatch),
     }
 }
 

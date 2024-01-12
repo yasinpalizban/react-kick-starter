@@ -1,4 +1,4 @@
-import {IAlert} from "../interfaces/alert.interface";
+import {IAlert} from "../interfaces/ialert";
 
 export const ALERT_NEW = 'ALERT_NEW';
 export const ALERT_REMOVE = 'ALERT_REMOVE';

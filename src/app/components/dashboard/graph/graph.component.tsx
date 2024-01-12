@@ -3,12 +3,12 @@ import './graph.component.scss';
 import {connect} from "react-redux";
 import {Trans, withTranslation} from "react-i18next";
 import withRouter from "../../../utils/with.router";
-import {query, save} from '../../../actions/graph.actions';
+import {retrieve, save} from '../../../actions/graph.actions';
 import {faAsterisk, faCalendar, faChartArea, faList} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Formik, FormikState} from "formik";
 import * as Yup from "yup";
-import AlertComponent from "../../alert/alert.component";
+import AlertComponent from "../../../commons/alert/alert.component";
 import {getDateByName} from "../../../utils/get.date.by.name";
 
 import {Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title} from 'chart.js';
@@ -87,7 +87,7 @@ class GraphComponent extends Component<IPropsGraph, IStateGraph> {
     }
 
     async componentDidMount() {
-        await this.props._query(null);
+        await this.props._retrieve(null);
     }
 
     handleSubmit = async (values: { _type?: string; toDate: any; fromDate: any; date: any; value?: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ _type: string; toDate: string; fromDate: string; date: string; }>> | undefined) => void) => {
@@ -422,7 +422,7 @@ const mapStateToProps = (state:IReduxState) => {
 }
 const mapDispatchToProps = (dispatch:IReduxDispatch) => {
     return {
-        _query: (argument: string | number | object | null) => query(argument,dispatch),
+        _retrieve: (argument: string | number | object | null) => retrieve(argument,dispatch),
         _save: (graph:Graph) => save(graph, dispatch),
         _alert: (error:any) => newAlert(error, dispatch)
     }

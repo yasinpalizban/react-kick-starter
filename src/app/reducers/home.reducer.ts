@@ -17,11 +17,11 @@ import {
     HOME_VISITOR_GET
 } from "../actions/home.actions";
 import {IReduxAction} from "../interfaces/redux.type.interface";
-import {IHome} from "../interfaces/home.interface";
+import {IHomeSetting} from "../interfaces/home.interface";
 
-const initialize: IHome = {};
+const initialize: IHomeSetting = {};
 
-export default function homeReducer(state = initialize, action: IReduxAction): IHome {
+export default function homeReducer(state = initialize, action: IReduxAction): IHomeSetting {
     switch (action.type) {
         case HOME_SETTING_GET:
             state.settingPost = action.payload;

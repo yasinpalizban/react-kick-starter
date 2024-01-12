@@ -25,73 +25,53 @@ class ProfileComponent extends Component <IPropsProfile,IStateProfile> {
     render() {
         return (
             <>
-                <section className="statistic">
-                    <div className="section__content section__content--p30">
-                        <div className="container-fluid">
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <div className="card">
-                                        <div className="card-header" style={{direction: 'ltr'}}>
-                                            <FontAwesomeIcon icon={faList}/>
-                                            <strong className="card-title pl-2">
-                                                <Trans i18nKey="profile.title"></Trans>
-                                            </strong>
-                                        </div>
-                                        <div className="card-body">
-                                            <div className="custom-tab">
+                <div className="custom-tab">
 
-                                                <nav>
-                                                    <div className="nav nav-tabs" id="nav-tab" role="tablist">
-                                                        <a className="nav-item nav-link active" id="custom-nav-info-tab"
-                                                           data-toggle="tab"
-                                                           href="src/app/components/profile/profile.component#custom-nav-info" role="tab"
-                                                           aria-controls="custom-nav-info"
-                                                           aria-selected="true" onClick={this.onClearAlert}> <Trans
-                                                            i18nKey="profile.title"></Trans></a>
-                                                        <a className="nav-item nav-link" id="custom-nav-address-tab"
-                                                           data-toggle="tab"
-                                                           href="src/app/components/profile/profile.component#custom-nav-address" role="tab"
-                                                           aria-controls="custom-nav-address"
-                                                           aria-selected="false" onClick={this.onClearAlert}> <Trans
-                                                            i18nKey="profile.location"></Trans></a>
+                    <nav>
+                        <div className="nav nav-tabs" id="nav-tab" role="tablist">
+                            <a className="nav-item nav-link active" id="custom-nav-info-tab"
+                               data-toggle="tab"
+                               href="src/app/components/profile/profile.component#custom-nav-info" role="tab"
+                               aria-controls="custom-nav-info"
+                               aria-selected="true" onClick={this.onClearAlert}> <Trans
+                                i18nKey="profile.title"></Trans></a>
+                            <a className="nav-item nav-link" id="custom-nav-address-tab"
+                               data-toggle="tab"
+                               href="src/app/components/profile/profile.component#custom-nav-address" role="tab"
+                               aria-controls="custom-nav-address"
+                               aria-selected="false" onClick={this.onClearAlert}> <Trans
+                                i18nKey="profile.location"></Trans></a>
 
-                                                        <a className="nav-item nav-link" id="custom-nav-password-tab"
-                                                           data-toggle="tab"
-                                                           href="src/app/components/profile/profile.component#custom-nav-password" role="tab"
-                                                           aria-controls="custom-nav-password"
-                                                           aria-selected="false" onClick={this.onClearAlert}><Trans
-                                                            i18nKey="profile.change"></Trans></a>
+                            <a className="nav-item nav-link" id="custom-nav-password-tab"
+                               data-toggle="tab"
+                               href="src/app/components/profile/profile.component#custom-nav-password" role="tab"
+                               aria-controls="custom-nav-password"
+                               aria-selected="false" onClick={this.onClearAlert}><Trans
+                                i18nKey="profile.change"></Trans></a>
 
-                                                    </div>
-                                                </nav>
-                                                <div className="tab-content pl-3 pt-2" id="nav-tabContent">
-                                                    <div className="tab-pane fade show active" id="custom-nav-info"
-                                                         role="tabpanel"
-                                                         aria-labelledby="custom-nav-info-tab">
-                                                        <UserInfoComponent />
-                                                    </div>
-                                                    <div className="tab-pane fade" id="custom-nav-address"
-                                                         role="tabpanel"
-                                                         aria-labelledby="custom-nav-address-tab">
-                                                        <UserAddressComponent />
-
-                                                    </div>
-                                                    <div className="tab-pane fade" id="custom-nav-password"
-                                                         role="tabpanel"
-                                                         aria-labelledby="custom-nav-password-tab">
-                                                        <UserPasswordComponent />
-                                                    </div>
-
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
+                    </nav>
+                    <div className="tab-content pl-3 pt-2" id="nav-tabContent">
+                        <div className="tab-pane fade show active" id="custom-nav-info"
+                             role="tabpanel"
+                             aria-labelledby="custom-nav-info-tab">
+                            <UserInfoComponent />
+                        </div>
+                        <div className="tab-pane fade" id="custom-nav-address"
+                             role="tabpanel"
+                             aria-labelledby="custom-nav-address-tab">
+                            <UserAddressComponent />
+
+                        </div>
+                        <div className="tab-pane fade" id="custom-nav-password"
+                             role="tabpanel"
+                             aria-labelledby="custom-nav-password-tab">
+                            <UserPasswordComponent />
+                        </div>
+
                     </div>
-                </section>
+
+                </div>
 
 
             </>

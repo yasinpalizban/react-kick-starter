@@ -8,10 +8,10 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Trans, withTranslation} from "react-i18next";
 import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
-import {query, update} from "../../../actions/user.actions";
+import {retrieve, update} from "../../../actions/user.actions";
 import {connect} from "react-redux";
 
-import AlertComponent from '../../alert/alert.component';
+import AlertComponent from '../../../commons/alert/alert.component';
 import withRouter from "../../../utils/with.router";
 import * as groupActions from "../../../actions/group.actions";
 import {User} from "../../../models/user.model";
@@ -20,25 +20,22 @@ import {IPropsCommon} from "../../../interfaces/props.common.interface";
 import {IPropsUser, IStateUser} from "../../../interfaces/user.interface";
 
 class EditComponent extends Component <IPropsUser,IStateUser> {
-editId:number;
+
     constructor(props: IPropsUser | Readonly<IPropsUser>) {
         super(props);
-this.editId=0;
+
     }
 
     async componentDidMount() {
-
-        this.editId = +this.props.params.id;
-        await this.props._query(this.editId);
-        await this.props._groupQuery(null);
-
+        await this.props._retrieve(+this.props.params.id);
+        await this.props._groupRetrieve({limit:100});
     }
 
 
     handleSubmit = async (values: { email?: any; phone?: any; username?: any; firstName?: any; lastName?: any; groupId?: any; status?: any;  }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ email: any; phone: any; username: any; firstName: any; lastName: any; groupId: any; status: any; }>> | undefined) => void) => {
 
         const user = new User({
-            id: this.editId,
+            id: +this.props.params.id,
             firstName: values.firstName,
             lastName: values.lastName,
             status: values.status=="1",
@@ -49,18 +46,18 @@ this.editId=0;
     }
 
     render() {
-        const {userDetail, groupRows} = this.props;
+        const {user, groupList} = this.props;
 
         return (
             <Formik
                 initialValues={{
-                    email: userDetail.data![0].email,
-                    phone: userDetail.data![0].phone,
-                    username: userDetail.data![0].username,
-                    firstName: userDetail.data![0].firstName,
-                    lastName: userDetail.data![0].lastName,
-                    groupId: userDetail.data![0].groupId,
-                    status: userDetail.data![0].groupId
+                    email: user.data?.email,
+                    phone: user.data?.phone,
+                    username: user.data?.username,
+                    firstName: user.data?.firstName,
+                    lastName: user.data?.lastName,
+                    groupId: user.data?.groupId,
+                    status: user.data?.status
                 }}
                 enableReinitialize={true}
                 validationSchema={Yup.object().shape({
@@ -222,7 +219,7 @@ this.editId=0;
                                         <option disabled selected>{this.props.t('common.selectInputMessage')}</option>
 
                                         {
-                                            groupRows.data?.map((key, i) => <option key={i} value={key.id}>{key.name} </option>)
+                                            groupList.data?.map((key, i) => <option key={i} value={key.id}>{key.name} </option>)
                                         }
                                     </select>
                                     <div className="input-group-addon">
@@ -249,8 +246,8 @@ this.editId=0;
                                             className={`form-control ${(errors.status && touched.status) ? "is-invalid" : ""} `}
                                             onChange={handleChange} onBlur={handleBlur} defaultValue="1">
                                         <option disabled selected>{this.props.t('common.selectInputMessage')}</option>
-                                        <option selected={values.status == 1} value="1">{this.props.t('filed.activate')} </option>
-                                        <option selected={values.status==1} value="0">{this.props.t('filed.deActivate')} </option>
+                                        <option selected={values.status == true} value="1">{this.props.t('filed.activate')} </option>
+                                        <option selected={values.status == false} value="0">{this.props.t('filed.deActivate')} </option>
                                     </select>
                                     <div className="input-group-addon">
                                         <FontAwesomeIcon icon={faUsers}/>
@@ -287,16 +284,16 @@ this.editId=0;
 
 const mapStateToProps = (state: IReduxState) => {
     return {
-        userDetail: state.user,
-        groupRows: state.group,
+        user: state.userSelect,
+        groupList: state.group,
         queryArgument: state.queryArgument
     }
 }
 const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
         _update: (user: User, props: IPropsCommon) => update(user, props, dispatch),
-        _query: (argument: string | number | object | null) => query(argument, dispatch),
-        _groupQuery: (argument: string | number | object | null) => groupActions.query(argument, dispatch)
+        _query: (argument: string | number | object | null) => retrieve(argument, dispatch),
+        _groupQuery: (argument: string | number | object | null) => groupActions.retrieve(argument, dispatch)
     }
 }
 

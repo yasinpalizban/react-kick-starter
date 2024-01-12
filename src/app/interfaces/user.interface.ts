@@ -1,14 +1,12 @@
-import {IPagination} from "./pagination.interface";
 import {IPropsCommon} from "./props.common.interface";
 import {IStateCommon} from "./state.common.interface";
 import {IGroup} from "./group.interface";
 import {User} from "../models/user.model";
+import {IResponseObject} from "./iresponse.object";
+import {IBasic} from "./ibasic";
 
-export interface IUser {
+export interface IUser extends  IBasic {
 
-  pager?:IPagination;
-  data?: [{
-    id: number,
     email: string,
     username: string,
     status_message: string,
@@ -28,21 +26,20 @@ export interface IUser {
     phone: string,
     group: string,
     groupId?: number,
-  }];
-
 }
 
 
 export interface IPropsUser extends IPropsCommon {
-  _query: (argument: string | number | object | null) => Promise<void>;
+  _retrieve: (argument: string | number | object | null) => Promise<void>;
+  _detail: (argument: number) => Promise<void>;
   _save: (user: User, props: IPropsCommon) => Promise<void>;
   _update: (user: User, props: IPropsCommon) => Promise<void>;
   _remove: (id: number, index: number) => Promise<void>;
   _newQueryArgument: (queryArgument: any) => void;
-  _groupQuery:(argument: string | number | object | null)=> Promise<void>;
-  userDetail: IUser;
-  userRows: IUser;
-  groupRows: IGroup;
+  _groupRetrieve:(argument: string | number | object | null)=> Promise<void>;
+  user: IResponseObject<IUser>;
+  userList: IResponseObject<IUser[]>;
+  groupList: IResponseObject<IGroup[]>;
 }
 
 export interface IStateUser extends  IStateCommon{
