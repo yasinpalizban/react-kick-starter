@@ -36,37 +36,31 @@ import {
 
     SettingListComponent,
     SettingAddComponent,
-    SettingEditComponent,
     SettingDetailComponent,
 
 
     UserListComponent,
     UserAddComponent,
-    UserEditComponent,
     UserDetailComponent,
 
 
     GroupListComponent,
     GroupAddComponent,
-    GroupEditComponent,
     GroupDetailComponent,
 
 
     PermissionListComponent,
     PermissionAddComponent,
-    PermissionEditComponent,
     PermissionDetailComponent,
 
 
     PermissionGroupListComponent,
     PermissionGroupAddComponent,
-    PermissionGroupEditComponent,
     PermissionGroupDetailComponent,
 
 
     PermissionUserListComponent,
     PermissionUserAddComponent,
-    PermissionUserEditComponent,
     PermissionUserDetailComponent,
     HomeMainComponent,
 
@@ -156,40 +150,40 @@ class App extends Component<IPropsCommon, IStateCommon> {
                             <Route path="setting" >
                                 <Route path="list" element={<SettingListComponent/>}/>
                                 <Route path="add" element={<SettingAddComponent/>}/>
-                                <Route path="edit/:id" element={<SettingEditComponent/>}/>
+                                <Route path="edit/:id" element={<SettingAddComponent/>}/>
                                 <Route path="detail/:id" element={<SettingDetailComponent/>}/>
                             </Route>
                             <Route path="group" >
                                 <Route path="list" element={<GroupListComponent/>}/>
                                 <Route path="add" element={<GroupAddComponent/>}/>
-                                <Route path="edit/:id" element={<GroupEditComponent/>}/>
+                                <Route path="edit/:id" element={<GroupAddComponent/>}/>
                                 <Route path="detail/:id" element={<GroupDetailComponent/>}/>
                             </Route>
                             <Route path="user" >
                                 <Route path="list" element={<UserListComponent/>}/>
                                 <Route path="add" element={<UserAddComponent/>}/>
-                                <Route path="edit/:id" element={<UserEditComponent/>}/>
+                                <Route path="edit/:id" element={<UserAddComponent/>}/>
                                 <Route path="detail/:id" element={<UserDetailComponent/>}/>
                             </Route>
 
                             <Route path="permission" >
                                 <Route path="list" element={<PermissionListComponent/>}/>
                                 <Route path="add" element={<PermissionAddComponent/>}/>
-                                <Route path="edit/:id" element={<PermissionEditComponent/>}/>
+                                <Route path="edit/:id" element={<PermissionAddComponent/>}/>
                                 <Route path="detail/:id" element={<PermissionDetailComponent/>}/>
                             </Route>
 
                             <Route path="permission-group" >
                                 <Route path="list" element={<PermissionGroupListComponent/>}/>
                                 <Route path="add" element={<PermissionGroupAddComponent/>}/>
-                                <Route path="edit/:id" element={<PermissionGroupEditComponent/>}/>
+                                <Route path="edit/:id" element={<PermissionGroupAddComponent/>}/>
                                 <Route path="detail/:id" element={<PermissionGroupDetailComponent/>}/>
                             </Route>
 
                             <Route path="permission-user" >
                                 <Route path="list" element={<PermissionUserListComponent/>}/>
                                 <Route path="add" element={<PermissionUserAddComponent/>}/>
-                                <Route path="edit/:id" element={<PermissionUserEditComponent/>}/>
+                                <Route path="edit/:id" element={<PermissionUserAddComponent/>}/>
                                 <Route path="detail/:id" element={<PermissionUserDetailComponent/>}/>
                             </Route>
 

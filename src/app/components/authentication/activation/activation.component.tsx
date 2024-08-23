@@ -1,4 +1,4 @@
-import React, {Component, createRef} from 'react';
+import React, { useRef} from 'react';
 import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
 import './activation.component.scss';
@@ -16,55 +16,43 @@ import {resetAlert} from "../../../actions/alert.actions";
 import {Auth} from '../../../interfaces/authenticate.model';
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsCommon} from "../../../interfaces/props.common.interface";
-import {IPropsAuth, IStateAuth} from "../../../interfaces/authenticate.interface";
+import {IPropsAuth} from "../../../interfaces/authenticate.interface";
 
 
-class ActivationComponent extends Component <IPropsAuth, IStateAuth> {
-    private phoneInput: React.RefObject<HTMLInputElement>;
-    private emailInput: React.RefObject<HTMLInputElement>;
-
-    constructor(props: IPropsAuth | Readonly<IPropsAuth>) {
-        super(props);
-        this.phoneInput = createRef<HTMLInputElement>();
-        this.emailInput = createRef<HTMLInputElement>();
-    }
-
-
-    handleSubmit = async (values: { email: any; token: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ email: string; token: string; }>> | undefined) => void) => {
+function ActivationComponent(props: IPropsAuth ){
+        const usePhoneInput= useRef<HTMLInputElement>(null);
+      const useEmailInput= useRef<HTMLInputElement>(null);
+   const  handleSubmit = async (values: { email: any; token: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ email: string; token: string; }>> | undefined) => void) => {
 
         const auth = new Auth({
             activeToken: values.token.replace(/\s/g, ""),
             email: values.email.replace(/\s/g, "")
         });
-        await this.props._activateAccountViaEmail(auth, this.props);
+        await props._activateAccountViaEmail(auth,props);
     }
 
-    handleSubmit2 = async (values: { phone: any; code: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ phone: string; code: string; }>> | undefined) => void) => {
+   const handleSubmit2 = async (values: { phone: any; code: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ phone: string; code: string; }>> | undefined) => void) => {
 
         const auth = new Auth({
             activeToken: values.code.toString().replace(/\s/g, ""),
             phone: values.phone.replace(/\s/g, "")
         });
-        await this.props._activateAccountViaSms(auth, this.props);
+        await props._activateAccountViaSms(auth,props);
     }
-    onClearAlert = () => {
-        this.props._resetAlert();
-    }
-
-    onSendEmail = async () => {
-
-
-        const auth = new Auth({email: this.emailInput?.current?.value});
-
-         await this.props._sendActivateCodeViaEmail(auth, this.props);
-    }
-    onSendSms = async () => {
-
-        const auth = new Auth({phone: this.phoneInput?.current?.value});
-        await this.props._sendActivateCodeViaSms(auth, this.props)
+   const onClearAlert = () => {
+        props._resetAlert();
     }
 
-    render() {
+    const onSendEmail = async () => {
+        // @ts-ignore
+        const auth = new Auth({email: useEmailInput?.current?.value});
+         await props._sendActivateCodeViaEmail(auth, props);
+    }
+    const onSendSms = async () => {
+        // @ts-ignore
+        const auth = new Auth({phone: usePhoneInput?.current?.value});
+        await props._sendActivateCodeViaSms(auth, props)
+    }
         return (
             <main>
 
@@ -94,13 +82,13 @@ class ActivationComponent extends Component <IPropsAuth, IStateAuth> {
                                                     <a className="nav-item nav-link active" id="custom-nav-info-tab"
                                                        data-toggle="tab"
                                                        href="src/app/components/authentication/activation/activation.component#custom-nav-info" role="tab" aria-controls="custom-nav-info"
-                                                       aria-selected="true" onClick={this.onClearAlert}> <Trans
+                                                       aria-selected="true" onClick={onClearAlert}> <Trans
                                                         i18nKey="auth.activateViaEmail"></Trans> </a>
                                                     <a className="nav-item nav-link" id="custom-nav-address-tab"
                                                        data-toggle="tab"
                                                        href="src/app/components/authentication/activation/activation.component#custom-nav-address" role="tab"
                                                        aria-controls="custom-nav-address"
-                                                       aria-selected="false" onClick={this.onClearAlert}> <Trans
+                                                       aria-selected="false" onClick={onClearAlert}> <Trans
                                                         i18nKey="auth.activateViaSms"></Trans> </a>
 
                                                 </div>
@@ -124,7 +112,7 @@ class ActivationComponent extends Component <IPropsAuth, IStateAuth> {
                                                         onSubmit={(fields, {
                                                             setSubmitting,
                                                             resetForm
-                                                        }) => this.handleSubmit(fields, setSubmitting, resetForm)}>
+                                                        }) => handleSubmit(fields, setSubmitting, resetForm)}>
                                                         {
                                                             ({
                                                                  values,
@@ -156,10 +144,10 @@ class ActivationComponent extends Component <IPropsAuth, IStateAuth> {
                                                                                     className={`au-input au-input--full   ${(errors.email && touched.email && errors.email) ? "is-invalid" : ""} `}
                                                                                     type="email"
                                                                                     id="email" name="email"
-                                                                                    placeholder={this.props.t('filed.email')}
+                                                                                    placeholder={props.t('filed.email')}
                                                                                     onChange={handleChange}
                                                                                     onBlur={handleBlur}
-                                                                                    ref={this.emailInput}
+                                                                                    ref={useEmailInput}
                                                                                 />
 
                                                                                 <div className="invalid-feedback">
@@ -185,7 +173,7 @@ class ActivationComponent extends Component <IPropsAuth, IStateAuth> {
                                                                                     className={`au-input au-input--full   ${(errors.token && touched.token && errors.token) ? "is-invalid" : ""} `}
                                                                                     id="token"
                                                                                     type="text" name="token"
-                                                                                    placeholder={this.props.t('filed.token')}
+                                                                                    placeholder={props.t('filed.token')}
                                                                                     onChange={handleChange}
                                                                                     onBlur={handleBlur}/>
                                                                                 <div className="invalid-feedback ">
@@ -214,7 +202,7 @@ class ActivationComponent extends Component <IPropsAuth, IStateAuth> {
                                                                                 <button
                                                                                     className="au-btn  au-btn--blue m-l-5 m-t-15"
                                                                                     type="button"
-                                                                                    onClick={this.onSendEmail}
+                                                                                    onClick={onSendEmail}
                                                                                 ><Trans
                                                                                     i18nKey="common.sendEmailLink"></Trans>
                                                                                 </button>
@@ -230,26 +218,26 @@ class ActivationComponent extends Component <IPropsAuth, IStateAuth> {
 
                                                                             <div className="card-body">
                                                                                 <button type="button"
-                                                                                        onClick={(event) => this.props.navigate('../sign-in')}
+                                                                                        onClick={(event) => props.navigate('../sign-in')}
                                                                                         className="btn btn-link btn-sm">
                                                                                     <Trans
                                                                                         i18nKey="auth.signIn"></Trans>
                                                                                 </button>
                                                                                 <button type="button"
-                                                                                        onClick={(event) => this.props.navigate('../sign-up')}
+                                                                                        onClick={(event) => props.navigate('../sign-up')}
                                                                                         className="btn btn-link btn-sm">
                                                                                     <Trans
                                                                                         i18nKey="auth.signUp"></Trans>
                                                                                 </button>
                                                                                 <button
                                                                                     type="button"
-                                                                                    onClick={(event) => this.props.navigate('../forgot')}
+                                                                                    onClick={(event) => props.navigate('../forgot')}
                                                                                     className="btn btn-link btn-sm">
                                                                                     <Trans
                                                                                         i18nKey="auth.forgotPassword"></Trans>
                                                                                 </button>
                                                                                 <button type="button"
-                                                                                        onClick={(event) => this.props.navigate('../reset-password')}
+                                                                                        onClick={(event) => props.navigate('../reset-password')}
                                                                                         className="btn btn-link btn-sm">
                                                                                     <Trans
                                                                                         i18nKey="auth.resetPassword"></Trans>
@@ -285,7 +273,7 @@ class ActivationComponent extends Component <IPropsAuth, IStateAuth> {
                                                         onSubmit={(fields, {
                                                             setSubmitting,
                                                             resetForm
-                                                        }) => this.handleSubmit2(fields, setSubmitting, resetForm)}>
+                                                        }) => handleSubmit2(fields, setSubmitting, resetForm)}>
                                                         {
                                                             ({
                                                                  values,
@@ -317,10 +305,10 @@ class ActivationComponent extends Component <IPropsAuth, IStateAuth> {
                                                                                     className={`au-input au-input--full   ${(errors.phone && touched.phone && errors.phone) ? "is-invalid" : ""} `}
                                                                                     type="phone"
                                                                                     id="phone" name="phone"
-                                                                                    placeholder={this.props.t('filed.phone')}
+                                                                                    placeholder={props.t('filed.phone')}
                                                                                     onChange={handleChange}
                                                                                     onBlur={handleBlur}
-                                                                                    ref={this.phoneInput}
+                                                                                    ref={usePhoneInput}
                                                                                 />
 
                                                                                 <div className="invalid-feedback">
@@ -346,7 +334,7 @@ class ActivationComponent extends Component <IPropsAuth, IStateAuth> {
                                                                                     className={`au-input au-input--full   ${(errors.code && touched.code && errors.code) ? "is-invalid" : ""} `}
                                                                                     id="code"
                                                                                     type="text" name="code"
-                                                                                    placeholder={this.props.t('filed.code')}
+                                                                                    placeholder={props.t('filed.code')}
                                                                                     onChange={handleChange}
                                                                                     onBlur={handleBlur}/>
                                                                                 <div className="invalid-feedback ">
@@ -375,7 +363,7 @@ class ActivationComponent extends Component <IPropsAuth, IStateAuth> {
                                                                                 <button
                                                                                     className="au-btn  au-btn--blue m-l-5 m-t-15"
                                                                                     type="button"
-                                                                                    onClick={this.onSendSms}
+                                                                                    onClick={onSendSms}
                                                                                 ><Trans
                                                                                     i18nKey="common.sendSmsCode"></Trans>
                                                                                 </button>
@@ -391,26 +379,26 @@ class ActivationComponent extends Component <IPropsAuth, IStateAuth> {
 
                                                                             <div className="card-body">
                                                                                 <button type="button"
-                                                                                        onClick={(event) => this.props.navigate('../sign-in')}
+                                                                                        onClick={(event) => props.navigate('../sign-in')}
                                                                                         className="btn btn-link btn-sm">
                                                                                     <Trans
                                                                                         i18nKey="auth.signIn"></Trans>
                                                                                 </button>
                                                                                 <button type="button"
-                                                                                        onClick={(event) => this.props.navigate('../sign-up')}
+                                                                                        onClick={(event) => props.navigate('../sign-up')}
                                                                                         className="btn btn-link btn-sm">
                                                                                     <Trans
                                                                                         i18nKey="auth.signUp"></Trans>
                                                                                 </button>
                                                                                 <button
                                                                                     type="button"
-                                                                                    onClick={(event) => this.props.navigate('../forgot')}
+                                                                                    onClick={(event) => props.navigate('../forgot')}
                                                                                     className="btn btn-link btn-sm">
                                                                                     <Trans
                                                                                         i18nKey="auth.forgotPassword"></Trans>
                                                                                 </button>
                                                                                 <button type="button"
-                                                                                        onClick={(event) => this.props.navigate('../reset-password')}
+                                                                                        onClick={(event) => props.navigate('../reset-password')}
                                                                                         className="btn btn-link btn-sm">
                                                                                     <Trans
                                                                                         i18nKey="auth.resetPassword"></Trans>
@@ -443,7 +431,7 @@ class ActivationComponent extends Component <IPropsAuth, IStateAuth> {
                 </section>
             </main>
         );
-    }
+
 }
 
 const mapStateToProps = (state: IReduxState) => {

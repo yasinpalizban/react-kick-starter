@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import './detail.component.scss';
 import {Trans, withTranslation} from "react-i18next";
 import {detail} from "../../../actions/group.actions";
@@ -6,21 +6,19 @@ import {connect} from "react-redux";
 import withRouter from '../../../utils/with.router';
 
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsGroup, IStateGroup} from "../../../interfaces/group.interface";
+import {IPropsGroup} from "../../../interfaces/group.interface";
 
-class DetailComponent extends Component <IPropsGroup, IStateGroup> {
+function DetailComponent (props: IPropsGroup ) {
 
-    constructor(props: IPropsGroup | Readonly<IPropsGroup>) {
-        super(props);
-    }
-
-    async componentDidMount() {
-        await this.props._detail( +this.props.params.id);
-    }
+    useEffect(()=>{
+        (async ()=>{
+            await props._detail( +props.params.id);
+        })();
+    },[])
 
 
-    render() {
-        const {group} = this.props;
+
+        const {group} =props;
         return (
 
             <div className="table-responsive">
@@ -47,7 +45,7 @@ class DetailComponent extends Component <IPropsGroup, IStateGroup> {
 
 
         );
-    }
+
 }
 
 

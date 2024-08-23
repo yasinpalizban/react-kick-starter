@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import './over.view.component.scss';
 import {connect} from "react-redux";
 import {Trans, withTranslation} from "react-i18next";
@@ -8,20 +8,17 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faList} from "@fortawesome/free-solid-svg-icons";
 import moment from "moment";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsOverView, IStateOerView} from "../../../interfaces/over.view.interface";
+import {IPropsOverView} from "../../../interfaces/over.view.interface";
 
-class OverViewComponent extends Component<IPropsOverView, IStateOerView> {
-    constructor(props: IPropsOverView | Readonly<IPropsOverView>) {
+function OverViewComponent (props:IPropsOverView) {
+    useEffect(()=>{
+        (async ()=>{
+            await props._retrieve( null);
+        })();
+    },[])
 
-        super(props);
-    }
 
-    async componentDidMount() {
-        await this.props._retrieve(null);
-    }
-
-    render() {
-        const {overView} = this.props;
+    const {overView} = props;
 
         return (
             <>
@@ -103,7 +100,7 @@ class OverViewComponent extends Component<IPropsOverView, IStateOerView> {
                 </div>
             </>
         );
-    }
+
 }
 
 

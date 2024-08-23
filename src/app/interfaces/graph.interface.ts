@@ -1,5 +1,4 @@
 import {IPropsCommon} from "./props.common.interface";
-import {IStateCommon} from "./state.common.interface";
 import {Graph} from "../models/graph.model";
 import {IResponseObject} from "./iresponse.object";
 
@@ -16,5 +15,3 @@ export interface IPropsGraph extends IPropsCommon {
   graphData: IResponseObject<IGraph[]>;
 }
 
-export interface IStateGraph extends  IStateCommon{
-}

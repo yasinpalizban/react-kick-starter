@@ -1,11 +1,11 @@
 import {faPhone, faUser, faEnvelope, faUsers, faAsterisk} from "@fortawesome/free-solid-svg-icons";
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import './add.component.scss';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Trans, withTranslation} from "react-i18next";
-import {Formik, FormikState} from 'formik';
+import {Formik, FormikState, FormikValues} from 'formik';
 import * as Yup from 'yup';
-import {save} from "../../../actions/user.actions";
+import {retrieve, save, update} from "../../../actions/user.actions";
 import * as groupActions from "../../../actions/group.actions";
 import {connect} from "react-redux";
 import AlertComponent from '../../../commons/alert/alert.component';
@@ -13,37 +13,52 @@ import withRouter from "../../../utils/with.router";
 import { User } from "../../../models/user.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsCommon} from "../../../interfaces/props.common.interface";
-import {IPropsUser, IStateUser} from "../../../interfaces/user.interface";
+import {IPropsUser} from "../../../interfaces/user.interface";
 
-class AddComponent extends Component <IPropsUser,IStateUser> {
-    defaultPassword: string;
-    constructor(props: IPropsUser | Readonly<IPropsUser>) {
-        super(props);
-        this.defaultPassword = 'abc123456';;
-    }
+function AddComponent(props: IPropsUser) {
+   const defaultPassword: string ='abc123456';
 
-    async componentDidMount() {
-        await this.props._groupRetrieve(null);
-    }
+    useEffect(()=>{
+        (async ()=>{
+            if(+props.params.id){
+                await props._retrieve(+props.params.id);
+            }
+            await props._groupRetrieve({limit:100});
+        })();
+    },[]);
 
-    handleSubmit = async (values: { email: string; phone: string; username: string; firstName: string; lastName: string; groupId: string; password:string;  }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ email: string; phone: string; username: string; firstName: string; lastName: string; groupId: string;password:string;  }>> | undefined) => void) => {
+   const handleSubmit = async (values: any, setSubmitting: any, resetForm:any) => {
        const user = new User(values);
-        await this.props._save(user, this.props);
+
+       // const user = new User({
+       //     id: +props.params.id,
+       //     firstName: values.firstName,
+       //     lastName: values.lastName,
+       //     status: values.status=="1",
+       //     groupId: values.groupId,
+       // });
+       if(+props.params.id){
+           await props._update(user, props);
+       }else{
+           await props._save(user, props);
+
+       }
 
     }
 
-    render() {
-        const {groupList} = this.props;
+
+        const {groupList,user} = props;
         return (
             <Formik
                 initialValues={{
-                    email: '',
-                    phone: '',
-                    username: '',
-                    firstName: '',
-                    lastName: '',
-                    groupId: '',
-                    password: this.defaultPassword
+                    password: defaultPassword||'',
+                    email: user.data?.email||'',
+                    phone: user.data?.phone||'',
+                    username: user.data?.username||'',
+                    firstName: user.data?.firstName||'',
+                    lastName: user.data?.lastName||'',
+                    groupId: user.data?.groupId||'',
+                    status: user.data?.status||''
                 }}
                 enableReinitialize={true}
                 validationSchema={Yup.object().shape({
@@ -61,8 +76,10 @@ class AddComponent extends Component <IPropsUser,IStateUser> {
                         .required('required'),
                     password: Yup.string()
                         .required('required'),
+                    status:Yup.string()
+                        .required('required'),
                 })}
-                onSubmit={(fields, {setSubmitting, resetForm}) => this.handleSubmit(fields, setSubmitting, resetForm)}>
+                onSubmit={(fields, {setSubmitting, resetForm}) => handleSubmit(fields, setSubmitting, resetForm)}>
                 {
                     ({values, errors, touched, status, handleChange, handleBlur, handleSubmit, isSubmitting}) => (
                         <form onSubmit={handleSubmit}>
@@ -208,7 +225,7 @@ class AddComponent extends Component <IPropsUser,IStateUser> {
                                             className={`form-control ${(errors.groupId && touched.groupId) ? "is-invalid" : ""} `}
                                             onChange={handleChange} onBlur={handleBlur} defaultValue="1">
                                         <option disabled selected
-                                        >{this.props.t('common.selectInputMessage')}</option>
+                                        >{props.t('common.selectInputMessage')}</option>
 
                                         {
                                             groupList.data?.map((key:any) => <option value={key.id}>{key.name} </option>)
@@ -234,7 +251,7 @@ class AddComponent extends Component <IPropsUser,IStateUser> {
 
                             <div className="form-group">
                                 <div className="input-group">
-                                    <div className="input-group-addon">{this.props.t('filed.password')}</div>
+                                    <div className="input-group-addon">{props.t('filed.password')}</div>
                                     <input type="text"
                                            id="password"
                                            name="password"
@@ -244,6 +261,32 @@ class AddComponent extends Component <IPropsUser,IStateUser> {
                                            readOnly={true}/>
                                     <div className="input-group-addon">
                                         <FontAwesomeIcon icon={faAsterisk}/>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <div className="input-group">
+                                    <div className="input-group-addon"><Trans i18nKey="filed.status"></Trans></div>
+                                    <select id="status" name="status" required
+                                            className={`form-control ${(errors.status && touched.status) ? "is-invalid" : ""} `}
+                                            onChange={handleChange} onBlur={handleBlur} defaultValue="1">
+                                        <option disabled selected>{props.t('common.selectInputMessage')}</option>
+                                        <option selected={values.status == true} value="1">{props.t('filed.activate')} </option>
+                                        <option  value="0">{props.t('filed.deActivate')} </option>
+                                    </select>
+                                    <div className="input-group-addon">
+                                        <FontAwesomeIcon icon={faUsers}/>
+                                    </div>
+
+                                    <div className="invalid-feedback ">
+
+                                        {
+                                            errors.status === 'required' ?
+                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
+                                                </div> : ''
+                                        }
+
                                     </div>
 
                                 </div>
@@ -260,19 +303,23 @@ class AddComponent extends Component <IPropsUser,IStateUser> {
 
             </Formik>
         );
-    }
+
 }
 
 
 const mapStateToProps = (state:IReduxState) => {
     return {
-        groupRows: state.group
+        user: state.userSelect,
+        groupList: state.group,
+        queryArgument: state.queryArgument
     }
 }
 const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
         _save: (user: User, props: IPropsCommon) => save(user, props, dispatch),
-        _groupQuery: (argument: string | number | object | null) => groupActions.retrieve(argument, dispatch)
+        _groupQuery: (argument: string | number | object | null) => groupActions.retrieve(argument, dispatch),
+        _update: (user: User, props: IPropsCommon) => update(user, props, dispatch),
+        _query: (argument: string | number | object | null) => retrieve(argument, dispatch),
     }
 }
 

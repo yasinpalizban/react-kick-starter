@@ -2,8 +2,7 @@ import React, {Component} from 'react';
 import './footer.component.scss';
 import ToastComponent from "../../../commons/toast/toast.component";
 
-class FooterComponent extends Component {
-    render() {
+function FooterComponent (props:any)  {
         return (
 
             <>
@@ -22,7 +21,7 @@ class FooterComponent extends Component {
                 </section>
             </>
         );
-    }
+
 }
 
 export default FooterComponent;

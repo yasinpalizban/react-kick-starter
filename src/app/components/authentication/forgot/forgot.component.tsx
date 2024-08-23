@@ -12,19 +12,14 @@ import {environment} from "../../../../environments/environment";
 import { Auth } from '../../../interfaces/authenticate.model';
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsCommon} from "../../../interfaces/props.common.interface";
-import {IPropsAuth, IStateAuth} from "../../../interfaces/authenticate.interface";
+import {IPropsAuth} from "../../../interfaces/authenticate.interface";
 
-class ForgotComponent extends Component  <IPropsAuth,IStateAuth>{
+function ForgotComponent (props: IPropsAuth | Readonly<IPropsAuth>){
 
-    constructor(props: IPropsAuth | Readonly<IPropsAuth>) {
-        super(props);
-    }
-
-
-    handleSubmit = async (values: { login?: string; token?: any; action?: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ login: string; }>> | undefined) => void) => {
+   const handleSubmit = async (values: { login?: string; token?: any; action?: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ login: string; }>> | undefined) => void) => {
       //  const {executeRecaptcha}:any = this.props.googleReCaptchaProps;
 
-        const { executeRecaptcha } = (this.props as IWithGoogleReCaptchaProps)
+        const { executeRecaptcha } = (props as IWithGoogleReCaptchaProps)
             .googleReCaptchaProps;
         if (!executeRecaptcha) {
             console.log('Recaptcha has not been loaded');
@@ -37,11 +32,11 @@ class ForgotComponent extends Component  <IPropsAuth,IStateAuth>{
             token: token,
             action: action
         });
-        await this.props._forgot(auth,this.props);
+        await props._forgot(auth,props);
 
     }
 
-    render() {
+
         return (
             <main>
 
@@ -80,7 +75,7 @@ class ForgotComponent extends Component  <IPropsAuth,IStateAuth>{
                                             onSubmit={(fields, {
                                                 setSubmitting,
                                                 resetForm
-                                            }) => this.handleSubmit(fields, setSubmitting, resetForm)}>
+                                            }) => handleSubmit(fields, setSubmitting, resetForm)}>
                                             {
                                                 ({
                                                      values,
@@ -115,7 +110,7 @@ class ForgotComponent extends Component  <IPropsAuth,IStateAuth>{
                                                                         className={`au-input au-input--full   ${(errors.login && touched.login && errors.login) ? "is-invalid" : ""} `}
                                                                         type="text"
                                                                         id="login" name="login"
-                                                                        placeholder={this.props.t('filed.emailPhoneUsername')}
+                                                                        placeholder={props.t('filed.emailPhoneUsername')}
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}/>
 
@@ -141,25 +136,25 @@ class ForgotComponent extends Component  <IPropsAuth,IStateAuth>{
                                                                 <div className="card-body">
 
                                                                     <button type="button"
-                                                                            onClick={(event) => this.props.navigate('../sign-in')}
+                                                                            onClick={(event) => props.navigate('../sign-in')}
                                                                             className="btn btn-link btn-sm">
                                                                         <Trans
                                                                             i18nKey="auth.signIn"></Trans></button>
                                                                     <button
                                                                         type="button"
-                                                                        onClick={(event) => this.props.navigate('../sign-up')}
+                                                                        onClick={(event) => props.navigate('../sign-up')}
                                                                         className="btn btn-link btn-sm">
                                                                         <Trans
                                                                             i18nKey="auth.signUp"></Trans>
                                                                     </button>
                                                                     <button type="button"
-                                                                            onClick={(event) => this.props.navigate('../reset-password')}
+                                                                            onClick={(event) => props.navigate('../reset-password')}
                                                                             className="btn btn-link btn-sm">
                                                                         <Trans
                                                                             i18nKey="auth.resetPassword"></Trans>
                                                                     </button>
                                                                     <button type="button"
-                                                                            onClick={(event) => this.props.navigate('../activation')}
+                                                                            onClick={(event) => props.navigate('../activation')}
                                                                             className="btn btn-link btn-sm">
                                                                         <Trans
                                                                             i18nKey="auth.activationAccount"></Trans>
@@ -184,7 +179,7 @@ class ForgotComponent extends Component  <IPropsAuth,IStateAuth>{
                 </section>
             </main>
         );
-    }
+
 }
 
 const mapStateToProps = (state: IReduxState) => {

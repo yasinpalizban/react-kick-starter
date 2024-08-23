@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import './graph.component.scss';
 import {connect} from "react-redux";
 import {Trans, withTranslation} from "react-i18next";
@@ -10,24 +10,67 @@ import {Formik, FormikState} from "formik";
 import * as Yup from "yup";
 import AlertComponent from "../../../commons/alert/alert.component";
 import {getDateByName} from "../../../utils/get.date.by.name";
-
 import {Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title} from 'chart.js';
 import {Pie, Bar} from 'react-chartjs-2';
-
 import {newAlert} from "../../../actions/alert.actions";
 import {alertError} from "../../../utils/alert.functions";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {Graph} from "../../../models/graph.model";
-import {IPropsGraph, IStateGraph} from "../../../interfaces/graph.interface";
+import {IPropsGraph} from "../../../interfaces/graph.interface";
 
 
-class GraphComponent extends Component<IPropsGraph, IStateGraph> {
-    private data2:any;
-    private data:any;
-    private options:any;
+function GraphComponent (props: IPropsGraph ) {
+    useEffect(()=>{
+        (async ()=>{
+            await props._retrieve(null);
+        })();
+    },[])
 
-    constructor(props: IPropsGraph | Readonly<IPropsGraph>) {
-        super(props);
+
+    let data2:any={
+        labels: ['January'],
+        datasets: [
+            {
+                label: 'Dataset 1',
+                data: [100],
+                backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            },
+
+        ],
+    };
+
+    let data:any={
+        labels: ['Red'],
+        datasets: [
+            {
+                label: '# of Votes',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                ],
+                borderWidth: 1,
+            },
+        ],
+    };
+    let options:any= {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'center',
+            },
+            title: {
+                display: true,
+                text: 'Chart.js Bar Chart',
+            },
+        },
+    };
+
+
+
+
         ChartJS.register(
             ArcElement,
             CategoryScale,
@@ -38,65 +81,16 @@ class GraphComponent extends Component<IPropsGraph, IStateGraph> {
             Legend,
         );
 
-        this.data = {
-            labels: ['Red'],
-            datasets: [
-                {
-                    label: '# of Votes',
-                    data: [12, 19, 3, 5, 2, 3],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                    ],
-                    borderWidth: 1,
-                },
-            ],
-        };
 
 
-        this.options = {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'center',
-                },
-                title: {
-                    display: true,
-                    text: 'Chart.js Bar Chart',
-                },
-            },
-        };
 
-        const labels = ['January'];
-
-        this.data2 = {
-            labels,
-            datasets: [
-                {
-                    label: 'Dataset 1',
-                    data: [100],
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
-                },
-
-            ],
-        };
-
-
-    }
-
-    async componentDidMount() {
-        await this.props._retrieve(null);
-    }
-
-    handleSubmit = async (values: { _type?: string; toDate: any; fromDate: any; date: any; value?: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ _type: string; toDate: string; fromDate: string; date: string; }>> | undefined) => void) => {
+   const handleSubmit = async (values: { _type?: string; toDate: any; fromDate: any; date: any; value?: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ _type: string; toDate: string; fromDate: string; date: string; }>> | undefined) => void) => {
 
         if ((!values?.date || values?.date === 'none') &&
             !values?.fromDate &&
             !values?.toDate) {
-            const error = alertError(this.props.t('error.selectDate'));
-            this.props._alert(error);
+            const error = alertError(props.t('error.selectDate'));
+            props._alert(error);
             return;
         }
 
@@ -105,16 +99,13 @@ class GraphComponent extends Component<IPropsGraph, IStateGraph> {
         const toDate = values.toDate.length > 0 ? values.toDate : getDateByName('today');
 
 
-        await this.props._save({
+        await props._save({
             type: values._type,
             toDate: toDate.replace("\//", "-"),
             fromDate: fromDate.replace("\//", "-")
         });
 
     }
-
-    render() {
-
         let labels: string[] = [];
         let datasets: object[] = [];
         let dataRows: number[] = [];
@@ -122,7 +113,7 @@ class GraphComponent extends Component<IPropsGraph, IStateGraph> {
         const colors:string[]= ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange','Pink', 'Brown', 'Gray','Black','Silver'];
         let indexColor= 0;
 
-        this.props.graphData.data?.map((key, i) => {
+        props.graphData.data?.map((key, i) => {
             labels.push(key.name);
             dataRows.push(Number(key.value));
             backgroundColor.push(colors[indexColor]);
@@ -135,12 +126,12 @@ class GraphComponent extends Component<IPropsGraph, IStateGraph> {
         });
 
 
-        this.data2 = {
+        data2 = {
             labels:labels,
             datasets: datasets,
         };
 
-        this.data = {
+        data = {
             labels:labels,
             datasets: [
                 {
@@ -179,7 +170,7 @@ class GraphComponent extends Component<IPropsGraph, IStateGraph> {
                                     onSubmit={(fields, {
                                         setSubmitting,
                                         resetForm
-                                    }) => this.handleSubmit(fields, setSubmitting, resetForm)}>
+                                    }) => handleSubmit(fields, setSubmitting, resetForm)}>
                                     {
                                         ({
                                              values,
@@ -204,15 +195,15 @@ class GraphComponent extends Component<IPropsGraph, IStateGraph> {
                                                                 className={`form-control ${(errors._type && touched._type) ? "is-invalid" : ""} `}
                                                                 onChange={handleChange} onBlur={handleBlur}>
                                                             <option disabled
-                                                                    value="default"> {this.props.t('common.selectInputMessage')} </option>
+                                                                    value="default"> {props.t('common.selectInputMessage')} </option>
                                                             <option
-                                                                value="news">  {this.props.t("dashboard.news")} </option>
+                                                                value="news">  {props.t("dashboard.news")} </option>
                                                             <option
-                                                                value="visitor"> {this.props.t("dashboard.visitor")} </option>
+                                                                value="visitor"> {props.t("dashboard.visitor")} </option>
                                                             <option
-                                                                value="request">  {this.props.t("dashboard.request")}</option>
+                                                                value="request">  {props.t("dashboard.request")}</option>
                                                             <option
-                                                                value="jobPost">  {this.props.t("dashboard.jobPost")}</option>
+                                                                value="jobPost">  {props.t("dashboard.jobPost")}</option>
                                                         </select>
                                                         <div className="input-group-addon">
                                                             <FontAwesomeIcon icon={faAsterisk}/>
@@ -373,7 +364,7 @@ class GraphComponent extends Component<IPropsGraph, IStateGraph> {
                             </div>
                             <div className="card-body"  style={{height:'700px'}} >
 
-                                <Pie  data={this.data} options={{
+                                <Pie  data={data} options={{
                                     // padding:"2px",
                                     responsive:true,
                                     maintainAspectRatio:false,
@@ -392,7 +383,7 @@ class GraphComponent extends Component<IPropsGraph, IStateGraph> {
                                 <strong className="card-title pl-2"><Trans i18nKey="dashboard.chart"></Trans> </strong>
                             </div>
                             <div className="card-body" style={{height:'700px'}}>
-                                <Bar  data={this.data2} options={{
+                                <Bar  data={data2} options={{
                                     // padding:2,
                                     responsive:true,
                                     maintainAspectRatio:false,
@@ -411,7 +402,7 @@ class GraphComponent extends Component<IPropsGraph, IStateGraph> {
             </>
         )
             ;
-    }
+
 }
 
 

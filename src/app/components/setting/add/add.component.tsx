@@ -1,48 +1,56 @@
 import {faEye, faFileWord, faAddressBook} from "@fortawesome/free-solid-svg-icons";
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import './add.component.scss';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Trans, withTranslation} from "react-i18next";
-import {Formik, FormikState} from 'formik';
+import {Formik, FormikState, FormikValues} from 'formik';
 import * as Yup from 'yup';
-import {save} from "../../../actions/setting.actions";
+import {detail, save, update} from "../../../actions/setting.actions";
 import {connect} from "react-redux";
 import AlertComponent from '../../../commons/alert/alert.component';
 import withRouter from "../../../utils/with.router";
 import {Setting} from "../../../models/setting.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsCommon} from "../../../interfaces/props.common.interface";
-import {IPropsSetting,  IStateSetting} from "../../../interfaces/setting.interface";
+import {IPropsSetting} from "../../../interfaces/setting.interface";
 
 
-class AddComponent extends Component <IPropsSetting, IStateSetting> {
+function AddComponent (props: IPropsSetting ) {
+    useEffect(() => {
+        (async ()=>{
+            if(+props.params.id)
+            {
+                await props._detail(+props.params.id);
+            }
+        })();
+    },[]);
+ const   handleSubmit = async (values: FormikValues, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: (Partial<FormikState<{ key: string; value: string; description: string; status: string }>> | undefined)) => void) => {
 
-    constructor(props: IPropsSetting | Readonly<IPropsSetting>) {
-        super(props);
+
+     const setting = new Setting({
+         id: +props.params.id,
+         value:values.value.toUpperCase(),
+         description: values.description,
+         status: values.status=='1',
+     });
+     if(+props.params.id){
+         await props._update(setting, props);
+     }else{
+         await props._save(setting, props);
+     }
+
+
 
     }
 
-
-    handleSubmit = async (values: { key: string; value: string; description: string; status: string; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ key: string; value: string; description: string; status: string; }>> | undefined) => void) => {
-        const setting = new Setting({
-            key: values.key.toUpperCase() ,
-            value: values.value.toUpperCase(),
-            description: values.description,
-            status: values.status=="1",
-        });
-        await this.props._save(setting, this.props);
-
-    }
-
-    render() {
-
+    const {setting} = props;
         return (
             <Formik
                 initialValues={{
-                    key: '',
-                    value: '',
-                    description: '',
-                    status: ''
+                    key: setting.data?.key||'',
+                    value: setting.data?.value||'',
+                    description: setting.data?.description||'',
+                    status: setting.data?.status||''
                 }}
                 enableReinitialize={true}
                 validationSchema={Yup.object().shape({
@@ -55,7 +63,7 @@ class AddComponent extends Component <IPropsSetting, IStateSetting> {
                     status: Yup.string()
                         .required('required'),
                 })}
-                onSubmit={(fields, {setSubmitting, resetForm}) => this.handleSubmit(fields, setSubmitting, resetForm)}>
+                onSubmit={(fields, {setSubmitting, resetForm}) => handleSubmit(fields, setSubmitting, resetForm)}>
                 {
                     ({values, errors, touched, status, handleChange, handleBlur, handleSubmit, isSubmitting}) => (
                         <form onSubmit={handleSubmit}>
@@ -149,9 +157,9 @@ class AddComponent extends Component <IPropsSetting, IStateSetting> {
                                     <select id="status" name="status" required
                                             className={`form-control ${(errors.status && touched.status) ? "is-invalid" : ""} `}
                                             onChange={handleChange} onBlur={handleBlur} defaultValue="1">
-                                        <option disabled selected>{this.props.t('common.selectInputMessage')}</option>
-                                        <option  value="1">{this.props.t('filed.activate')} </option>
-                                        <option value="0">{this.props.t('filed.deActivate')} </option>
+                                        <option disabled selected>{props.t('common.selectInputMessage')}</option>
+                                        <option  value="1">{props.t('filed.activate')} </option>
+                                        <option value="0">{props.t('filed.deActivate')} </option>
                                     </select>
                                     <div className="input-group-addon">
                                         <FontAwesomeIcon icon={faEye}/>
@@ -183,16 +191,21 @@ class AddComponent extends Component <IPropsSetting, IStateSetting> {
 
             </Formik>
         );
-    }
+
 }
 
 
 const mapStateToProps = (state:IReduxState) => {
-    return {}
+    return {
+        setting: state.settingSelect,
+        queryArgument: state.queryArgument
+    }
 }
 const mapDispatchToProps = (dispatch:IReduxDispatch) => {
     return {
         _save: (setting: Setting, props: IPropsCommon) => save(setting,props, dispatch),
+        _update: (setting: Setting, props: IPropsCommon) => update(setting, props, dispatch),
+        _detail: (argument:  number | null) => detail(argument, dispatch),
     }
 }
 

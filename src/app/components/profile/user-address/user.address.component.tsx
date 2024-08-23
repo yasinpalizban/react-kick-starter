@@ -1,5 +1,5 @@
 import {faMapMarker, faAddressBook, faMap} from "@fortawesome/free-solid-svg-icons";
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import './user.address.component.scss';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Trans, withTranslation} from "react-i18next";
@@ -11,30 +11,27 @@ import {connect} from "react-redux";
 import AlertComponent from '../../../commons/alert/alert.component';
 import {Profile} from "../../../models/profile.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsProfile, IStateProfile} from "../../../interfaces/profile.interface";
+import {IPropsProfile} from "../../../interfaces/profile.interface";
 import withRouter from "../../../utils/with.router";
 import {IPropsCommon} from "../../../interfaces/props.common.interface";
 
-class UserAddressComponent extends Component <IPropsProfile, IStateProfile> {
+function UserAddressComponent (props: IPropsProfile) {
 
-    constructor(props: IPropsProfile | Readonly<IPropsProfile>) {
-        super(props);
-    }
-
-    async componentDidMount() {
-        await this.props._retrieve();
-
-    }
+    useEffect(()=>{
+        (async ()=>{
+            await props._retrieve();
+        })();
+    },[]);
 
 
-    handleSubmit = async (values: { country: any; city: any; address: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ country: any; city: any; address: any; }>> | undefined) => void) => {
+   const handleSubmit = async (values: { country: any; city: any; address: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ country: any; city: any; address: any; }>> | undefined) => void) => {
         const profile = new Profile(values);
-        await this.props._save(profile, this.props);
+        await props._save(profile, props);
 
     }
 
-    render() {
-        const {profile} = this.props;
+
+        const {profile} = props;
         return (
             <Formik
                 initialValues={{
@@ -51,7 +48,7 @@ class UserAddressComponent extends Component <IPropsProfile, IStateProfile> {
                     address: Yup.string()
                         .required('required').max(255, 'maxlength'),
                 })}
-                onSubmit={(fields, {setSubmitting, resetForm}) => this.handleSubmit(fields, setSubmitting, resetForm)}>
+                onSubmit={(fields, {setSubmitting, resetForm}) => handleSubmit(fields, setSubmitting, resetForm)}>
                 {
                     ({values, errors, touched, status, handleChange, handleBlur, handleSubmit, isSubmitting}) => (
                         <form onSubmit={handleSubmit}>
@@ -150,7 +147,7 @@ class UserAddressComponent extends Component <IPropsProfile, IStateProfile> {
 
             </Formik>
         );
-    }
+
 }
 
 

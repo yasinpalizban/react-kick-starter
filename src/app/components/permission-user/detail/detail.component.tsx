@@ -1,24 +1,21 @@
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import './detail.component.scss';
 import {Trans, withTranslation} from "react-i18next";
 import {detail} from "../../../actions/permission.user.actions";
 import {connect} from "react-redux";
 import withRouter from '../../../utils/with.router';
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsPermissionUser, IStatePermissionUser} from "../../../interfaces/permission.user.interface";
+import {IPropsPermissionUser} from "../../../interfaces/permission.user.interface";
 
-class DetailComponent extends Component <IPropsPermissionUser, IStatePermissionUser> {
-    constructor(props: IPropsPermissionUser | Readonly<IPropsPermissionUser>) {
-        super(props);
-    }
+function DetailComponent (props: IPropsPermissionUser | Readonly<IPropsPermissionUser>)  {
 
-    async componentDidMount() {
-        await this.props._detail(+this.props.params.id);
-    }
+  useEffect(()=>{
+      (async ()=>{
+          await props._detail(+props.params.id);
+      })();
+  },[]);
 
-
-    render() {
-        const {permissionUser} = this.props;
+        const {permissionUser} = props;
         return (
 
             <div className="table-responsive">
@@ -56,7 +53,7 @@ class DetailComponent extends Component <IPropsPermissionUser, IStatePermissionU
 
 
         );
-    }
+
 }
 
 

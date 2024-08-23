@@ -28,11 +28,3 @@ export interface IPropsPermissionGroup extends IPropsCommon {
   groupList:IResponseObject<IGroup[]>;
   permissionList:IResponseObject<IPermission[]>;
 }
-
-export interface IStatePermissionGroup extends IStateCommon{
-  isDelete?: boolean;
-  isGet?: boolean;
-  isPost?: boolean;
-  isPut?: boolean;
-  isCheck?: boolean;
-}

@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {useEffect} from 'react';
 import './detail.component.scss';
 import {Trans, withTranslation} from "react-i18next";
 import moment from "moment";
@@ -6,23 +6,20 @@ import {detail} from "../../../actions/setting.actions";
 import {connect} from "react-redux";
 import withRouter from '../../../utils/with.router';
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsSetting, IStateSetting} from "../../../interfaces/setting.interface";
+import {IPropsSetting} from "../../../interfaces/setting.interface";
 
-class DetailComponent extends Component <IPropsSetting, IStateSetting> {
+function DetailComponent (props: IPropsSetting ) {
+    useEffect(()=>{
+        (async ()=>{
+            if(+props.params.id){
+                await props._detail(+props.params.id);
+            }
+        })();
+    },[])
 
-    constructor(props: IPropsSetting | Readonly<IPropsSetting>) {
-        super(props);
-    }
 
-    async componentDidMount() {
-        await this.props._detail(+this.props.params.id);
-    }
-
-
-    render() {
-        const {setting} = this.props;
+    const {setting} = props;
         return (
-
             <div className="table-responsive">
                 <table className="table table-top-campaign">
                     <tbody>
@@ -77,7 +74,7 @@ class DetailComponent extends Component <IPropsSetting, IStateSetting> {
 
 
         );
-    }
+
 }
 
 

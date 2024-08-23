@@ -52,6 +52,7 @@ class SearchingFiledComponent extends Component <IPropsSearchingField, IStateSea
         this.ruleData = props.ruleData
 
         this.state = {
+            onClickSearch:props.onClickSearch,
             modalRef: false,
             initSearchFiled: {
                 _data: [{
@@ -64,9 +65,6 @@ class SearchingFiledComponent extends Component <IPropsSearchingField, IStateSea
         }
     }
 
-    componentDidMount() {
-
-    }
 
 
     onOpenModal = () => {
@@ -105,6 +103,8 @@ class SearchingFiledComponent extends Component <IPropsSearchingField, IStateSea
             },
         );
 
+        this.state.onClickSearch();
+
     }
     onRuleChange = (event: any) => {
         this.ruleValue = event.currentTarget.value;
@@ -136,7 +136,7 @@ class SearchingFiledComponent extends Component <IPropsSearchingField, IStateSea
                 search: `?${params}` + queryParam,
             },
         );
-
+        this.state.onClickSearch();
 
     }
     onModalHide = () => {

@@ -7,7 +7,9 @@ export interface IPropsSearchingField extends IPropsCommon {
   redirectPath:string;
   listLink: Array<{ link: string, name: string }>
   service:any;
+  onClickSearch:any
 }
 
 export interface IStateSearchingField  extends  IStateCommon{
+  onClickSearch:any;
 }

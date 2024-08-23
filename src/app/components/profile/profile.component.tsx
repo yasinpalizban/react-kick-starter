@@ -1,28 +1,22 @@
 import React, {Component} from 'react';
 import './profile.component.scss';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Trans, withTranslation} from "react-i18next";
-import {faList} from "@fortawesome/free-solid-svg-icons";
 import UserAddressComponent from "./user-address/user.address.component";
 import UserPasswordComponent from "./user-password/user.password.component";
 import UserInfoComponent from "./user-info/user.info.component";
 import {connect} from "react-redux";
 import {resetAlert} from "../../actions/alert.actions";
 import {IReduxDispatch, IReduxState} from "../../interfaces/redux.type.interface";
-import {IPropsProfile, IStateProfile} from "../../interfaces/profile.interface";
+import {IPropsProfile} from "../../interfaces/profile.interface";
 import withRouter from "../../utils/with.router";
 
-class ProfileComponent extends Component <IPropsProfile,IStateProfile> {
+function ProfileComponent (props:IPropsProfile) {
 
-    constructor(props: IPropsProfile | Readonly<IPropsProfile>) {
-        super(props);
+ const   onClearAlert = () => {
+        props._resetAlert();
     }
 
-    onClearAlert = () => {
-        this.props._resetAlert();
-    }
 
-    render() {
         return (
             <>
                 <div className="custom-tab">
@@ -33,20 +27,20 @@ class ProfileComponent extends Component <IPropsProfile,IStateProfile> {
                                data-toggle="tab"
                                href="src/app/components/profile/profile.component#custom-nav-info" role="tab"
                                aria-controls="custom-nav-info"
-                               aria-selected="true" onClick={this.onClearAlert}> <Trans
+                               aria-selected="true" onClick={onClearAlert}> <Trans
                                 i18nKey="profile.title"></Trans></a>
                             <a className="nav-item nav-link" id="custom-nav-address-tab"
                                data-toggle="tab"
                                href="src/app/components/profile/profile.component#custom-nav-address" role="tab"
                                aria-controls="custom-nav-address"
-                               aria-selected="false" onClick={this.onClearAlert}> <Trans
+                               aria-selected="false" onClick={onClearAlert}> <Trans
                                 i18nKey="profile.location"></Trans></a>
 
                             <a className="nav-item nav-link" id="custom-nav-password-tab"
                                data-toggle="tab"
                                href="src/app/components/profile/profile.component#custom-nav-password" role="tab"
                                aria-controls="custom-nav-password"
-                               aria-selected="false" onClick={this.onClearAlert}><Trans
+                               aria-selected="false" onClick={onClearAlert}><Trans
                                 i18nKey="profile.change"></Trans></a>
 
                         </div>
@@ -78,7 +72,7 @@ class ProfileComponent extends Component <IPropsProfile,IStateProfile> {
 
         )
             ;
-    }
+
 }
 
 const mapStateToProps = (state: IReduxState) => {

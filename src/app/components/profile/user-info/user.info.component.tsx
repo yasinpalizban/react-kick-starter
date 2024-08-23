@@ -1,4 +1,4 @@
-import React, {Component, createRef} from 'react';
+import React, {Component, createRef, useRef, useState} from 'react';
 import './user.info.component.scss';
 import {Trans, withTranslation} from "react-i18next";
 import {Formik, FormikState} from 'formik';
@@ -17,25 +17,18 @@ import {connect} from "react-redux";
 import avatar from '../../../../assets/images/icon/default-avatar.jpg';
 import {Profile} from "../../../models/profile.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsProfile, IStateProfile} from "../../../interfaces/profile.interface";
+import {IPropsProfile} from "../../../interfaces/profile.interface";
 import withRouter from "../../../utils/with.router";
 import {IPropsCommon} from "../../../interfaces/props.common.interface";
 
-class UserInfoComponent extends Component <IPropsProfile, IStateProfile> {
-    private selectImage: React.RefObject<HTMLInputElement>;
-    private isNewImage: boolean;
-    private formData: FormData;
-
-    constructor(props: IPropsProfile | Readonly<IPropsProfile>) {
-        super(props);
-        this.selectImage = createRef<HTMLInputElement>();
-        this.isNewImage = false;
-        this.state = {image: avatar}
-        this.formData = new FormData();
-    }
+function UserInfoComponent (props:IPropsProfile) {
+    const selectImage =  useRef<HTMLInputElement>(null);
+    const [isNewImage, setNewImage] = useState(false);
+    const [image,setImage] = useState(avatar)
+    const formData: FormData =  new FormData();
 
 
-    handleSubmit = async (values: { username: any; phone: any; email: any; firstName: any; lastName: any; gender: any; title: any; bio: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ username: any; phone: any; email: any; firstName: any; lastName: any; gender: any; title: any; bio: any; }>> | undefined) => void) => {
+   const handleSubmit = async (values: { username: any; phone: any; email: any; firstName: any; lastName: any; gender: any; title: any; bio: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ username: any; phone: any; email: any; firstName: any; lastName: any; gender: any; title: any; bio: any; }>> | undefined) => void) => {
         const profile = new Profile({
             firstName: values.firstName,
             lastName: values.lastName,
@@ -44,29 +37,30 @@ class UserInfoComponent extends Component <IPropsProfile, IStateProfile> {
             bio: values.bio,
             title:values.title
         });
-       await this.props._save(profile, this.props)
-        if (this.isNewImage) {
-            await this.props._save(this.formData, this.props)
+       await props._save(profile, props)
+        if (isNewImage) {
+            await props._save(formData, props)
         }
 
     }
 
-    updateImage = (event: any) => {
+   const updateImage = (event: any) => {
 
         const file = event.target.files[0];
         // File Preview
         const reader = new FileReader();
         reader.onload = () => {
             const image = reader.result;
-            this.formData.append('image', file, file.name);
-            this.isNewImage = true;
-            this.setState({image: image})
+            formData.append('image', file, file.name);
+            setNewImage(true)
+            // @ts-ignore
+            setImage(image)
         };
         reader.readAsDataURL(file);
     }
 
-    render() {
-        const {profile} = this.props;
+
+        const {profile} = props;
         return (
             <Formik
                 initialValues={{
@@ -93,7 +87,7 @@ class UserInfoComponent extends Component <IPropsProfile, IStateProfile> {
                     gender: Yup.string()
                         .required('required'),
                 })}
-                onSubmit={(fields, {setSubmitting, resetForm}) => this.handleSubmit(fields, setSubmitting, resetForm)}>
+                onSubmit={(fields, {setSubmitting, resetForm}) => handleSubmit(fields, setSubmitting, resetForm)}>
                 {
                     ({values, errors, touched, status, handleChange, handleBlur, handleSubmit, isSubmitting}) => (
                         <form onSubmit={handleSubmit}>
@@ -106,13 +100,13 @@ class UserInfoComponent extends Component <IPropsProfile, IStateProfile> {
                                 <div className="profile">
                                     <div className="mx-auto d-block">
                                         <input
-                                            ref={this.selectImage}
+                                            ref={selectImage}
                                             accept="image/*"
                                             name="image" type="file"
-                                            onChange={this.updateImage}
+                                            onChange={updateImage}
                                             id="selectImage"/>
-                                        <img src={this.state.image} onClick={() => {
-                                            this.selectImage?.current?.click()
+                                        <img src={image} onClick={() => {
+                                            selectImage?.current?.click()
                                         }}
                                              className="rounded-circle mx-auto d-block " alt="Card image cap"/>
                                         <div className="location text-sm-center">
@@ -338,7 +332,7 @@ class UserInfoComponent extends Component <IPropsProfile, IStateProfile> {
 
             </Formik>
         );
-    }
+
 }
 
 

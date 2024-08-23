@@ -1,5 +1,4 @@
 import {IPropsCommon} from "./props.common.interface";
-import {IStateCommon} from "./state.common.interface";
 import {Auth} from "./authenticate.model";
 import {IGoogleRecaptchaProps} from 'react-google-recaptcha-v3';
 export interface IAuth {
@@ -58,7 +57,4 @@ export interface IPropsAuth extends IPropsCommon {
   _sendActivateCodeViaSms(auth: Auth, props:IPropsCommon): Promise<void>;
   googleReCaptchaProps?:IGoogleRecaptchaProps;
   _resetAlert():()=>void;
-}
-
-export interface IStateAuth extends  IStateCommon{
 }

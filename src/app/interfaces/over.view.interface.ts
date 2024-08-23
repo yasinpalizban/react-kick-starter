@@ -1,5 +1,4 @@
 import {IPropsCommon} from "./props.common.interface";
-import {IStateCommon} from "./state.common.interface";
 import {IUser} from "./user.interface";
 import {IResponseObject} from "./iresponse.object";
 
@@ -20,5 +19,3 @@ export interface IPropsOverView extends IPropsCommon {
   overView:  IResponseObject<IOverView>;
 }
 
-export interface IStateOerView extends  IStateCommon{
-}

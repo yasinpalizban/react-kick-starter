@@ -1,5 +1,4 @@
 import {IPropsCommon} from "./props.common.interface";
-import {IStateCommon} from "./state.common.interface";
 import {PermissionUser} from "../models/permission.user.model";
 import {IPermission} from "./permission.interface";
 import {IUser} from "./user.interface";
@@ -34,10 +33,3 @@ export interface IPropsPermissionUser extends IPropsCommon {
   permissionList:IResponseObject<IPermission[]>;
 }
 
-export interface IStatePermissionUser extends IStateCommon{
-  isDelete?: boolean;
-  isGet?: boolean;
-  isPost?: boolean;
-  isPut?: boolean;
-  isCheck?: boolean;
-}

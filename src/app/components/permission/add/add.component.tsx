@@ -1,11 +1,11 @@
 import {faEye, faFileWord, faStickyNote} from "@fortawesome/free-solid-svg-icons";
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import './add.component.scss';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Trans, withTranslation} from "react-i18next";
-import {Formik, FormikState} from 'formik';
+import {Formik, FormikState, FormikValues} from 'formik';
 import * as Yup from 'yup';
-import {save} from "../../../actions/permission.actions";
+import {detail, save, update} from "../../../actions/permission.actions";
 import {connect} from "react-redux";
 
 import AlertComponent from '../../../commons/alert/alert.component';
@@ -13,31 +13,44 @@ import withRouter from "../../../utils/with.router";
 import { Permission } from "../../../models/permission.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsCommon} from "../../../interfaces/props.common.interface";
-import {IPropsPermission, IStatePermission} from "../../../interfaces/permission.interface";
+import {IPropsPermission} from "../../../interfaces/permission.interface";
 
 
-class AddComponent extends Component <IPropsPermission, IStatePermission> {
+function AddComponent (props: IPropsPermission) {
+    useEffect(()=>{
+        (async ()=>{
+            if(+props.params.id){
+                await props._detail(+props.params.id);
+            }
 
-    constructor(props: IPropsPermission | Readonly<IPropsPermission>) {
-        super(props);
-
-    }
+        })();
+    },[])
 
 
-    handleSubmit = async (values: { name: string; description: string; active: string; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ name: string; description: string; active: string; }>> | undefined) => void) => {
-       const permission = new Permission(values);
-        await this.props._save(permission, this.props);
 
-    }
+   const  handleSubmit = async (values: FormikValues, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: (Partial<FormikState<{ name: string; description: string; active: string }>> | undefined)) => void) => {
+       const permission = new Permission({
+           id: +props.params.id,
+           name: values.name.toLowerCase(),
+           description: values.description,
+           active: values.active=='1',
+       });
 
-    render() {
+       if(+props.params.id){
+           await props._update(permission, props);
+       }else {
+           await props._save(permission, props);
+       }
+       }
 
+
+        const {permission} =props;
         return (
             <Formik
                 initialValues={{
-                    name: '',
-                    description: '',
-                    active: ''
+                    name: permission?.data?.name||'',
+                    description: permission?.data?.description||'',
+                    active: permission?.data?.active||''
                 }}
                 enableReinitialize={true}
                 validationSchema={Yup.object().shape({
@@ -48,7 +61,7 @@ class AddComponent extends Component <IPropsPermission, IStatePermission> {
                     active: Yup.string()
                         .required('required'),
                 })}
-                onSubmit={(fields, {setSubmitting, resetForm}) => this.handleSubmit(fields, setSubmitting, resetForm)}>
+                onSubmit={(fields, {setSubmitting, resetForm}) => handleSubmit(fields, setSubmitting, resetForm)}>
                 {
                     ({values, errors, touched, status, handleChange, handleBlur, handleSubmit, isSubmitting}) => (
                         <form onSubmit={handleSubmit}>
@@ -117,9 +130,9 @@ class AddComponent extends Component <IPropsPermission, IStatePermission> {
                                             className={`form-control ${(errors.active && touched.active) ? "is-invalid" : ""} `}
                                             onChange={handleChange} onBlur={handleBlur} defaultValue="1">
                                         <option disabled selected
-                                        >{this.props.t('common.selectInputMessage')}</option>
-                                        <option value="1">{this.props.t('filed.activate')} </option>
-                                        <option value="0">{this.props.t('filed.deActivate')} </option>
+                                        >{props.t('common.selectInputMessage')}</option>
+                                        <option value="1">{props.t('filed.activate')} </option>
+                                        <option value="0">{props.t('filed.deActivate')} </option>
                                     </select>
                                     <div className="input-group-addon">
                                         <FontAwesomeIcon icon={faEye}/>
@@ -151,18 +164,21 @@ class AddComponent extends Component <IPropsPermission, IStatePermission> {
 
             </Formik>
         );
-    }
+
 }
 
 
 const mapStateToProps = (state: IReduxState) => {
     return {
-
+        permission: state.permissionSelect,
+        queryArgument: state.queryArgument
     }
 }
 const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
         _save: (permission: Permission, props: IPropsCommon) => save(permission,props, dispatch),
+        _update: (permission: Permission, props: IPropsCommon) => update(permission, props, dispatch),
+        _detail: (argument:  number  | null) => detail(argument, dispatch),
     }
 }
 

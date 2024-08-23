@@ -8,7 +8,8 @@ export interface IPropsCommon {
     spinner: boolean;
     queryArgument: any[];
     isValidToRedirect?: boolean;
-    explodeLink:string[]
+    explodeLink:string[];
+
 
 }
 

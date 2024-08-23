@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
 import './login.component.scss';
@@ -9,28 +9,22 @@ import withRouter from "../../../utils/with.router";
 import AlertComponent from "../../../commons/alert/alert.component";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {Auth} from "../../../interfaces/authenticate.model";
-import {IPropsAuth, IStateAuth} from "../../../interfaces/authenticate.interface";
+import {IPropsAuth} from "../../../interfaces/authenticate.interface";
 
 
-class LoginComponent extends Component <IPropsAuth,IStateAuth> {
+function LoginComponent (props: IPropsAuth | Readonly<IPropsAuth>) {
+    useEffect(() => {
+        (async ()=>{
+            await props._isSignIn();
+        })();
+    },[]);
 
-    constructor(props: IPropsAuth | Readonly<IPropsAuth>) {
-        super(props);
-    }
-
-    async componentDidMount() {
-       await this.props._isSignIn();
-    }
-
-    handleSubmit = async (values: { login: string; password: string;  remember:boolean}, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ login: string; password: string;remember:boolean }>> | undefined) => void) => {
-
-
+   const handleSubmit = async (values: { login: string; password: string;  remember:boolean}, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ login: string; password: string;remember:boolean }>> | undefined) => void) => {
          const auth = new Auth(values);
-        await this.props._signIn(auth);
-
+        await props._signIn(auth);
     }
 
-    render() {
+
         return (
             <main>
 
@@ -69,7 +63,7 @@ class LoginComponent extends Component <IPropsAuth,IStateAuth> {
                                             onSubmit={(fields, {
                                                 setSubmitting,
                                                 resetForm
-                                            }) => this.handleSubmit(fields, setSubmitting, resetForm)}>
+                                            }) => handleSubmit(fields, setSubmitting, resetForm)}>
                                             {
                                                 ({
                                                      values,
@@ -101,7 +95,7 @@ class LoginComponent extends Component <IPropsAuth,IStateAuth> {
                                                                         className={`au-input au-input--full   ${(errors.login && touched.login && errors.login) ? "is-invalid" : ""} `}
                                                                         type="text"
                                                                         id="login" name="login"
-                                                                        placeholder={this.props.t('filed.emailPhoneUsername')}
+                                                                        placeholder={props.t('filed.emailPhoneUsername')}
                                                                         onChange={handleChange} onBlur={handleBlur}/>
 
                                                                     <div className="invalid-feedback">
@@ -119,7 +113,7 @@ class LoginComponent extends Component <IPropsAuth,IStateAuth> {
                                                                         className={`au-input au-input--full   ${(errors.password && touched.password && errors.password) ? "is-invalid" : ""} `}
                                                                         id="password"
                                                                         type="password" name="password"
-                                                                        placeholder={this.props.t('filed.password')}
+                                                                        placeholder={props.t('filed.password')}
                                                                         onChange={handleChange} onBlur={handleBlur}/>
                                                                     <div className="invalid-feedback ">
                                                                         {
@@ -149,25 +143,25 @@ class LoginComponent extends Component <IPropsAuth,IStateAuth> {
                                                                 <div className="card-body">
 
                                                                     <button type="button"
-                                                                            onClick={(event)=>this.props.navigate('../sign-up')}
+                                                                            onClick={(event)=>props.navigate('../sign-up')}
                                                                             className="btn btn-link btn-sm">
                                                                         <Trans
                                                                             i18nKey="auth.signUp"></Trans></button>
                                                                     <button
                                                                         type="button"
-                                                                        onClick={(event)=>this.props.navigate('../forgot')}
+                                                                        onClick={(event)=>props.navigate('../forgot')}
                                                                         className="btn btn-link btn-sm">
                                                                         <Trans
                                                                             i18nKey="auth.forgotPassword"></Trans>
                                                                     </button>
                                                                     <button type="button"
-                                                                            onClick={(event)=>this.props.navigate('../reset-password')}
+                                                                            onClick={(event)=>props.navigate('../reset-password')}
                                                                             className="btn btn-link btn-sm">
                                                                         <Trans
                                                                             i18nKey="auth.resetPassword"></Trans>
                                                                     </button>
                                                                     <button type="button"
-                                                                            onClick={(event)=>this.props.navigate('../activation')}
+                                                                            onClick={(event)=>props.navigate('../activation')}
                                                                             className="btn btn-link btn-sm">
                                                                         <Trans
                                                                             i18nKey="auth.activationAccount"></Trans>
@@ -192,7 +186,7 @@ class LoginComponent extends Component <IPropsAuth,IStateAuth> {
                 </section>
             </main>
         );
-    }
+
 }
 
 const mapStateToProps = (state:IReduxState) => {

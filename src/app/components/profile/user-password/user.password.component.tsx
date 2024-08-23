@@ -10,23 +10,20 @@ import { save} from "../../../actions/profile.actions";
 import {connect} from "react-redux";
 import { Profile } from '../../../models/profile.model';
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsProfile, IStateProfile} from "../../../interfaces/profile.interface";
+import {IPropsProfile} from "../../../interfaces/profile.interface";
 import withRouter from "../../../utils/with.router";
 import {IPropsCommon} from "../../../interfaces/props.common.interface";
 
-class UserPasswordComponent extends Component <IPropsProfile, IStateProfile> {
-
-    constructor(props: IPropsProfile | Readonly<IPropsProfile>) {
-        super(props);
-    }
+function UserPasswordComponent (props: IPropsProfile ) {
 
 
-    handleSubmit = async (values: { password: string; passConfirm: string; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ password: string; passConfirm: string; }>> | undefined) => void) => {
+
+ const   handleSubmit = async (values: { password: string; passConfirm: string; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ password: string; passConfirm: string; }>> | undefined) => void) => {
        const profile = new Profile(values);
-        await this.props._save(profile, this.props)
+        await props._save(profile, props)
     }
 
-    render() {
+
         return (
             <Formik
                 initialValues={{
@@ -39,7 +36,7 @@ class UserPasswordComponent extends Component <IPropsProfile, IStateProfile> {
                     passConfirm: Yup.string()
                         .required('required').max(255, 'maxlength').oneOf([Yup.ref("password"), ""], "equal"),
                 })}
-                onSubmit={(fields, {setSubmitting, resetForm}) => this.handleSubmit(fields, setSubmitting, resetForm)}>
+                onSubmit={(fields, {setSubmitting, resetForm}) => handleSubmit(fields, setSubmitting, resetForm)}>
                 {
                     ({values, errors, touched, status, handleChange, handleBlur, handleSubmit, isSubmitting}) => (
                         <form onSubmit={handleSubmit}>
@@ -119,7 +116,7 @@ class UserPasswordComponent extends Component <IPropsProfile, IStateProfile> {
 
             </Formik>
         );
-    }
+
 }
 const mapStateToProps = (state:  IReduxState) => {
     return {

@@ -8,25 +8,17 @@ import { IPropsCommon} from "../../interfaces/props.common.interface";
 import {IReduxDispatch, IReduxState} from "../../interfaces/redux.type.interface";
 import {IStateCommon} from "../../interfaces/state.common.interface";
 import withRouter from "../../utils/with.router";
-class WebSiteComponent extends Component <IPropsCommon,IStateCommon> {
-    constructor(props: IPropsCommon | Readonly<IPropsCommon>) {
-        super(props);
-
-    }
-    render() {
+function webSiteComponent (props: IPropsCommon) {
         return (
             <>
                 <HeaderComponent/>
-                <div dir={this.props.language !== 'en' ? 'rtl' : 'ltr'} className="ms_main_wrapper">
+                <div dir={props.language !== 'en' ? 'rtl' : 'ltr'} className="ms_main_wrapper">
                     <Outlet/>
                 </div>
                 <FooterComponent/>
-
             </>
+        );
 
-        )
-            ;
-    }
 }
 
 const mapStateToProps = (state: IReduxState) => {
@@ -34,6 +26,5 @@ const mapStateToProps = (state: IReduxState) => {
 }
 const mapDispatchToProps = (dispatch:IReduxDispatch) => {
     return {}
-
 }
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(WebSiteComponent));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(webSiteComponent));

@@ -1,31 +1,22 @@
 import {RoleType} from "../../enums/role.enum";
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import './forbidden-page.component.scss';
 import withRouter from "../../utils/with.router";
 import {IPropsCommon} from "../../interfaces/props.common.interface";
 import {IStateCommon} from "../../interfaces/state.common.interface";
 
-class ForbiddenPageComponent extends Component <IPropsCommon,IStateCommon>{
-
-    constructor(props: IPropsCommon | Readonly<IPropsCommon>) {
-        super(props);
-    }
-
-    componentDidMount() {
-
-        // const user = JSON.parse(localStorage.getItem('user')!);
-        // let pathRedirect = '/admin/dashboard/over-view';
-        // if (user.role.name === RoleType.Member) {
-        //     pathRedirect =  '/admin/profile';
-        // }
-        const  pathRedirect =  '/admin/profile';
-        setTimeout(() => {
-            this.props.navigate(pathRedirect,{replace: true});
-        }, 2000);
-    }
-
-
-    render() {
+function ForbiddenPageComponent (props:IPropsCommon){
+     useEffect(()=>{
+         // const user = JSON.parse(localStorage.getItem('user')!);
+         // let pathRedirect = '/admin/dashboard/over-view';
+         // if (user.role.name === RoleType.Member) {
+         //     pathRedirect =  '/admin/profile';
+         // }
+         const  pathRedirect =  '/admin/profile';
+         setTimeout(() => {
+             props.navigate(pathRedirect,{replace: true});
+         }, 2000);
+     },[])
 
         return (
             <>
@@ -44,7 +35,7 @@ class ForbiddenPageComponent extends Component <IPropsCommon,IStateCommon>{
             </>
 
         );
-    }
+
 
 }
 

@@ -1,95 +1,84 @@
-import {faEdit, faEnvelopeOpen, faTrash} from "@fortawesome/free-solid-svg-icons";
-import React, {Component} from 'react';
+import React, {Component, useEffect} from 'react';
 import './list.component.scss';
 import {Trans, withTranslation} from "react-i18next";
 import {connect} from "react-redux";
 import {retrieve, remove} from '../../../actions/permission.actions';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {Tooltip, OverlayTrigger} from 'react-bootstrap';
 import withRouter from '../../../utils/with.router';
 import ReactPaginate from 'react-paginate';
 import {createSearchParams} from "react-router-dom";
 import {newQueryArgument} from "../../../actions/query.argument.actions";
 import queryString from "query-string";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsPermission, IStatePermission} from "../../../interfaces/permission.interface";
+import {IPropsPermission} from "../../../interfaces/permission.interface";
 import ModalComponent from "../../../commons/modal/modal.component";
 import SearchingFiledComponent from "../../../commons/search-field/searching.filed.component";
-import BasicListComponent from "../../../abstracts/basic.list";
 import AuthCommonComponent from "../../../guards/auth.common.component";
+import BasicListHooks from "../../../hooks/basic.list.hooks";
+import {PermissionType} from "../../../enums/permission.enum";
 
-class ListComponent extends BasicListComponent <IPropsPermission, IStatePermission> {
-
-    sortData = [
+function ListComponent (props: IPropsPermission ) {
+    const baseListHooks=BasicListHooks();
+   const sortData = [
         {id: 'id', text: 'Id',},
         {id: 'name', text: 'Name',},
         {id: 'active', text: 'Active',}
     ];
+     useEffect(()=>{
+         (async ()=>{
+            await initData();
+         })();
+     },[])
 
-    constructor(props: IPropsPermission | Readonly<IPropsPermission>) {
-        super(props);
-    }
+    const initData=async ()=> {
 
-    async componentDidMount() {
-
-        if (this.props.location.search) {
-            await this.props._retrieve(this.props.location.search);
+        if (props.location.search) {
+            await props._retrieve(props.location.search);
         } else {
-            await this.props._retrieve(null);
-        }
-    }
-
-    async componentDidUpdate(prevProps: { location: string; }, prevState: any, snapshot: any) {
-
-        if (this.props.location.search !== '' && prevProps.location.search !== this.props.location.search) {
-            if (this.props.location.search) {
-                await this.props._retrieve(this.props.location.search);
-            } else {
-                await this.props._retrieve(null);
-            }
+            await props._retrieve(null);
         }
     }
 
 
-    onEditItem = (event: any) => {
+
+   const onEditItem = (event: any) => {
         const id = event.currentTarget.getAttribute('data-value');
         const path = '../edit/' + id;
-        const queryArgument = queryString.parse(this.props.location.search);
-        this.props._newQueryArgument(queryArgument);
-        this.props.navigate(path);
+        const queryArgument = queryString.parse(props.location.search);
+        props._newQueryArgument(queryArgument);
+        props.navigate(path);
     }
-    onDetailItem = (event: any) => {
+  const  onDetailItem = (event: any) => {
         const id = event.currentTarget.getAttribute('data-value');
         const path = '../detail/' + id;
-        this.props.navigate(path);
+        props.navigate(path);
     }
 
 
-    onOpenModal = (event: any) => {
+  const  onOpenModal = (event: any) => {
         const id = event.currentTarget.getAttribute('data-value');
         const index = event.currentTarget.getAttribute('data-index');
-        this.setState({
+      baseListHooks.setData({
             modalRef: true,
             deleteId: id,
             deleteIndex: index,
-            deleteItem: this.props.permissionList.data![index].name
+            deleteItem: props.permissionList.data![index].name
         });
 
     }
-    onModalConfirm = async () => {
-        await this.props._remove(this.state.deleteId!, this.state.deleteIndex!);
-        this.setState({
+   const  onModalConfirm = async () => {
+        await props._remove(baseListHooks.data.deleteId!, baseListHooks.data.deleteIndex!);
+       baseListHooks.setData({
             modalRef: false,
         });
 
     }
-    onChangePaginate = (event: any) => {
+  const  onChangePaginate = (event: any) => {
         const params = {
             page: event.selected + 1,
         };
 
         const createSearchParam = createSearchParams(params);
-        this.props.navigate(
+        props.navigate(
             {
                 pathname: "../list",
                 search: `?${createSearchParam}`,
@@ -97,15 +86,15 @@ class ListComponent extends BasicListComponent <IPropsPermission, IStatePermissi
         );
     }
 
-    render() {
-        const {permissionList} = this.props;
+
+        const {permissionList} = props;
 
         return (<>
 
 
             <div className="table-responsive table-responsive-data2">
 
-                <SearchingFiledComponent sortData={this.sortData}/>
+                <SearchingFiledComponent onClickSearch={initData} sortData={sortData}/>
 
                 <table className="table table-data2">
                     <thead>
@@ -144,17 +133,16 @@ class ListComponent extends BasicListComponent <IPropsPermission, IStatePermissi
                                         <td>
                                             <div className="table-data-feature">
 
-                                                <AuthCommonComponent onClick={this.onEditItem} index={i} id={item.id} label={this.props.t('common.edit')} permissionName={this.permissionName}
-                                                                     permissionType={this.permissionType.Put}>
+                                                <AuthCommonComponent onClick={onEditItem} index={i} id={item.id} label={props.t('common.edit')} permissionName={baseListHooks.data.permissionName}
+                                                                     permissionType={PermissionType.Put} >
                                                 </AuthCommonComponent>
 
-                                                <AuthCommonComponent onClick={this.onOpenModal} index={i} id={item.id} label={this.props.t('common.remove')} permissionName={this.permissionName}
-                                                                     permissionType={this.permissionType.Delete}>
+                                                <AuthCommonComponent onClick={onOpenModal} index={i} id={item.id} label={props.t('common.remove')} permissionName={baseListHooks.data.permissionName}
+                                                                     permissionType={PermissionType.Delete}>
                                                 </AuthCommonComponent>
-                                                <AuthCommonComponent onClick={this.onDetailItem} index={i} id={item.id} label={this.props.t('common.detail')} permissionName={this.permissionName}
-                                                                     permissionType={this.permissionType.Get}>
+                                                <AuthCommonComponent onClick={onDetailItem} index={i} id={item.id} label={props.t('common.detail')} permissionName={baseListHooks.data.permissionName}
+                                                                     permissionType={PermissionType.Get}>
                                                 </AuthCommonComponent>
-
 
                                             </div>
                                         </td>
@@ -179,25 +167,25 @@ class ListComponent extends BasicListComponent <IPropsPermission, IStatePermissi
                         pageLinkClassName="page-link"
                         previousClassName="page-link"
                         nextClassName="page-link"
-                        nextLabel={this.props.t('common.next')}
-                        onPageChange={this.onChangePaginate}
-                        pageRangeDisplayed={this.sizePage}
+                        nextLabel={props.t('common.next')}
+                        onPageChange={onChangePaginate}
+                        pageRangeDisplayed={baseListHooks.data.pageSize}
                         pageCount={permissionList.pager?.pageCount!}
-                        previousLabel={this.props.t('common.previous')}
+                        previousLabel={props.t('common.previous')}
                         activeClassName="page-item active"
 
                     />
                 </div>
             </div>
 
-            <ModalComponent show={this.state.modalRef}
-                            title={this.state.deleteItem}
-                            onClickConfirm={this.onModalConfirm}
+            <ModalComponent show={baseListHooks.data.modalRef}
+                            title={baseListHooks.data.deleteItem}
+                            onClickConfirm={onModalConfirm}
             />
 
         </>)
             ;
-    }
+
 }
 
 

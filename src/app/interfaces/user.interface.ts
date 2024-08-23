@@ -1,5 +1,4 @@
 import {IPropsCommon} from "./props.common.interface";
-import {IStateCommon} from "./state.common.interface";
 import {IGroup} from "./group.interface";
 import {User} from "../models/user.model";
 import {IResponseObject} from "./iresponse.object";
@@ -42,5 +41,3 @@ export interface IPropsUser extends IPropsCommon {
   groupList: IResponseObject<IGroup[]>;
 }
 
-export interface IStateUser extends  IStateCommon{
-}

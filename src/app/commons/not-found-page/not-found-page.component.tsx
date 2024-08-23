@@ -4,12 +4,7 @@ import {IPropsCommon} from "../../interfaces/props.common.interface";
 import {IStateCommon} from "../../interfaces/state.common.interface";
 import withRouter from "../../utils/with.router";
 
-class NotFoundPageComponent extends Component <IPropsCommon, IStateCommon> {
-    constructor(props: IPropsCommon | Readonly<IPropsCommon>) {
-        super(props);
-    }
-
-    render() {
+function NotFoundPageComponent (props:IPropsCommon) {
 
         return (
             <>
@@ -29,7 +24,7 @@ class NotFoundPageComponent extends Component <IPropsCommon, IStateCommon> {
 
         )
             ;
-    }
+
 }
 
 export default withRouter(NotFoundPageComponent);

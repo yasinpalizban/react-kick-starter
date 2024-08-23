@@ -32,7 +32,3 @@ export interface IPropsProfile extends IPropsCommon {
   profile: IResponseObject<IProfile>;
 
 }
-
-export interface IStateProfile extends  IStateCommon{
-  image?:any
-}

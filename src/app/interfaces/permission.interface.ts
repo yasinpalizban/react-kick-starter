@@ -1,6 +1,5 @@
 import {IPropsCommon} from "./props.common.interface";
 import {Permission} from "../models/permission.model";
-import {IStateCommon} from "./state.common.interface";
 import {IResponseObject} from "./iresponse.object";
 import {IBasic} from "./ibasic";
 
@@ -22,6 +21,3 @@ export interface IPropsPermission extends IPropsCommon {
   permissionList: IResponseObject<IPermission[]>;
 }
 
-export interface IStatePermission extends IStateCommon{
-
-}

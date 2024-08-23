@@ -8,22 +8,17 @@ import {signUp} from '../../../actions/auth.actions';
 import withRouter from "../../../utils/with.router";
 import AlertComponent from "../../../commons/alert/alert.component";
 import {GoogleReCaptchaProvider, IWithGoogleReCaptchaProps, withGoogleReCaptcha} from 'react-google-recaptcha-v3';
-import {environment} from "../../../../environments/environment";
 import {Auth} from "../../../interfaces/authenticate.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsCommon} from "../../../interfaces/props.common.interface";
-import {IPropsAuth, IStateAuth} from "../../../interfaces/authenticate.interface";
+import {IPropsAuth} from "../../../interfaces/authenticate.interface";
 
-class RegisterComponent extends Component  <IPropsAuth, IStateAuth> {
-
-    constructor(props: IPropsAuth | Readonly<IPropsAuth>) {
-        super(props);
-    }
+function RegisterComponent (props: IPropsAuth | Readonly<IPropsAuth>) {
 
 
-    handleSubmit = async (values: { login?: string; username?: string; password?: string; passConfirm?: string; token?: any; action?: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ login: string; username: string; password: string; passConfirm: string; }>> | undefined) => void) => {
+   const handleSubmit = async (values: { login?: string; username?: string; password?: string; passConfirm?: string; token?: any; action?: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ login: string; username: string; password: string; passConfirm: string; }>> | undefined) => void) => {
 
-        const { executeRecaptcha } = (this.props as IWithGoogleReCaptchaProps)
+        const { executeRecaptcha } = (props as IWithGoogleReCaptchaProps)
             .googleReCaptchaProps;
         if (!executeRecaptcha) {
             console.log('Recaptcha has not been loaded');
@@ -40,10 +35,10 @@ class RegisterComponent extends Component  <IPropsAuth, IStateAuth> {
             action:action ,
             token: token
         });
-        await this.props._signUp(auth, this.props);
+        await props._signUp(auth, props);
     }
 
-    render() {
+
         return (
             <main>
 
@@ -89,7 +84,7 @@ class RegisterComponent extends Component  <IPropsAuth, IStateAuth> {
                                                 onSubmit={(fields, {
                                                     setSubmitting,
                                                     resetForm
-                                                }) => this.handleSubmit(fields, setSubmitting, resetForm)}>
+                                                }) => handleSubmit(fields, setSubmitting, resetForm)}>
                                                 {
                                                     ({
                                                          values,
@@ -123,7 +118,7 @@ class RegisterComponent extends Component  <IPropsAuth, IStateAuth> {
                                                                             className={`au-input au-input--full   ${(errors.login && touched.login && errors.login) ? "is-invalid" : ""} `}
                                                                             type="text"
                                                                             id="login" name="login"
-                                                                            placeholder={this.props.t('filed.emailPhone')}
+                                                                            placeholder={props.t('filed.emailPhone')}
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}/>
 
@@ -145,7 +140,7 @@ class RegisterComponent extends Component  <IPropsAuth, IStateAuth> {
                                                                             className={`au-input au-input--full   ${(errors.username && touched.username && errors.username) ? "is-invalid" : ""} `}
                                                                             type="text"
                                                                             id="username" name="username"
-                                                                            placeholder={this.props.t('filed.userName')}
+                                                                            placeholder={props.t('filed.userName')}
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}/>
 
@@ -166,7 +161,7 @@ class RegisterComponent extends Component  <IPropsAuth, IStateAuth> {
                                                                             className={`au-input au-input--full   ${(errors.password && touched.password && errors.password) ? "is-invalid" : ""} `}
                                                                             id="password"
                                                                             type="password" name="password"
-                                                                            placeholder={this.props.t('filed.password')}
+                                                                            placeholder={props.t('filed.password')}
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}/>
                                                                         <div className="invalid-feedback ">
@@ -186,7 +181,7 @@ class RegisterComponent extends Component  <IPropsAuth, IStateAuth> {
                                                                             className={`au-input au-input--full   ${(errors.password && touched.password && errors.password) ? "is-invalid" : ""} `}
                                                                             id="passConfirm"
                                                                             type="password" name="passConfirm"
-                                                                            placeholder={this.props.t('filed.passwordConfirm')}
+                                                                            placeholder={props.t('filed.passwordConfirm')}
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}/>
                                                                         <div className="invalid-feedback ">
@@ -223,25 +218,25 @@ class RegisterComponent extends Component  <IPropsAuth, IStateAuth> {
                                                                     <div className="card-body">
 
                                                                         <button type="button"
-                                                                                onClick={(event) => this.props.navigate('../sign-in')}
+                                                                                onClick={(event) => props.navigate('../sign-in')}
                                                                                 className="btn btn-link btn-sm">
                                                                             <Trans
                                                                                 i18nKey="auth.signIn"></Trans></button>
                                                                         <button
                                                                             type="button"
-                                                                            onClick={(event) => this.props.navigate('../forgot')}
+                                                                            onClick={(event) => props.navigate('../forgot')}
                                                                             className="btn btn-link btn-sm">
                                                                             <Trans
                                                                                 i18nKey="auth.forgotPassword"></Trans>
                                                                         </button>
                                                                         <button type="button"
-                                                                                onClick={(event) => this.props.navigate('../reset-password')}
+                                                                                onClick={(event) => props.navigate('../reset-password')}
                                                                                 className="btn btn-link btn-sm">
                                                                             <Trans
                                                                                 i18nKey="auth.resetPassword"></Trans>
                                                                         </button>
                                                                         <button type="button"
-                                                                                onClick={(event) => this.props.navigate('../activation')}
+                                                                                onClick={(event) => props.navigate('../activation')}
                                                                                 className="btn btn-link btn-sm">
                                                                             <Trans
                                                                                 i18nKey="auth.activationAccount"></Trans>
@@ -268,7 +263,7 @@ class RegisterComponent extends Component  <IPropsAuth, IStateAuth> {
 
             </main>
         );
-    }
+
 }
 
 const mapStateToProps = (state: IReduxState) => {

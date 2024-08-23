@@ -1,5 +1,5 @@
 import {faAsterisk} from "@fortawesome/free-solid-svg-icons";
-import React, {Component} from 'react';
+import React, {Component, useEffect, useState} from 'react';
 import './add.component.scss';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Trans, withTranslation} from "react-i18next";
@@ -14,49 +14,97 @@ import withRouter from "../../../utils/with.router";
 import { PermissionUser } from "../../../models/permission.user.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {IPropsCommon} from "../../../interfaces/props.common.interface";
-import {IPropsPermissionUser, IStatePermissionUser} from "../../../interfaces/permission.user.interface";
+import {IPropsPermissionUser} from "../../../interfaces/permission.user.interface";
 import * as groupActions from "../../../actions/group.actions";
 
-class AddComponent extends Component <IPropsPermissionUser, IStatePermissionUser> {
+function AddComponent (props: IPropsPermissionUser) {
+    const  [isDelete,setDelete]= useState(false);
+    const [ isGet, setGet]= useState(false);
+    const [isPost, setPost]= useState(false);
+    const [isPut, setPut]= useState(false);
 
-    constructor(props: IPropsPermissionUser | Readonly<IPropsPermissionUser>) {
-        super(props);
+    const   onCheckboxChange = (event: any) => {
+
+        switch (event.target.value) {
+            case "-get":
+                setGet( !isGet);
+                break;
+            case "-post":
+                setPost( !isPost);
+                break;
+
+            case "-put":
+                setPut( !isPut);
+                break;
+
+            case "-delete":
+                setDelete( !isDelete);
+                break;
+        }
+
     }
 
-    async componentDidMount() {
-        await this.props._groupRetrieve({limit:100});
-        await this.props._userRetrieve({limit:200});
-        await this.props._permissionRetrieve({limit:20});
-    }
+    useEffect(()=>{
+        (async ()=>{
+            await props._groupRetrieve({limit:100});
+            await props._userRetrieve({limit:200});
+            await props._permissionRetrieve({limit:20});
+             if(+props.params.id){
+                await props._retrieve(+props.params.id);
+             }
+            props.permissionUser.data?.actions.split("-").forEach((value: string) => {
 
-    handleSubmit = async (values: {  groupId: any;permissionId: any; userId: any; actions: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ groupId: string; permissionId: string; userId: string; actions: never[]; }>> | undefined) => void) => {
+                if (value === "get")
+                    setGet( true);
+                else if (value === "post")
+                    setPost( true);
+                else if (value === "put")
+                    setPut( true);
+                else if (value === "delete")
+                    setDelete( true);
+
+            });
+
+        })();
+    },[])
+
+   const handleSubmit = async (values: {  groupId: any;permissionId: any; userId: any; actions: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ groupId: string; permissionId: string; userId: string; actions: never[]; }>> | undefined) => void) => {
         let combineAction = '';
-        values.actions.forEach((ctl:string) => combineAction += ctl);
-        const permission = {
-            permissionId: values.permissionId,
-            userId: values.userId,
-            actions: combineAction
-        };
+       values.actions.forEach((ctl:string) => combineAction += ctl);
 
-        const permissionUser = new PermissionUser(permission);
-        await this.props._save(permissionUser, this.props);
+       if (true) {
+           combineAction = (isGet ? '-get' : '') + (isPost ? '-post' : '') + (isPut ? '-put' : '') + (isDelete ? '-delete' : '');
+       } else {
+           combineAction = props.permissionUser.data?.actions!;
+       }
+       const permissionUser = {
+           id: +props.params.id,
+           permissionId: values.permissionId,
+           userId: values.userId,
+           actions: combineAction
+       };
+       if(+props.params.id){
+           await props._update(permissionUser, props);
+       }else{
+           await props._save(permissionUser, props);
+       }
 
     }
-    onChangeGroup=async (event: any)=>{
+   const onChangeGroup=async (event: any)=>{
         const value = event.currentTarget.value;
         const queryParam = `name[eq]=${value}`;
-        await this.props._userRetrieve(queryParam);
+        await props._userRetrieve(queryParam);
     }
-    render() {
-        const {userList, permissionList, groupList} = this.props;
+
+    const {permissionUser, userList, permissionList, groupList} = props;
 
         return (
             <Formik
                 initialValues={{
-                    permissionId: '',
+                    permissionId: permissionUser?.data?.permissionId||'',
+                    userId: permissionUser?.data?.userId||'',
+                    actions: [],
                     groupId: '',
-                    userId: '',
-                    actions: []
                 }}
                 enableReinitialize={true}
                 validationSchema={Yup.object().shape({
@@ -66,7 +114,7 @@ class AddComponent extends Component <IPropsPermissionUser, IStatePermissionUser
                         .required('required'),
                     actions: Yup.array().min(1).required('required')
                 })}
-                onSubmit={(fields, {setSubmitting, resetForm}) => this.handleSubmit(fields, setSubmitting, resetForm)}>
+                onSubmit={(fields, {setSubmitting, resetForm}) => handleSubmit(fields, setSubmitting, resetForm)}>
                 {
                     ({values, errors, touched, status, handleChange, handleBlur, handleSubmit, isSubmitting}) => (
                         <form onSubmit={handleSubmit}>
@@ -81,13 +129,13 @@ class AddComponent extends Component <IPropsPermissionUser, IStatePermissionUser
                                             className={`form-control ${(errors.groupId && touched.groupId) ? "is-invalid" : ""} `}
                                             onChange={async (event) => {
                                                 handleChange(event);
-                                                await this.onChangeGroup(event);
+                                                await onChangeGroup(event);
                                             }}
                                             onBlur={handleBlur} defaultValue="1">
                                         <option disabled selected
-                                        >{this.props.t('common.selectInputMessage')}</option>
+                                        >{props.t('common.selectInputMessage')}</option>
                                         {
-                                            groupList?.data?.map((item, i: number) => <option
+                                            groupList?.data?.map((item:any, i: number) => <option
                                                 value={item.name}>{item.name} </option>)
                                         }
                                     </select>
@@ -114,9 +162,9 @@ class AddComponent extends Component <IPropsPermissionUser, IStatePermissionUser
                                             className={`form-control ${(errors.userId && touched.userId) ? "is-invalid" : ""} `}
                                             onChange={handleChange} onBlur={handleBlur} defaultValue="1">
                                         <option disabled selected
-                                                >{this.props.t('common.selectInputMessage')}</option>
+                                                >{props.t('common.selectInputMessage')}</option>
                                         {
-                                            userList?.data?.map((item, i:number) => <option
+                                            userList?.data?.map((item:any, i:number) => <option
                                                 value={item.id}>{item.username + ' (' + item.firstName + '  ' + item.lastName + ')'} </option>)
                                         }
                                     </select>
@@ -144,9 +192,9 @@ class AddComponent extends Component <IPropsPermissionUser, IStatePermissionUser
                                             className={`form-control ${(errors.permissionId && touched.permissionId) ? "is-invalid" : ""} `}
                                             onChange={handleChange} onBlur={handleBlur} defaultValue="1">
                                         <option disabled selected
-                                                >{this.props.t('common.selectInputMessage')}</option>
+                                                >{props.t('common.selectInputMessage')}</option>
                                         {
-                                            permissionList?.data?.map((item, i: number) => <option
+                                            permissionList?.data?.map((item:any, i: number) => <option
                                                 value={item.id}>{item.name} </option>)
                                         }
                                     </select>
@@ -176,7 +224,7 @@ class AddComponent extends Component <IPropsPermissionUser, IStatePermissionUser
 
                                         <label style={{transform: 'scale(1)'}}
                                                className="switch switch-text switch-primary switch-pill lg m-r-10 m-l-20">
-                                            <input name="actions" value="-get" onChange={handleChange}
+                                            <input name="actions" value="-get" onChange={onCheckboxChange}
                                                    onBlur={handleBlur}
                                                    type="checkbox"
                                                    className="switch-input "/>
@@ -187,7 +235,7 @@ class AddComponent extends Component <IPropsPermissionUser, IStatePermissionUser
 
                                         <label style={{transform: 'scale(1)'}}
                                                className="switch switch-text switch-success switch-pill m-r-5 m-l-5">
-                                            <input name="actions" value="-post" onChange={handleChange}
+                                            <input name="actions" value="-post" onChange={onCheckboxChange}
                                                    onBlur={handleBlur}
                                                    type="checkbox"
                                                    className="switch-input"/>
@@ -197,7 +245,7 @@ class AddComponent extends Component <IPropsPermissionUser, IStatePermissionUser
 
                                         <label style={{transform: 'scale(1)'}}
                                                className="switch switch-text switch-warning switch-pill m-r-5 m-l-5">
-                                            <input name="actions" value="-put" onChange={handleChange}
+                                            <input name="actions" value="-put" onChange={onCheckboxChange}
                                                    onBlur={handleBlur}
                                                    type="checkbox"
                                                    className="switch-input"/>
@@ -206,7 +254,7 @@ class AddComponent extends Component <IPropsPermissionUser, IStatePermissionUser
                                         </label>
                                         <label style={{transform: 'scale(1)'}}
                                                className="switch switch-text switch-danger switch-pill  m-l-5">
-                                            <input name="actions" value="-delete" onChange={handleChange}
+                                            <input name="actions" value="-delete" onChange={onCheckboxChange}
                                                    onBlur={handleBlur}
                                                    type="checkbox"
                                                    className="switch-input"/>
@@ -236,7 +284,7 @@ class AddComponent extends Component <IPropsPermissionUser, IStatePermissionUser
 
             </Formik>
         );
-    }
+
 }
 
 

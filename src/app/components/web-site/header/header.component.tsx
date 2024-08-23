@@ -4,16 +4,8 @@ import {withTranslation} from "react-i18next";
 import withRouter from "../../../utils/with.router";
 import {IPropsHome, IStateHome} from "../../../interfaces/home.interface";
 
-class HeaderComponent extends  Component <IPropsHome,IStateHome> {
-
-    constructor(props: IPropsHome | Readonly<IPropsHome>) {
-        super(props);
-
-    }
-        render() {
+function headerComponent (props: IPropsHome ) {
         return (
-
-
 
                 <header id="header" className="header d-flex align-items-center fixed-top">
                     <div className="container-fluid container-xl d-flex align-items-center justify-content-between">
@@ -21,7 +13,7 @@ class HeaderComponent extends  Component <IPropsHome,IStateHome> {
 
                         <a  className="logo d-flex align-items-center">
 
-                                <h1>{this.props.t('website.other.findYourDream')}</h1>
+                                <h1>{props.t('website.other.findYourDream')}</h1>
                         </a>
 
 
@@ -29,21 +21,20 @@ class HeaderComponent extends  Component <IPropsHome,IStateHome> {
                         <nav id="navbar" className="navbar">
                             <ul>
                                 <li><a href="#" onClick={(event)=>{
-                                    this.props.navigate('/home/main')
-                                }} className="active">{this.props.t('website.link.home')}</a></li>
+                                    props.navigate('/home/main')
+                                }} className="active">{props.t('website.link.home')}</a></li>
                                 <li><a href="#" onClick={(event)=>{
-                                    this.props.navigate('/home/recruitment')
-                                }}>{this.props.t('website.link.job')}</a></li>
+                                    props.navigate('/home/recruitment')
+                                }}>{props.t('website.link.job')}</a></li>
                                 <li><a href="#" onClick={(event)=>{
-                                    this.props.navigate('/home/blog')
-                                }}>{this.props.t('website.link.blog')}</a></li>
+                                    props.navigate('/home/blog')
+                                }}>{props.t('website.link.blog')}</a></li>
                                 <li><a href="#" onClick={(event)=>{
-                                    this.props.navigate('/home/contact-us')
-                                }}>{this.props.t('website.link.contact')}</a></li>
+                                    props.navigate('/home/contact-us')
+                                }}>{props.t('website.link.contact')}</a></li>
                                 <li><a href="#" onClick={(event)=>{
-                                    this.props.navigate('/home/sign-in')
-                                }}>{this.props.t('website.link.signIn')}</a></li>
-
+                                    props.navigate('/home/sign-in')
+                                }}>{props.t('website.link.signIn')}</a></li>
                             </ul>
                         </nav>
 
@@ -52,7 +43,6 @@ class HeaderComponent extends  Component <IPropsHome,IStateHome> {
 
 
         );
-    }
 }
 
-export default  withTranslation()(withRouter( HeaderComponent));
+export default  withTranslation()(withRouter(headerComponent));

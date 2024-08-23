@@ -1,5 +1,4 @@
 import {IPropsCommon} from "./props.common.interface";
-import {IStateCommon} from "./state.common.interface";
 import {Setting} from "../models/setting.model";
 import {IResponseObject} from "./iresponse.object";
 import {IBasic} from "./ibasic";
@@ -26,5 +25,3 @@ export interface IPropsSetting extends IPropsCommon {
   settingList: IResponseObject<ISetting[]>;
 }
 
-export interface IStateSetting extends  IStateCommon{
-}
