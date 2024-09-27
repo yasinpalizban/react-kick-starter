@@ -1,23 +1,26 @@
-import React, {Component, useEffect} from 'react';
+import React, { useEffect} from 'react';
 import './detail.component.scss';
 import {Trans, withTranslation} from "react-i18next";
 import moment from "moment";
 import {detail} from "../../../actions/user.actions";
-import {connect} from "react-redux";
-import withRouter from '../../../utils/with.router';
-import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsUser} from "../../../interfaces/user.interface";
+import { useDispatch, useSelector} from "react-redux";
+import withRouter from '../../../hooks/with.router';
+import { IReduxState} from "../../../interfaces/redux.type.interface";
+import {IProps} from "../../../interfaces/props.common.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object";
+import {IUser} from "../../../interfaces/user.interface";
 
-function DetailComponent(props:IPropsUser) {
-
+function DetailComponent(props:IProps) {
+    const  user :IResponseObject<IUser> = useSelector((item:IReduxState)=>item.userSelect);
+    const dispatch=useDispatch();
       useEffect(()=>{
           (async ()=>{
-              await props._detail(props.params.id);
+              await detail(dispatch,props.params.id);
           })();
       },[])
 
 
-    const { user } = props;
+
 
     return (
 
@@ -127,15 +130,5 @@ function DetailComponent(props:IPropsUser) {
 }
 
 
-const mapStateToProps = (state: IReduxState) => {
-    return {
-        user: state.userSelect
-    }
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _detail: (argument: number ) => detail(argument, dispatch),
-    }
-}
 
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(DetailComponent)));
+export default withTranslation()(withRouter(DetailComponent));

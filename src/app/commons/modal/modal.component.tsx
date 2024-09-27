@@ -1,12 +1,12 @@
 import {faTrash} from "@fortawesome/free-solid-svg-icons";
-import React, {Component, useEffect, useState} from 'react';
+import React, { useEffect, useState} from 'react';
 import './modal.component.scss';
 import {Trans} from "react-i18next";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Modal} from 'react-bootstrap';
 
 
-function ModalComponent(props: any) {
+function ModalComponent(props: {onClickConfirm:any,show:boolean, title:string}) {
     const [show, setShow] = useState(false);
     useEffect(()=>{
      setShow(props.show);

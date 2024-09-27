@@ -1,6 +1,5 @@
-import {IPropsCommon} from "./props.common.interface";
+
 import {IUser} from "./user.interface";
-import {IResponseObject} from "./iresponse.object";
 
 
 export interface IOverView {
@@ -13,9 +12,3 @@ export interface IOverView {
   };
 
 }
-
-export interface IPropsOverView extends IPropsCommon {
-  _retrieve: (argument: string | number | object | null) => Promise<void>;
-  overView:  IResponseObject<IOverView>;
-}
-

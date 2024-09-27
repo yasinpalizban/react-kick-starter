@@ -1,24 +1,23 @@
-import React, {Component, useEffect} from 'react';
+import React, { useEffect} from 'react';
 import './detail.component.scss';
 import {Trans, withTranslation} from "react-i18next";
 import {detail} from "../../../actions/group.actions";
-import {connect} from "react-redux";
-import withRouter from '../../../utils/with.router';
+import { useDispatch, useSelector} from "react-redux";
+import withRouter from '../../../hooks/with.router';
+import { IReduxState} from "../../../interfaces/redux.type.interface";
+import {IGroup} from "../../../interfaces/group.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object";
+import {IProps} from "../../../interfaces/props.common.interface";
 
-import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsGroup} from "../../../interfaces/group.interface";
-
-function DetailComponent (props: IPropsGroup ) {
-
+function DetailComponent (props: IProps ) {
+   const group:IResponseObject<IGroup> =  useSelector((item:IReduxState)=> item.groupSelect);
+    const dispatch= useDispatch();
     useEffect(()=>{
         (async ()=>{
-            await props._detail( +props.params.id);
+            await detail( dispatch,+props.params.id);
         })();
     },[])
 
-
-
-        const {group} =props;
         return (
 
             <div className="table-responsive">
@@ -48,16 +47,4 @@ function DetailComponent (props: IPropsGroup ) {
 
 }
 
-
-const mapStateToProps = (state: IReduxState) => {
-    return {
-        group: state.groupSelect
-    }
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _detail: (argument:  number | null) => detail(argument, dispatch),
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(DetailComponent)));
+export default withTranslation()(withRouter(DetailComponent));

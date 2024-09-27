@@ -3,22 +3,22 @@ import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
 import './reset.password.component.scss';
 import {Trans, withTranslation} from 'react-i18next';
-import {connect} from 'react-redux'
+import {connect, useDispatch} from 'react-redux'
 import {
     resetPasswordViaEmail, resetPasswordViaSms
 } from '../../../actions/auth.actions';
-import withRouter from "../../../utils/with.router";
+import withRouter from "../../../hooks/with.router";
 import AlertComponent from "../../../commons/alert/alert.component";
 import {resetAlert} from "../../../actions/alert.actions";
 import {Auth} from '../../../interfaces/authenticate.model';
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsCommon} from "../../../interfaces/props.common.interface";
-import {IPropsAuth} from "../../../interfaces/authenticate.interface";
+import {IProps} from "../../../interfaces/props.common.interface";
 
 
-function ResetPasswordComponent(props: IPropsAuth) {
+function ResetPasswordComponent(props: IProps) {
     const useEmailInput = useRef<HTMLInputElement>(null);
     const usePhoneInput = useRef<HTMLInputElement>(null);
+    const dispatch= useDispatch();
 
     const handleSubmit = async (values: { email: string; token: string; password: string; passConfirm: string; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ email: string; token: string; password: string; passConfirm: string; }>> | undefined) => void) => {
         const auth = new Auth({
@@ -27,7 +27,7 @@ function ResetPasswordComponent(props: IPropsAuth) {
             passConfirm: values.passConfirm,
             resetToken: values.token,
         });
-        await props._resetPasswordViaEmail(auth, props);
+        await resetPasswordViaEmail(dispatch,auth, props);
     }
 
     const handleSubmit2 = async (values: { phone: string; code: string; password: string; passConfirm: string; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ phone: string; code: string; password: string; passConfirm: string; }>> | undefined) => void) => {
@@ -37,10 +37,10 @@ function ResetPasswordComponent(props: IPropsAuth) {
             passConfirm: values.passConfirm,
             resetToken: values.code
         });
-        await props._resetPasswordViaSms(auth, props);
+        await resetPasswordViaSms(dispatch,auth, props);
     }
     const onClearAlert = () => {
-        props._resetAlert();
+        resetAlert(dispatch);
     }
 
     return (
@@ -554,16 +554,6 @@ function ResetPasswordComponent(props: IPropsAuth) {
 
 }
 
-const mapStateToProps = (state: IReduxState) => {
-    return {}
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _resetPasswordViaEmail: (auth: Auth, props: IPropsCommon) => resetPasswordViaEmail(auth, props, dispatch),
-        _resetPasswordViaSms: (auth: Auth, props: IPropsCommon) => resetPasswordViaSms(auth, props, dispatch),
-        _resetAlert: () => resetAlert(dispatch),
-    }
-}
 
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(ResetPasswordComponent)));
+export default withTranslation()(withRouter(ResetPasswordComponent));
 

@@ -7,8 +7,8 @@ import {GRAPH_SERVICE} from "../configs/path.constants";
 export const GRAPH_GET = 'GRAPH_GET';
 export const GRAPH_POST = 'GRAPH_POST';
 
-export async function retrieve(argument: string | number | object | null, dispatch:IReduxDispatch) {
-    const result = await get<IGraph>(GRAPH_SERVICE.base,argument);
+export async function retrieve(dispatch:IReduxDispatch,argument?: string | number | object ) {
+    const result = await get<IGraph>(GRAPH_SERVICE.base,argument!);
 
     dispatch({
         type: GRAPH_GET,
@@ -17,7 +17,7 @@ export async function retrieve(argument: string | number | object | null, dispat
 
 }
 
-export async function save(graph:Graph, dispatch:IReduxDispatch) {
+export async function save(dispatch:IReduxDispatch,graph:Graph) {
     const result = await post<IGraph>(GRAPH_SERVICE.base, graph);
 
     dispatch({

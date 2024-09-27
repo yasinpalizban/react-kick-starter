@@ -5,7 +5,7 @@ import {createSearchParams} from "react-router-dom";
 import {PermissionGroup} from "../models/permission.group.model";
 import {IPermissionGroup} from "../interfaces/permission.group.interface";
 import {IReduxDispatch} from "../interfaces/redux.type.interface";
-import {IPropsCommon} from "../interfaces/props.common.interface";
+import {IProps} from "../interfaces/props.common.interface";
 import {PERMISSION_GROUP_SERVICE} from "../configs/path.constants";
 import {TOAST_NEW} from "./toast.actions";
 import {ToastModel} from "../models/toast.model";
@@ -16,8 +16,8 @@ export const GROUP_PERMISSION_PUT = 'GROUP_PERMISSION_PUT';
 export const GROUP_PERMISSION_DELETE = 'GROUP_PERMISSION_DELETE';
 export const GROUP_PERMISSION_SHOW = 'GROUP_PERMISSION_SHOW';
 
-export async function retrieve(argument: number | string | object|null, dispatch:IReduxDispatch):Promise<void> {
-    const result = await get<IPermissionGroup>(PERMISSION_GROUP_SERVICE.base, argument);
+export async function retrieve(dispatch: IReduxDispatch,argument?: number | string | object):Promise<void> {
+    const result = await get<IPermissionGroup>(PERMISSION_GROUP_SERVICE.base, argument!);
 
     dispatch({
         type: GROUP_PERMISSION_GET,
@@ -25,7 +25,7 @@ export async function retrieve(argument: number | string | object|null, dispatch
     });
 }
 
-export async function detail(argument: number |null, dispatch:IReduxDispatch):Promise<void> {
+export async function detail(dispatch: IReduxDispatch,argument: number ):Promise<void> {
     const result = await show<IPermissionGroup>(PERMISSION_GROUP_SERVICE.base, argument);
     dispatch({
         type: GROUP_PERMISSION_SHOW,
@@ -33,7 +33,7 @@ export async function detail(argument: number |null, dispatch:IReduxDispatch):Pr
     });
 }
 
-export async function save(permissionGroup:PermissionGroup, props:IPropsCommon, dispatch:IReduxDispatch) :Promise<void>{
+export async function save(dispatch: IReduxDispatch,permissionGroup:PermissionGroup, props:IProps) :Promise<void>{
 
     const result = await post<IPermissionGroup>(PERMISSION_GROUP_SERVICE.base, permissionGroup);
 
@@ -54,7 +54,7 @@ export async function save(permissionGroup:PermissionGroup, props:IPropsCommon, 
 
 }
 
-export async function update(permissionGroup:PermissionGroup, props:IPropsCommon, dispatch:IReduxDispatch):Promise<void> {
+export async function update(dispatch: IReduxDispatch,permissionGroup:PermissionGroup, props:IProps):Promise<void> {
 
     const result = await put<IPermissionGroup>(PERMISSION_GROUP_SERVICE.base, permissionGroup);
 
@@ -82,7 +82,7 @@ export async function update(permissionGroup:PermissionGroup, props:IPropsCommon
 
 }
 
-export async function remove(id:number, index:number, dispatch:IReduxDispatch):Promise<void> {
+export async function remove(dispatch: IReduxDispatch,id:number, index:number):Promise<void> {
 
     const result = await _delete(PERMISSION_GROUP_SERVICE.base, id);
     dispatch({

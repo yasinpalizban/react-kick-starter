@@ -5,7 +5,7 @@ import {createSearchParams} from "react-router-dom";
 import {Group} from "../models/group.model";
 import {IGroup} from "../interfaces/group.interface";
 import {IReduxDispatch} from "../interfaces/redux.type.interface";
-import {IPropsCommon} from "../interfaces/props.common.interface";
+import {IProps} from "../interfaces/props.common.interface";
 import {GROUP_SERVICE} from "../configs/path.constants";
 import {TOAST_NEW} from "./toast.actions";
 import {ToastModel} from "../models/toast.model";
@@ -16,8 +16,8 @@ export const GROUP_PUT = 'GROUP_PUT';
 export const GROUP_DELETE = 'GROUP_DELETE';
 export const GROUP_SHOW = 'GROUP_SHOW';
 
-export async function retrieve(argument: number | string | object|null, dispatch:IReduxDispatch) :Promise<void>{
-    const result = await get<IGroup>(GROUP_SERVICE.base, argument);
+export async function retrieve( dispatch:IReduxDispatch,argument?: number | string | object) :Promise<void>{
+    const result = await get<IGroup>(GROUP_SERVICE.base, argument!);
     dispatch({
         type: GROUP_GET,
         payload: result
@@ -25,7 +25,7 @@ export async function retrieve(argument: number | string | object|null, dispatch
 
 }
 
-export async function detail(argument: number |null, dispatch:IReduxDispatch) :Promise<void>{
+export async function detail( dispatch:IReduxDispatch,argument: number ) :Promise<void>{
     const result = await show<IGroup>(GROUP_SERVICE.base, argument);
     dispatch({
         type: GROUP_SHOW,
@@ -34,7 +34,7 @@ export async function detail(argument: number |null, dispatch:IReduxDispatch) :P
 
 }
 
-export async function save(group:Group,props:IPropsCommon, dispatch:IReduxDispatch):Promise<void> {
+export async function save( dispatch:IReduxDispatch,group:Group, props:IProps):Promise<void> {
 
     const result = await post<IGroup>(GROUP_SERVICE.base, group);
     dispatch({
@@ -54,8 +54,7 @@ export async function save(group:Group,props:IPropsCommon, dispatch:IReduxDispat
 
 }
 
-export async function update(group:Group, props:IPropsCommon, dispatch:IReduxDispatch):Promise<void> {
-
+export async function update( dispatch:IReduxDispatch,group:Group, props:IProps):Promise<void> {
     const result = await put<IGroup>(GROUP_SERVICE.base, group);
 
     dispatch({
@@ -68,7 +67,7 @@ export async function update(group:Group, props:IPropsCommon, dispatch:IReduxDis
         payload: alertSuccess(props.t('common.messageUpdate'))
     });
 
-    const createSearchParam = createSearchParams(props.queryArgument[props.queryArgument.length - 1]);
+    const createSearchParam = createSearchParams(props.queryArgument[props.queryArgument?.length - 1]);
 
     setTimeout(() => {
         props.navigate(
@@ -82,7 +81,7 @@ export async function update(group:Group, props:IPropsCommon, dispatch:IReduxDis
 
 }
 
-export async function remove(id:number, index: number, dispatch:IReduxDispatch):Promise<void> {
+export async function remove( dispatch:IReduxDispatch,id:number, index: number):Promise<void> {
 
     const result = await _delete(GROUP_SERVICE.base, id);
     dispatch({

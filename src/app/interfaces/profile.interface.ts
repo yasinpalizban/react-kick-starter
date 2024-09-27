@@ -1,7 +1,4 @@
-import {IPropsCommon} from "./props.common.interface";
-import {IStateCommon} from "./state.common.interface";
-import {Profile} from "../models/profile.model";
-import {IResponseObject} from "./iresponse.object";
+
 import {IBasic} from "./ibasic";
 
 export interface IProfile  extends  IBasic{
@@ -20,15 +17,5 @@ export interface IProfile  extends  IBasic{
     createdAt:Date
     updatedAt: Date,
     deletedAt:  Date,
-
-}
-
-
-
-export interface IPropsProfile extends IPropsCommon {
-  _retrieve: () => Promise<void>;
-  _save: (profile: Profile|FormData, props:IPropsCommon) => Promise<void>;
-  _resetAlert:()=>void;
-  profile: IResponseObject<IProfile>;
 
 }

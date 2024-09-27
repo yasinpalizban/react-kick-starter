@@ -1,6 +1,7 @@
 import {IAuth} from "../interfaces/authenticate.interface";
 
 export function isValidToPassAuth(permissionName: string, permissionType: string, user: IAuth): boolean {
+
     let isAllowed: boolean = false;
     for (const permission of user.permissions!) {
         if (permissionName.toLowerCase() === permission.name.toLowerCase()) {

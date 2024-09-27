@@ -5,7 +5,7 @@ import {ALERT_NEW} from "./alert.actions";
 import {alertSuccess} from "../utils/alert.functions";
 import {Auth} from "../interfaces/authenticate.model";
 import {IAuth} from "../interfaces/authenticate.interface";
-import {IPropsCommon} from "../interfaces/props.common.interface";
+import {IProps} from "../interfaces/props.common.interface";
 import {IReduxDispatch} from "../interfaces/redux.type.interface";
 import {isEmpty} from "../utils/is.empty";
 import {AUTH_SERVICE} from "../configs/path.constants";
@@ -27,7 +27,7 @@ export const AUTH_RESET_PASSWORD_ACCOUNT_VIA_SMS = 'AUTH_RESET_PASSWORD_ACCOUNT_
 export const AUTH_ACTIVATE_ACCOUNT_VIA_SMS = 'AUTH_ACTIVATE_ACCOUNT_VIA_SMS';
 export const AUTH_SEND_ACTIVATE_ACCOUNT_VIA_SMS = 'AUTH_SEND_ACTIVATE_ACCOUNT_VIA_SMS';
 
-export async function signIn(auth: Auth, dispatch: IReduxDispatch) {
+export async function signIn(dispatch: IReduxDispatch,auth: Auth) {
     const result= await post<IAuth>('auth/signin', auth);
 
     localStorage.setItem('csrf', result.data?.csrf!);
@@ -51,7 +51,7 @@ export async function signIn(auth: Auth, dispatch: IReduxDispatch) {
 
 }
 
-export async function signOut(flag:boolean, dispatch: IReduxDispatch) {
+export async function signOut(dispatch: IReduxDispatch,flag:boolean) {
 
     if(flag){
         const result = await post<IAuth>('auth/signout', {none: ''});
@@ -101,7 +101,7 @@ export async function isSignIn(dispatch: IReduxDispatch) {
 }
 
 
-export async function activateAccountViaEmail(auth: Auth, props: IPropsCommon, dispatch: IReduxDispatch) {
+export async function activateAccountViaEmail(dispatch: IReduxDispatch,auth: Auth, props: IProps) {
 
     const result = await post<IAuth>('auth/activate-account-email', auth);
 
@@ -122,7 +122,7 @@ export async function activateAccountViaEmail(auth: Auth, props: IPropsCommon, d
 }
 
 
-export async function sendActivateCodeViaEmail(auth: Auth, props: IPropsCommon, dispatch: IReduxDispatch) {
+export async function sendActivateCodeViaEmail(dispatch: IReduxDispatch,auth: Auth, props: IProps) {
 
     const result = await post<IAuth>('auth/send-activate-email', auth);
 
@@ -139,7 +139,7 @@ export async function sendActivateCodeViaEmail(auth: Auth, props: IPropsCommon, 
 }
 
 
-export async function forgot(auth: Auth, props: IPropsCommon, dispatch: IReduxDispatch) {
+export async function forgot(dispatch: IReduxDispatch,auth: Auth, props: IProps) {
 
     const result = await post<IAuth>('auth/forgot', auth);
 
@@ -155,7 +155,7 @@ export async function forgot(auth: Auth, props: IPropsCommon, dispatch: IReduxDi
 
 }
 
-export async function signUp(auth: Auth, props: IPropsCommon, dispatch: IReduxDispatch) {
+export async function signUp(dispatch: IReduxDispatch,auth: Auth, props: IProps) {
 
     const result = await post<IAuth>('auth/signup', auth);
 
@@ -177,7 +177,7 @@ export async function signUp(auth: Auth, props: IPropsCommon, dispatch: IReduxDi
 }
 
 
-export async function resetPasswordViaEmail(auth: Auth, props: IPropsCommon, dispatch: IReduxDispatch) {
+export async function resetPasswordViaEmail(dispatch: IReduxDispatch,auth: Auth, props: IProps) {
 
     const result = await post<IAuth>('auth/reset-password-email', auth);
 
@@ -199,7 +199,7 @@ export async function resetPasswordViaEmail(auth: Auth, props: IPropsCommon, dis
 }
 
 
-export async function resetPasswordViaSms(auth: Auth, props: IPropsCommon, dispatch: IReduxDispatch) {
+export async function resetPasswordViaSms(dispatch: IReduxDispatch,auth: Auth, props: IProps) {
 
     const result = await post<IAuth>('auth/reset-password-sms', auth);
 
@@ -220,7 +220,7 @@ export async function resetPasswordViaSms(auth: Auth, props: IPropsCommon, dispa
 
 }
 
-export async function activateAccountViaSms(auth: Auth, props: IPropsCommon, dispatch: IReduxDispatch) {
+export async function activateAccountViaSms(dispatch: IReduxDispatch,auth: Auth, props: IProps) {
 
     const result = await post<IAuth>('auth/activate-account-sms', auth);
 
@@ -240,7 +240,7 @@ export async function activateAccountViaSms(auth: Auth, props: IPropsCommon, dis
 }
 
 
-export async function sendActivateCodeViaSms(auth: Auth, props: IPropsCommon, dispatch: IReduxDispatch) {
+export async function sendActivateCodeViaSms(dispatch: IReduxDispatch,auth: Auth, props: IProps) {
 
     const result = await post<IAuth>('auth/send-activate-sms', auth);
 

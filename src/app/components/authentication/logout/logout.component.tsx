@@ -1,28 +1,20 @@
 import React, {Component, useEffect} from 'react';
 import './logout.component.scss';
-import {connect} from 'react-redux'
+import {connect, useDispatch} from 'react-redux'
 import {signOut} from '../../../actions/auth.actions';
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import withRouter from "../../../utils/with.router";
+import withRouter from "../../../hooks/with.router";
 
 
 function  LogoutComponent (props:any){
+    const dispatch=useDispatch();
     useEffect(()=>{
         (async()=>{
-            await props._signOut();
+            await signOut(dispatch,false);
         })();
     },[]);
-        return (<></>);
+    return (<></>);
 
 }
 
-const mapStateToProps = (state:IReduxState) => {
-    return {}
-}
-const mapDispatchToProps =(dispatch:IReduxDispatch) => {
-    return {
-        _signOut:  () =>  signOut(false,dispatch)
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(LogoutComponent));
+export default withRouter(LogoutComponent);

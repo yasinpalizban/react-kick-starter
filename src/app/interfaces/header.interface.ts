@@ -1,10 +1,9 @@
-import {IPropsCommon} from "./props.common.interface";
-import {IStateCommon} from "./state.common.interface";
+import {IProps} from "./props.common.interface";
 import {IProfile} from "./profile.interface";
 import {INotification} from "./notification.interface";
 import {IResponseObject} from "./iresponse.object";
 
-export interface IPropsAdminHeader extends IPropsCommon {
+export interface IPropsAdminHeader extends IProps {
   _urlPath: (url:string) => void;
   _language: (lang:string) => void;
   _explodeLink: (url:string[]) =>void;
@@ -15,7 +14,7 @@ export interface IPropsAdminHeader extends IPropsCommon {
   profile: IResponseObject<IProfile>
 }
 
-export interface IStateAdminHeader extends  IStateCommon{
+export interface IStateAdminHeader{
   isLeftArrow: {
     account: boolean;
     news: boolean;

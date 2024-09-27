@@ -3,22 +3,22 @@ import './detail.component.scss';
 import {Trans, withTranslation} from "react-i18next";
 import moment from "moment";
 import {detail} from "../../../actions/setting.actions";
-import {connect} from "react-redux";
-import withRouter from '../../../utils/with.router';
-import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsSetting} from "../../../interfaces/setting.interface";
+import {useDispatch, useSelector} from "react-redux";
+import withRouter from '../../../hooks/with.router';
+import {IReduxState} from "../../../interfaces/redux.type.interface";
+import { ISetting} from "../../../interfaces/setting.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object";
+import {IProps} from "../../../interfaces/props.common.interface";
 
-function DetailComponent (props: IPropsSetting ) {
+function DetailComponent (props: IProps ) {
+const setting:IResponseObject<ISetting>= useSelector((item:IReduxState)=> item.settingSelect);
+const dispatch=useDispatch();
     useEffect(()=>{
         (async ()=>{
-            if(+props.params.id){
-                await props._detail(+props.params.id);
-            }
+               await detail(dispatch,+props.params.id);
         })();
-    },[])
+    },[]);
 
-
-    const {setting} = props;
         return (
             <div className="table-responsive">
                 <table className="table table-top-campaign">
@@ -78,15 +78,6 @@ function DetailComponent (props: IPropsSetting ) {
 }
 
 
-const mapStateToProps = (state: IReduxState) => {
-    return {
-        setting: state.settingSelect
-    }
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _detail: (argument: number | null) => detail(argument, dispatch),
-    }
-}
 
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(DetailComponent)));
+
+export default withTranslation()(withRouter(DetailComponent));

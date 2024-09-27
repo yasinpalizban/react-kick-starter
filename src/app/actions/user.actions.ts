@@ -5,7 +5,7 @@ import {createSearchParams} from "react-router-dom";
 import {User} from "../models/user.model";
 import {IUser} from "../interfaces/user.interface";
 import {IReduxDispatch} from "../interfaces/redux.type.interface";
-import {IPropsCommon} from "../interfaces/props.common.interface";
+import {IProps} from "../interfaces/props.common.interface";
 import {USER_SERVICE} from "../configs/path.constants";
 import {TOAST_NEW} from "./toast.actions";
 import {ToastModel} from "../models/toast.model";
@@ -16,23 +16,23 @@ export const USER_PUT = 'USER_PUT';
 export const USER_DELETE = 'USER_DELETE';
 export const USER_SHOW = 'USER_SHOW';
 
-export async function retrieve(argument: number | string | object | null, dispatch: IReduxDispatch):Promise<void> {
-    const result = await get<IUser>(USER_SERVICE.base, argument);
+export async function retrieve(dispatch: IReduxDispatch,argument?: number | string | object ):Promise<void> {
+    const result = await get<IUser>(USER_SERVICE.base, argument!);
     dispatch({
         type: USER_GET,
         payload: result
     });
 }
 
-export async function detail(argument: number | null, dispatch: IReduxDispatch):Promise<void> {
-    const result = await show<IUser>(USER_SERVICE.base, argument);
+export async function detail(dispatch: IReduxDispatch,argument?: number ):Promise<void> {
+    const result = await show<IUser>(USER_SERVICE.base, argument!);
     dispatch({
         type: USER_SHOW,
         payload: result
     });
 }
 
-export async function save(user: User, props: IPropsCommon, dispatch: IReduxDispatch):Promise<void> {
+export async function save(dispatch: IReduxDispatch,user: User, props: IProps):Promise<void> {
 
     const result = await post<IUser>(USER_SERVICE.base, user);
 
@@ -53,7 +53,7 @@ export async function save(user: User, props: IPropsCommon, dispatch: IReduxDisp
 
 }
 
-export async function update(user: User, props: IPropsCommon, dispatch: IReduxDispatch):Promise<void> {
+export async function update(dispatch: IReduxDispatch,user: User, props: IProps):Promise<void> {
     const result = await put<IUser>(USER_SERVICE.base, user);
     dispatch({
         type: USER_PUT,
@@ -76,7 +76,7 @@ export async function update(user: User, props: IPropsCommon, dispatch: IReduxDi
 
 }
 
-export async function remove(id: number, index: number, dispatch: IReduxDispatch):Promise<void> {
+export async function remove(dispatch: IReduxDispatch,id: number, index: number):Promise<void> {
     const result = await _delete(USER_SERVICE.base, id);
     dispatch({
         type: USER_DELETE,

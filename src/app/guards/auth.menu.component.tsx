@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, useContext} from 'react';
 import {AuthContext} from "../contexts/auth.context";
 import {isValidToPassAuth} from "../utils/is.valid.to.pass.auth";
 import {PermissionType} from "../enums/permission.enum";
@@ -8,24 +8,18 @@ interface IAuthMenu {
     children?: any;
     category: string;
 }
-class AuthMenuComponent extends Component<IAuthMenu, any> {
-    static contextType = AuthContext;
-    limitUserMenu = GlobalConstants.limitUserMenu;
-
-    constructor(props: IAuthMenu) {
-        super(props);
-    }
-
-    render() {
-        const user: IAuth = this.context!;
-        const permissionList: string[] = this.limitUserMenu[this.props.category];
+function AuthMenuComponent (props:IAuthMenu) {
+     const contextType:IAuth = useContext(AuthContext);
+    const limitUserMenu = GlobalConstants.limitUserMenu;
+        const permissionList: string[] = limitUserMenu[props.category];
         for (let i = 0; i < permissionList.length; i++) {
-            if (isValidToPassAuth(permissionList[i], PermissionType.Get, user)) {
-                return (this.props.children)
+            if (isValidToPassAuth(permissionList[i], PermissionType.Get, contextType)) {
+                return (props.children)
             }
         }
         return (<> </>);
-    }
+
+
 }
 
 export default AuthMenuComponent;

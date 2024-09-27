@@ -6,19 +6,24 @@ import {Trans, withTranslation} from "react-i18next";
 import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
 import {detail, save, update} from "../../../actions/group.actions";
-import {connect} from "react-redux";
+import {connect, useDispatch, useSelector} from "react-redux";
 import AlertComponent from '../../../commons/alert/alert.component';
-import withRouter from "../../../utils/with.router";
+import withRouter from "../../../hooks/with.router";
 import {Group} from "../../../models/group.model";
-import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsCommon} from "../../../interfaces/props.common.interface";
-import {IPropsGroup} from "../../../interfaces/group.interface";
+import { IReduxState} from "../../../interfaces/redux.type.interface";
+import {IProps} from "../../../interfaces/props.common.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object";
+import {IGroup} from "../../../interfaces/group.interface";
+import ErrorHintComponent from "../../../commons/error-hint/error-hint.component";
 
-function AddComponent(props: IPropsGroup) {
+function AddComponent(props: IProps) {
+    const group:IResponseObject<IGroup> =  useSelector((item:IReduxState)=> item.groupSelect);
+    const dispatch= useDispatch();
+    const queryArgument  = useSelector((item: IReduxState) => item.queryArgument)
     useEffect(()=>{
         (async ()=>{
             if(+props.params.id){
-                await props._detail(+props.params.id);
+                await detail(dispatch,+props.params.id);;
             }
         })();
     },[])
@@ -31,13 +36,13 @@ function AddComponent(props: IPropsGroup) {
             description: values.description,
         });
         if (+props.params.id) {
-            await props._update(group, props);
+            props={...props,queryArgument:queryArgument};
+            await update(dispatch,group, props);
         } else {
-            await props._save(group, props);
+            await save(dispatch,group, props);
         }
 
     }
-    const {group} = props;
 
     return (
         <Formik
@@ -70,19 +75,8 @@ function AddComponent(props: IPropsGroup) {
                                 <div className="input-group-addon">
                                     <FontAwesomeIcon icon={faStickyNote}/>
                                 </div>
+                                <ErrorHintComponent  name='name' errors={errors}/>
 
-                                <div className="invalid-feedback ">
-
-                                    {
-                                        errors.name === 'required' ?
-                                            <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                            </div> : ''
-                                    }
-                                    {errors.name === 'maxlength' ?
-                                        <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                        </div> : ''
-                                    }
-                                </div>
 
                             </div>
                         </div>
@@ -98,19 +92,7 @@ function AddComponent(props: IPropsGroup) {
                                     <FontAwesomeIcon icon={faFileWord}/>
 
                                 </div>
-                                <div className="invalid-feedback ">
-
-                                    {
-                                        errors.description === 'required' ?
-                                            <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                            </div> : ''
-                                    }
-                                    {errors.description === 'maxlength' ?
-                                        <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                        </div> : ''
-                                    }
-                                </div>
-
+                                <ErrorHintComponent  name='description' errors={errors}/>
                             </div>
                         </div>
 
@@ -130,19 +112,6 @@ function AddComponent(props: IPropsGroup) {
 
 }
 
-
-const mapStateToProps = (state: IReduxState) => {
-    return { group: state.groupSelect,
-        queryArgument: state.queryArgument}
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _save: (group: Group, props: IPropsCommon) => save(group, props, dispatch),
-        _update: (group: Group, props: IPropsCommon) => update(group, props, dispatch),
-        _detail: (argument:  number | null) => detail(argument, dispatch),
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(AddComponent)));
+export default withTranslation()(withRouter(AddComponent));
 
 

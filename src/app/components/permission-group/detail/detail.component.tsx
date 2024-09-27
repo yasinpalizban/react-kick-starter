@@ -2,21 +2,22 @@ import React, {Component, useEffect} from 'react';
 import './detail.component.scss';
 import {Trans, withTranslation} from "react-i18next";
 import {retrieve} from "../../../actions/permission..group.actions";
-import {connect} from "react-redux";
-import withRouter from '../../../utils/with.router';
-import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsPermissionGroup} from "../../../interfaces/permission.group.interface";
+import { useDispatch, useSelector} from "react-redux";
+import withRouter from '../../../hooks/with.router';
+import {IPermissionGroup} from "../../../interfaces/permission.group.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object";
+import {IReduxState} from "../../../interfaces/redux.type.interface";
+import {IProps} from "../../../interfaces/props.common.interface";
 
-function DetailComponent (props: IPropsPermissionGroup) {
-
+function DetailComponent (props: IProps) {
+   const permissionGroup:IResponseObject<IPermissionGroup> =  useSelector((item:IReduxState)=> item.permissionGroupSelect);
+    const dispatch= useDispatch();
     useEffect(()=>{
         (async ()=>{
-            await props._retrieve(+props.params.id);
+            await retrieve(dispatch,+props.params.id);
         })();
     },[])
 
-
-        const {permissionGroup} = props;
         return (
 
             <div className="table-responsive">
@@ -47,16 +48,4 @@ function DetailComponent (props: IPropsPermissionGroup) {
 
 }
 
-
-const mapStateToProps = (state: IReduxState) => {
-    return {
-        permissionGroupList: state.permissionGroupSelect
-    }
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _query: (argument: any) => retrieve(argument, dispatch),
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(DetailComponent)));
+export default withTranslation()(withRouter(DetailComponent));

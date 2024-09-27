@@ -1,11 +1,10 @@
-import {RoleType} from "../../enums/role.enum";
-import React, {Component, useEffect} from 'react';
-import './forbidden-page.component.scss';
-import withRouter from "../../utils/with.router";
-import {IPropsCommon} from "../../interfaces/props.common.interface";
-import {IStateCommon} from "../../interfaces/state.common.interface";
 
-function ForbiddenPageComponent (props:IPropsCommon){
+import React, { useEffect} from 'react';
+import './forbidden-page.component.scss';
+import withRouter from "../../hooks/with.router";
+import {IProps} from "../../interfaces/props.common.interface";
+
+function ForbiddenPageComponent (props:IProps){
      useEffect(()=>{
          // const user = JSON.parse(localStorage.getItem('user')!);
          // let pathRedirect = '/admin/dashboard/over-view';

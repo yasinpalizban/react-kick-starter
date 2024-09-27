@@ -22,7 +22,7 @@ import {urlPath, notification, language, explodeLink} from '../../../actions/hea
 import * as profileActions from '../../../actions/profile.actions';
 import {signOut} from '../../../actions/auth.actions';
 import HeaderService from '../../../services/header.service';
-import withRouter from "../../../utils/with.router";
+import withRouter from "../../../hooks/with.router";
 import {GlobalConstants} from "../../../configs/global-constants";
 import * as urlPathComponent from "../../../utils/url-path";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
@@ -777,12 +777,12 @@ const mapStateToProps = (state: IReduxState) => {
 
 const mapDispatchToProps = (dispatch: IReduxDispatch) => {
     return {
-        _urlPath: (url: string) => urlPath(url, dispatch),
-        _language: (lang: string) => language(lang, dispatch),
-        _explodeLink: (url: string[]) => explodeLink(url, dispatch),
-        _notification: (notify: any) => notification(notify, dispatch),
-        _profileRetrieve: () => profileActions.retrieve(null, dispatch),
-        _signOut: () => signOut(true, dispatch)
+        _urlPath: (url: string) => urlPath(dispatch,url),
+        _language: (lang: string) => language(dispatch,lang),
+        _explodeLink: (url: string[]) => explodeLink( dispatch,url),
+        _notification: (notify: any) => notification(dispatch,notify),
+        _profileRetrieve: () => profileActions.retrieve( dispatch),
+        _signOut: () => signOut(dispatch,true )
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(HeaderComponent)));

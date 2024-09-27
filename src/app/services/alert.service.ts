@@ -31,6 +31,7 @@ export class AlertService {
     }
 
     error(message:string, options:any): void {
+        console.error(message,options);
         this.clear();
         this.alert({...options, type: AlertType.Error, message});
     }
@@ -48,16 +49,13 @@ export class AlertService {
 // main alert method
     alert(alertObj:Alert): void {
         alertObj.id = alertObj.id || this.defaultId;
-
         // @ts-ignore
-        initStore.dispatch((dispatch:IReduxDispatch)=> newAlert(alertObj,dispatch));
+        initStore.dispatch((dispatch:IReduxDispatch)=> newAlert(dispatch,alertObj));
 
     }
-
-// clear alerts
     clear(id = this.defaultId): void {
         // @ts-ignore
-        initStore.dispatch((dispatch:IReduxDispatch)=> removeAlert({id}, dispatch));
+        initStore.dispatch((dispatch:IReduxDispatch)=> removeAlert( dispatch,{id}));
 
     }
 }

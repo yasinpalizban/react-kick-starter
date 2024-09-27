@@ -12,6 +12,8 @@ import {Action, AnyAction} from "redux";
 import {INotification} from "./notification.interface";
 import {IHomeSetting} from "./home.interface";
 import {IResponseObject} from "./iresponse.object";
+import {IAlert} from "./ialert";
+import {IToast} from "./itoast";
 
 export interface IReduxState {
     urlPath: string;
@@ -19,8 +21,8 @@ export interface IReduxState {
     language: string;
     notification: Array<INotification>;
     explodeLink: string[];
-    alert: any[];
-    toast: any;
+    alert: IAlert[];
+    toast: IToast;
     shareId: number;
     queryArgument: any[];
     auth: IResponseObject<IAuth>;
@@ -31,7 +33,7 @@ export interface IReduxState {
     graph: IResponseObject<IGraph[]>;
     group: IResponseObject<IGroup[]>;
     groupSelect: IResponseObject<IGroup>;
-    permission: IResponseObject<IPermission>;
+    permission: IResponseObject<IPermission[]>;
     permissionSelect: IResponseObject<IPermission>;
     permissionGroup: IResponseObject<IPermissionGroup[]>;
     permissionGroupSelect: IResponseObject<IPermissionGroup>;
@@ -39,7 +41,7 @@ export interface IReduxState {
     permissionUserSelect: IResponseObject<IPermissionUser>;
     user: IResponseObject<IUser[]>;
     userSelect: IResponseObject<IUser>;
-    home:IResponseObject<IHomeSetting>
+    homeSetting:IResponseObject<IHomeSetting>
 }
 
 export interface IReduxAction {

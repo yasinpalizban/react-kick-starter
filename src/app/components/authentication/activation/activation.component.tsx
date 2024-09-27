@@ -3,23 +3,23 @@ import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
 import './activation.component.scss';
 import {Trans, withTranslation} from 'react-i18next';
-import {connect} from 'react-redux'
+import {connect, useDispatch} from 'react-redux'
 import {
     activateAccountViaEmail,
     activateAccountViaSms,
     sendActivateCodeViaEmail,
     sendActivateCodeViaSms
 } from '../../../actions/auth.actions';
-import withRouter from "../../../utils/with.router";
+import withRouter from "../../../hooks/with.router";
 import AlertComponent from "../../../commons/alert/alert.component";
 import {resetAlert} from "../../../actions/alert.actions";
 import {Auth} from '../../../interfaces/authenticate.model';
-import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsCommon} from "../../../interfaces/props.common.interface";
-import {IPropsAuth} from "../../../interfaces/authenticate.interface";
+import {IProps} from "../../../interfaces/props.common.interface";
 
 
-function ActivationComponent(props: IPropsAuth ){
+
+function ActivationComponent(props: IProps ){
+    const dispatch= useDispatch();
         const usePhoneInput= useRef<HTMLInputElement>(null);
       const useEmailInput= useRef<HTMLInputElement>(null);
    const  handleSubmit = async (values: { email: any; token: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ email: string; token: string; }>> | undefined) => void) => {
@@ -28,7 +28,7 @@ function ActivationComponent(props: IPropsAuth ){
             activeToken: values.token.replace(/\s/g, ""),
             email: values.email.replace(/\s/g, "")
         });
-        await props._activateAccountViaEmail(auth,props);
+        await activateAccountViaEmail(dispatch,auth,props);
     }
 
    const handleSubmit2 = async (values: { phone: any; code: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ phone: string; code: string; }>> | undefined) => void) => {
@@ -37,21 +37,21 @@ function ActivationComponent(props: IPropsAuth ){
             activeToken: values.code.toString().replace(/\s/g, ""),
             phone: values.phone.replace(/\s/g, "")
         });
-        await props._activateAccountViaSms(auth,props);
+        await activateAccountViaSms(dispatch,auth,props);
     }
    const onClearAlert = () => {
-        props._resetAlert();
+        resetAlert(dispatch);
     }
 
     const onSendEmail = async () => {
         // @ts-ignore
         const auth = new Auth({email: useEmailInput?.current?.value});
-         await props._sendActivateCodeViaEmail(auth, props);
+         await sendActivateCodeViaEmail(dispatch,auth, props);
     }
     const onSendSms = async () => {
         // @ts-ignore
         const auth = new Auth({phone: usePhoneInput?.current?.value});
-        await props._sendActivateCodeViaSms(auth, props)
+        await sendActivateCodeViaSms(dispatch,auth, props)
     }
         return (
             <main>
@@ -434,18 +434,5 @@ function ActivationComponent(props: IPropsAuth ){
 
 }
 
-const mapStateToProps = (state: IReduxState) => {
-    return {}
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _activateAccountViaEmail: (auth: Auth, props: IPropsCommon) => activateAccountViaEmail(auth, props, dispatch),
-        _activateAccountViaSms: (auth: Auth, props: IPropsCommon) => activateAccountViaSms(auth, props, dispatch),
-        _sendActivateCodeViaSms: (auth: Auth, props: IPropsCommon) => sendActivateCodeViaSms(auth, props, dispatch),
-        _sendActivateCodeViaEmail: (auth: Auth, props: IPropsCommon) => sendActivateCodeViaEmail(auth, props, dispatch),
-        _resetAlert: () => resetAlert(dispatch),
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(ActivationComponent)));
+export default withTranslation()(withRouter(ActivationComponent));
 

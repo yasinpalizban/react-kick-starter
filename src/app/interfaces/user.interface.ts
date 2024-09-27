@@ -1,7 +1,4 @@
-import {IPropsCommon} from "./props.common.interface";
-import {IGroup} from "./group.interface";
-import {User} from "../models/user.model";
-import {IResponseObject} from "./iresponse.object";
+
 import {IBasic} from "./ibasic";
 
 export interface IUser extends  IBasic {
@@ -25,19 +22,5 @@ export interface IUser extends  IBasic {
     phone: string,
     group: string,
     groupId?: number,
-}
-
-
-export interface IPropsUser extends IPropsCommon {
-  _retrieve: (argument: string | number | object | null) => Promise<void>;
-  _detail: (argument: number) => Promise<void>;
-  _save: (user: User, props: IPropsCommon) => Promise<void>;
-  _update: (user: User, props: IPropsCommon) => Promise<void>;
-  _remove: (id: number, index: number) => Promise<void>;
-  _newQueryArgument: (queryArgument: any) => void;
-  _groupRetrieve:(argument: string | number | object | null)=> Promise<void>;
-  user: IResponseObject<IUser>;
-  userList: IResponseObject<IUser[]>;
-  groupList: IResponseObject<IGroup[]>;
 }
 

@@ -11,23 +11,3 @@ export default function IndexComponent() {
         <></>
     );
 }
-
-// class IndexComponent extends Component <IPropsCommon, IStateCommon> {
-//     constructor(props: IPropsCommon | Readonly<IPropsCommon>) {
-//         super(props);
-//     }
-//
-//     componentDidUpdate(prevProps: Readonly<IPropsCommon>, prevState: Readonly<IStateCommon>, snapshot?: any) {
-//         this.props.navigate('home/main');
-//     }
-//
-//     render() {
-//
-//         return <></>;
-//     }
-//
-//
-// }
-//
-// export default withRouter(IndexComponent);
-

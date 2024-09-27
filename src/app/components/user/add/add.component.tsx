@@ -7,47 +7,46 @@ import {Formik, FormikState, FormikValues} from 'formik';
 import * as Yup from 'yup';
 import {retrieve, save, update} from "../../../actions/user.actions";
 import * as groupActions from "../../../actions/group.actions";
-import {connect} from "react-redux";
+import {connect, useDispatch, useSelector} from "react-redux";
 import AlertComponent from '../../../commons/alert/alert.component';
-import withRouter from "../../../utils/with.router";
+import withRouter from "../../../hooks/with.router";
 import { User } from "../../../models/user.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsCommon} from "../../../interfaces/props.common.interface";
-import {IPropsUser} from "../../../interfaces/user.interface";
+import {IProps} from "../../../interfaces/props.common.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object";
+import {IUser} from "../../../interfaces/user.interface";
+import {IGroup} from "../../../interfaces/group.interface";
+import {detail} from "../../../actions/group.actions";
+import ErrorHintComponent from "../../../commons/error-hint/error-hint.component";
 
-function AddComponent(props: IPropsUser) {
+function AddComponent(props: IProps) {
    const defaultPassword: string ='abc123456';
-
+    const  user :IResponseObject<IUser> = useSelector((item:IReduxState)=>item.userSelect);
+    const  groupList :IResponseObject<IGroup[]> = useSelector((item:IReduxState)=>item.group);
+    const dispatch=useDispatch();
+    const queryArgument  = useSelector((item: IReduxState) => item.queryArgument)
     useEffect(()=>{
         (async ()=>{
             if(+props.params.id){
-                await props._retrieve(+props.params.id);
+                await detail(dispatch,+props.params.id);
+                props={...props,queryArgument:queryArgument};
             }
-            await props._groupRetrieve({limit:100});
         })();
-    },[]);
+    },[])
 
    const handleSubmit = async (values: any, setSubmitting: any, resetForm:any) => {
        const user = new User(values);
-
-       // const user = new User({
-       //     id: +props.params.id,
-       //     firstName: values.firstName,
-       //     lastName: values.lastName,
-       //     status: values.status=="1",
-       //     groupId: values.groupId,
-       // });
        if(+props.params.id){
-           await props._update(user, props);
+           props={...props,queryArgument:queryArgument};
+           await update(dispatch,user, props);
        }else{
-           await props._save(user, props);
+           await save(dispatch,user, props);
 
        }
 
     }
 
 
-        const {groupList,user} = props;
         return (
             <Formik
                 initialValues={{
@@ -98,18 +97,7 @@ function AddComponent(props: IPropsUser) {
                                         <FontAwesomeIcon icon={faUser}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.username === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.username === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-                                    </div>
+                                    <ErrorHintComponent  name='username' errors={errors}/>
 
                                 </div>
                             </div>
@@ -124,18 +112,7 @@ function AddComponent(props: IPropsUser) {
                                         <FontAwesomeIcon icon={faEnvelope}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.email === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.email === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-                                    </div>
+                                    <ErrorHintComponent  name='email' errors={errors}/>
 
                                 </div>
                             </div>
@@ -149,20 +126,7 @@ function AddComponent(props: IPropsUser) {
                                         <FontAwesomeIcon icon={faPhone}/>
 
                                     </div>
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.phone === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.phone === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-
-                                    </div>
-
+                                    <ErrorHintComponent  name='phone' errors={errors}/>
                                 </div>
                             </div>
 
@@ -177,18 +141,7 @@ function AddComponent(props: IPropsUser) {
                                         <FontAwesomeIcon icon={faUser}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.firstName === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.firstName === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-                                    </div>
+                                    <ErrorHintComponent  name='firstName' errors={errors}/>
 
                                 </div>
                             </div>
@@ -202,18 +155,7 @@ function AddComponent(props: IPropsUser) {
                                         <FontAwesomeIcon icon={faUser}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.lastName === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.lastName === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-                                    </div>
+                                    <ErrorHintComponent  name='lastName' errors={errors}/>
 
                                 </div>
                             </div>
@@ -235,15 +177,7 @@ function AddComponent(props: IPropsUser) {
                                         <FontAwesomeIcon icon={faUsers}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.groupId === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-
-                                    </div>
+                                    <ErrorHintComponent  name='groupId' errors={errors}/>
 
                                 </div>
                             </div>
@@ -279,15 +213,7 @@ function AddComponent(props: IPropsUser) {
                                         <FontAwesomeIcon icon={faUsers}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.status === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-
-                                    </div>
+                                    <ErrorHintComponent  name='status' errors={errors}/>
 
                                 </div>
                             </div>
@@ -307,22 +233,8 @@ function AddComponent(props: IPropsUser) {
 }
 
 
-const mapStateToProps = (state:IReduxState) => {
-    return {
-        user: state.userSelect,
-        groupList: state.group,
-        queryArgument: state.queryArgument
-    }
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _save: (user: User, props: IPropsCommon) => save(user, props, dispatch),
-        _groupQuery: (argument: string | number | object | null) => groupActions.retrieve(argument, dispatch),
-        _update: (user: User, props: IPropsCommon) => update(user, props, dispatch),
-        _query: (argument: string | number | object | null) => retrieve(argument, dispatch),
-    }
-}
 
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(AddComponent)));
+
+export default withTranslation()(withRouter(AddComponent));
 
 

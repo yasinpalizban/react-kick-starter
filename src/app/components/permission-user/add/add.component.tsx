@@ -5,105 +5,77 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Trans, withTranslation} from "react-i18next";
 import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
-import {save} from "../../../actions/permission.user.actions";
+import {save,detail, update} from "../../../actions/permission.user.actions";
 import * as  userActions from "../../../actions/user.actions";
 import * as permissionActions from "../../../actions/permission.actions";
-import {connect} from "react-redux";
+import {connect, useDispatch, useSelector} from "react-redux";
 import AlertComponent from '../../../commons/alert/alert.component';
-import withRouter from "../../../utils/with.router";
+import withRouter from "../../../hooks/with.router";
 import { PermissionUser } from "../../../models/permission.user.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsCommon} from "../../../interfaces/props.common.interface";
-import {IPropsPermissionUser} from "../../../interfaces/permission.user.interface";
+import {IProps} from "../../../interfaces/props.common.interface";
+import {IPermissionUser} from "../../../interfaces/permission.user.interface";
 import * as groupActions from "../../../actions/group.actions";
+import {IResponseObject} from "../../../interfaces/iresponse.object";
+import {IPermission} from "../../../interfaces/permission.interface";
+import {IGroup} from "../../../interfaces/group.interface";
+import {IUser} from "../../../interfaces/user.interface";
+import ErrorHintComponent from "../../../commons/error-hint/error-hint.component";
 
-function AddComponent (props: IPropsPermissionUser) {
-    const  [isDelete,setDelete]= useState(false);
-    const [ isGet, setGet]= useState(false);
-    const [isPost, setPost]= useState(false);
-    const [isPut, setPut]= useState(false);
-
-    const   onCheckboxChange = (event: any) => {
-
-        switch (event.target.value) {
-            case "-get":
-                setGet( !isGet);
-                break;
-            case "-post":
-                setPost( !isPost);
-                break;
-
-            case "-put":
-                setPut( !isPut);
-                break;
-
-            case "-delete":
-                setDelete( !isDelete);
-                break;
-        }
-
-    }
+function AddComponent (props: IProps) {
+    const permissionUser:IResponseObject<IPermissionUser> =  useSelector((item:IReduxState)=> item.permissionUserSelect);;
+      const userList:IResponseObject<IUser[]> =  useSelector((item:IReduxState)=> item.user);
+      const  permissionList:IResponseObject<IPermission[]> =  useSelector((item:IReduxState)=> item.permission);
+      const  groupList:IResponseObject<IGroup[]> =  useSelector((item:IReduxState)=> item.group);
+    const dispatch= useDispatch();
+    const queryArgument  = useSelector((item: IReduxState) => item.queryArgument)
 
     useEffect(()=>{
         (async ()=>{
-            await props._groupRetrieve({limit:100});
-            await props._userRetrieve({limit:200});
-            await props._permissionRetrieve({limit:20});
+            await groupActions.retrieve(dispatch,{limit:100});
+            await permissionActions.retrieve(dispatch,{limit:200});
+            await userActions.retrieve(dispatch,{limit:20});
              if(+props.params.id){
-                await props._retrieve(+props.params.id);
+                await detail(dispatch,+props.params.id);
+                 props={...props,queryArgument:queryArgument};
              }
-            props.permissionUser.data?.actions.split("-").forEach((value: string) => {
-
-                if (value === "get")
-                    setGet( true);
-                else if (value === "post")
-                    setPost( true);
-                else if (value === "put")
-                    setPut( true);
-                else if (value === "delete")
-                    setDelete( true);
-
-            });
 
         })();
-    },[])
+    },[]);
+
 
    const handleSubmit = async (values: {  groupId: any;permissionId: any; userId: any; actions: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ groupId: string; permissionId: string; userId: string; actions: never[]; }>> | undefined) => void) => {
         let combineAction = '';
        values.actions.forEach((ctl:string) => combineAction += ctl);
 
-       if (true) {
-           combineAction = (isGet ? '-get' : '') + (isPost ? '-post' : '') + (isPut ? '-put' : '') + (isDelete ? '-delete' : '');
-       } else {
-           combineAction = props.permissionUser.data?.actions!;
-       }
-       const permissionUser = {
+       const model = new PermissionUser({
            id: +props.params.id,
            permissionId: values.permissionId,
            userId: values.userId,
            actions: combineAction
-       };
+       }) ;
        if(+props.params.id){
-           await props._update(permissionUser, props);
+           props={...props,queryArgument:queryArgument};
+           await update(dispatch,model, props);
        }else{
-           await props._save(permissionUser, props);
+           await save(dispatch,model, props);
        }
 
     }
    const onChangeGroup=async (event: any)=>{
         const value = event.currentTarget.value;
         const queryParam = `name[eq]=${value}`;
-        await props._userRetrieve(queryParam);
+        await userActions.retrieve(dispatch,queryParam);
     }
 
-    const {permissionUser, userList, permissionList, groupList} = props;
+
 
         return (
             <Formik
                 initialValues={{
                     permissionId: permissionUser?.data?.permissionId||'',
                     userId: permissionUser?.data?.userId||'',
-                    actions: [],
+                    actions: permissionUser?.data?.actions.split('-')||[],
                     groupId: '',
                 }}
                 enableReinitialize={true}
@@ -143,15 +115,7 @@ function AddComponent (props: IPropsPermissionUser) {
                                         <FontAwesomeIcon icon={faAsterisk}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.groupId === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-
-                                    </div>
+                                    <ErrorHintComponent  name='groupId' errors={errors}/>
 
                                 </div>
                             </div>
@@ -172,15 +136,7 @@ function AddComponent (props: IPropsPermissionUser) {
                                         <FontAwesomeIcon icon={faAsterisk}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.userId === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-
-                                    </div>
+                                    <ErrorHintComponent  name='userId' errors={errors}/>
 
                                 </div>
                             </div>
@@ -202,15 +158,7 @@ function AddComponent (props: IPropsPermissionUser) {
                                         <FontAwesomeIcon icon={faAsterisk}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.permissionId === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-
-                                    </div>
+                                    <ErrorHintComponent  name='permissionId' errors={errors}/>
 
                                 </div>
                             </div>
@@ -224,7 +172,7 @@ function AddComponent (props: IPropsPermissionUser) {
 
                                         <label style={{transform: 'scale(1)'}}
                                                className="switch switch-text switch-primary switch-pill lg m-r-10 m-l-20">
-                                            <input name="actions" value="-get" onChange={onCheckboxChange}
+                                            <input name="actions" value="-get" onChange={handleChange}
                                                    onBlur={handleBlur}
                                                    type="checkbox"
                                                    className="switch-input "/>
@@ -235,7 +183,7 @@ function AddComponent (props: IPropsPermissionUser) {
 
                                         <label style={{transform: 'scale(1)'}}
                                                className="switch switch-text switch-success switch-pill m-r-5 m-l-5">
-                                            <input name="actions" value="-post" onChange={onCheckboxChange}
+                                            <input name="actions" value="-post" onChange={handleChange}
                                                    onBlur={handleBlur}
                                                    type="checkbox"
                                                    className="switch-input"/>
@@ -245,7 +193,7 @@ function AddComponent (props: IPropsPermissionUser) {
 
                                         <label style={{transform: 'scale(1)'}}
                                                className="switch switch-text switch-warning switch-pill m-r-5 m-l-5">
-                                            <input name="actions" value="-put" onChange={onCheckboxChange}
+                                            <input name="actions" value="-put" onChange={handleChange}
                                                    onBlur={handleBlur}
                                                    type="checkbox"
                                                    className="switch-input"/>
@@ -254,7 +202,7 @@ function AddComponent (props: IPropsPermissionUser) {
                                         </label>
                                         <label style={{transform: 'scale(1)'}}
                                                className="switch switch-text switch-danger switch-pill  m-l-5">
-                                            <input name="actions" value="-delete" onChange={onCheckboxChange}
+                                            <input name="actions" value="-delete" onChange={handleChange}
                                                    onBlur={handleBlur}
                                                    type="checkbox"
                                                    className="switch-input"/>
@@ -268,7 +216,7 @@ function AddComponent (props: IPropsPermissionUser) {
                                     <div className="input-group-addon">
                                         <FontAwesomeIcon icon={faAsterisk}/>
                                     </div>
-
+                                    <ErrorHintComponent  name='actions' errors={errors}/>
                                 </div>
                             </div>
 
@@ -288,22 +236,6 @@ function AddComponent (props: IPropsPermissionUser) {
 }
 
 
-const mapStateToProps = (state: IReduxState) => {
-    return {
-        userList: state.user,
-        permissionList: state.permission,
-        groupList: state.group,
-    }
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _save: (permissionUser: PermissionUser, props: IPropsCommon) => save(permissionUser, props, dispatch),
-        _userRetrieve: (argument: number | string | object|null) => userActions.retrieve(argument, dispatch),
-        _permissionRetrieve: (argument: number | string | object|null) => permissionActions.retrieve(argument, dispatch),
-        _groupRetrieve: (argument: number | string | object|null) => groupActions.retrieve(argument, dispatch),
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(AddComponent)));
+export default withTranslation()(withRouter(AddComponent));
 
 

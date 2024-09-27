@@ -3,23 +3,20 @@ import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
 import './forgot.component.scss';
 import {Trans, withTranslation} from 'react-i18next';
-import {connect} from 'react-redux'
+import {connect, useDispatch} from 'react-redux'
 import {forgot} from '../../../actions/auth.actions';
-import withRouter from "../../../utils/with.router";
+import withRouter from "../../../hooks/with.router";
 import AlertComponent from "../../../commons/alert/alert.component";
 import {GoogleReCaptchaProvider, IWithGoogleReCaptchaProps, withGoogleReCaptcha} from 'react-google-recaptcha-v3';
-import {environment} from "../../../../environments/environment";
 import { Auth } from '../../../interfaces/authenticate.model';
-import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsCommon} from "../../../interfaces/props.common.interface";
-import {IPropsAuth} from "../../../interfaces/authenticate.interface";
-
-function ForgotComponent (props: IPropsAuth | Readonly<IPropsAuth>){
-
+import {IProps} from "../../../interfaces/props.common.interface";
+function ForgotComponent (props: IProps){
+  const dispatch= useDispatch()
    const handleSubmit = async (values: { login?: string; token?: any; action?: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ login: string; }>> | undefined) => void) => {
       //  const {executeRecaptcha}:any = this.props.googleReCaptchaProps;
 
-        const { executeRecaptcha } = (props as IWithGoogleReCaptchaProps)
+        // @ts-ignore
+       const { executeRecaptcha } = (props as IWithGoogleReCaptchaProps)
             .googleReCaptchaProps;
         if (!executeRecaptcha) {
             console.log('Recaptcha has not been loaded');
@@ -32,7 +29,7 @@ function ForgotComponent (props: IPropsAuth | Readonly<IPropsAuth>){
             token: token,
             action: action
         });
-        await props._forgot(auth,props);
+        await forgot(dispatch,auth,props);
 
     }
 
@@ -182,14 +179,6 @@ function ForgotComponent (props: IPropsAuth | Readonly<IPropsAuth>){
 
 }
 
-const mapStateToProps = (state: IReduxState) => {
-    return {}
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _forgot: (auth: Auth,props:IPropsCommon) => forgot(auth, props,dispatch)
-    }
-}
 
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(withGoogleReCaptcha(ForgotComponent))));
+export default withTranslation()(withRouter(withGoogleReCaptcha(ForgotComponent)));
 

@@ -1,10 +1,11 @@
-import React, {Component} from 'react';
+import React, {useContext} from 'react';
 import {AuthContext} from "../contexts/auth.context";
 import {isValidToPassAuth} from "../utils/is.valid.to.pass.auth";
 import {OverlayTrigger, Tooltip} from "react-bootstrap";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faEdit, faEnvelopeOpen, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {PermissionType} from "../enums/permission.enum";
+import {IAuth} from "../interfaces/authenticate.interface";
 
 interface IAuthAction {
     children?:any;
@@ -16,44 +17,37 @@ interface IAuthAction {
     onClick: any;
 }
 
-class AuthCommonComponent extends Component<IAuthAction, any> {
-    static contextType = AuthContext;
+function AuthCommonComponent(props: IAuthAction) {
+    const contextType:IAuth = useContext(AuthContext);
+  const  onItemAction=()=> {
 
-    constructor(props: IAuthAction) {
-        super(props);
-    }
-
-    onItemAction() {
-
-        if (this.props.permissionType == PermissionType.Get) {
+        if (props.permissionType == PermissionType.Get) {
             return (<FontAwesomeIcon icon={faEnvelopeOpen}/>)
-        } else if (this.props.permissionType == PermissionType.Put) {
+        } else if (props.permissionType == PermissionType.Put) {
             return (<FontAwesomeIcon icon={faEdit}/>)
-        } else if (this.props.permissionType == PermissionType.Delete) {
+        } else if (props.permissionType == PermissionType.Delete) {
             return (<FontAwesomeIcon icon={faTrash}/>)
         } else {
             return (<> not define</>)
         }
     }
 
-    render() {
-
-        if (isValidToPassAuth(this.props.permissionName!, this.props.permissionType!, this.context!)) {
+    if (isValidToPassAuth(props.permissionName!, props.permissionType!, contextType!)) {
             return (<>
                 <OverlayTrigger
                     delay={{hide: 300, show: 200}}
                     overlay={(props) => (
                         <Tooltip {...props}>
-                            {this.props.label}
+                            {props.label}
                         </Tooltip>
                     )}
                     placement="top">
                     <button
-                        onClick={this.props.onClick} className="item"
-                        data-value={this.props.id}
-                        data-index={this.props.index}>
+                        onClick={props.onClick} className="item"
+                        data-value={props.id}
+                        data-index={props.index}>
                         {
-                            this.onItemAction()
+                            onItemAction()
                         }
 
                     </button>
@@ -62,7 +56,7 @@ class AuthCommonComponent extends Component<IAuthAction, any> {
         } else {
             return (<> </>);
         }
-    }
+
 }
 
 export default AuthCommonComponent;

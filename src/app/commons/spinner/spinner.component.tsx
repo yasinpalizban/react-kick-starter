@@ -1,28 +1,21 @@
-import React, {Component} from 'react';
+import React from 'react';
 import './spinner.component.scss';
-import {connect} from "react-redux";
+import { useSelector} from "react-redux";
 import FadeLoader from "react-spinners/FadeLoader";
-import {IReduxAction, IReduxDispatch, IReduxState} from "../../interfaces/redux.type.interface";
-import {IPropsCommon} from "../../interfaces/props.common.interface";
-import {IStateCommon} from "../../interfaces/state.common.interface";
+import { IReduxState} from "../../interfaces/redux.type.interface";
+import {IProps} from "../../interfaces/props.common.interface";
 
-function Spinner (props:IPropsCommon) {
+function Spinner (props:IProps) {
+    const  spin = useSelector((item:IReduxState)=> item.spinner);
         return (
             <>
 
                 <div className='fixedButton'>
-                    <FadeLoader height={25} width={3} speedMultiplier={4} loading={props.spinner}
+                    <FadeLoader height={25} width={3} speedMultiplier={4} loading={spin}
                                 cssOverride={{display: "block"}}/>
                 </div>
             </>
         );
-
 }
 
-const mapStateToProps = (state: IReduxState) => {
-    return {spinner: state.spinner}
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {}
-}
-export default connect(mapStateToProps, mapDispatchToProps)(Spinner);
+export default Spinner;

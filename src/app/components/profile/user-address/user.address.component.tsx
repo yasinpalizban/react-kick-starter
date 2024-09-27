@@ -1,37 +1,39 @@
 import {faMapMarker, faAddressBook, faMap} from "@fortawesome/free-solid-svg-icons";
-import React, {Component, useEffect} from 'react';
+import React, { useEffect} from 'react';
 import './user.address.component.scss';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {Trans, withTranslation} from "react-i18next";
 import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
 import {retrieve, save} from "../../../actions/profile.actions";
-import {connect} from "react-redux";
-
 import AlertComponent from '../../../commons/alert/alert.component';
 import {Profile} from "../../../models/profile.model";
-import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsProfile} from "../../../interfaces/profile.interface";
-import withRouter from "../../../utils/with.router";
-import {IPropsCommon} from "../../../interfaces/props.common.interface";
+import { IReduxState} from "../../../interfaces/redux.type.interface";
+import {IProfile} from "../../../interfaces/profile.interface";
+import withRouter from "../../../hooks/with.router";
+import {IProps} from "../../../interfaces/props.common.interface";
+import {useDispatch, useSelector} from "react-redux";
+import {IResponseObject} from "../../../interfaces/iresponse.object";
+import ErrorHintComponent from "../../../commons/error-hint/error-hint.component";
 
-function UserAddressComponent (props: IPropsProfile) {
-
+function UserAddressComponent (props: IProps) {
+    const profile:IResponseObject<IProfile> = useSelector((item:IReduxState)=> item.profile);
+    const dispatch=useDispatch();
     useEffect(()=>{
         (async ()=>{
-            await props._retrieve();
+            await retrieve(dispatch);
         })();
     },[]);
 
 
    const handleSubmit = async (values: { country: any; city: any; address: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ country: any; city: any; address: any; }>> | undefined) => void) => {
         const profile = new Profile(values);
-        await props._save(profile, props);
+        await save(dispatch,profile, props);
 
     }
 
 
-        const {profile} = props;
+
         return (
             <Formik
                 initialValues={{
@@ -66,18 +68,7 @@ function UserAddressComponent (props: IPropsProfile) {
                                         <FontAwesomeIcon icon={faMap}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.country === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.country === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-                                    </div>
+                                    <ErrorHintComponent  name='country' errors={errors}/>
 
                                 </div>
                             </div>
@@ -91,19 +82,7 @@ function UserAddressComponent (props: IPropsProfile) {
                                         <FontAwesomeIcon icon={faMapMarker}/>
 
                                     </div>
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.city === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.city === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-
-                                    </div>
+                                    <ErrorHintComponent  name='city' errors={errors}/>
 
                                 </div>
                             </div>
@@ -119,18 +98,7 @@ function UserAddressComponent (props: IPropsProfile) {
                                         <FontAwesomeIcon icon={faAddressBook}/>
 
                                     </div>
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.address === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.address === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-                                    </div>
+                                    <ErrorHintComponent  name='address' errors={errors}/>
 
                                 </div>
                             </div>
@@ -150,17 +118,4 @@ function UserAddressComponent (props: IPropsProfile) {
 
 }
 
-
-const mapStateToProps = (state: IReduxState) => {
-    return {
-        profile: state.profile
-    }
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _save: (profile: Profile|FormData,props:IPropsCommon) => save(profile, props,dispatch),
-        _retrieve: (argument: string | number | object | null) => retrieve(argument, dispatch),
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(UserAddressComponent)));
+export default withTranslation()(withRouter(UserAddressComponent));

@@ -18,9 +18,9 @@ axios.interceptors.response.use(
         } else if (err.response.data.type && err.response.data.type === ErrorInterceptType.Csrf) {
             window.location.href=window.location.origin+'/home/sign-out';
         }
-      //  console.log('error::');
-      //  console.log(err);
-     //   console.log({ code:err.response.status , text: err.response.statusText,data: err.response.data} );
+       // console.log('error::');
+       // console.log(err);
+       // console.log({ code:err.response.status , text: err.response.statusText,data: err.response.data} );
             const errorService = new ErrorService();
             errorService.handleError(err );
       //  throw err;

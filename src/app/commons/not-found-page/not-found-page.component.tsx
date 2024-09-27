@@ -1,10 +1,9 @@
-import React, {Component} from 'react';
+import React from 'react';
 import './not-found-page.component.scss';
-import {IPropsCommon} from "../../interfaces/props.common.interface";
-import {IStateCommon} from "../../interfaces/state.common.interface";
-import withRouter from "../../utils/with.router";
+import {IProps} from "../../interfaces/props.common.interface";
+import withRouter from "../../hooks/with.router";
 
-function NotFoundPageComponent (props:IPropsCommon) {
+function NotFoundPageComponent (props:IProps) {
 
         return (
             <>

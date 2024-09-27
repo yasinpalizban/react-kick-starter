@@ -1,25 +1,25 @@
-import React, {Component, useEffect} from 'react';
+import React, { useEffect} from 'react';
 import './over.view.component.scss';
-import {connect} from "react-redux";
+import { useDispatch, useSelector} from "react-redux";
 import {Trans, withTranslation} from "react-i18next";
-import withRouter from "../../../utils/with.router";
+import withRouter from "../../../hooks/with.router";
 import {retrieve} from "../../../actions/over.view.actions";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faList} from "@fortawesome/free-solid-svg-icons";
 import moment from "moment";
-import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsOverView} from "../../../interfaces/over.view.interface";
+import {IReduxState} from "../../../interfaces/redux.type.interface";
+import {IOverView} from "../../../interfaces/over.view.interface";
+import {IProps} from "../../../interfaces/props.common.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object";
 
-function OverViewComponent (props:IPropsOverView) {
+function OverViewComponent (props:IProps) {
+   const  overView : IResponseObject<IOverView>= useSelector((item:IReduxState)=> item.overView);
+    const dispatch=useDispatch();
     useEffect(()=>{
         (async ()=>{
-            await props._retrieve( null);
+            await retrieve( dispatch);
         })();
     },[])
-
-
-    const {overView} = props;
-
         return (
             <>
                 <div className="row">
@@ -103,15 +103,4 @@ function OverViewComponent (props:IPropsOverView) {
 
 }
 
-
-const mapStateToProps = (state: IReduxState) => {
-    return {
-        overView: state.overView
-    }
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _retrieve: (argument: string | number | object | null) => retrieve(argument, dispatch)
-    }
-}
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(OverViewComponent)));
+export default withTranslation()(withRouter(OverViewComponent));

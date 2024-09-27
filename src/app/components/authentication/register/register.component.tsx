@@ -3,22 +3,20 @@ import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
 import './register.component.scss';
 import {Trans, withTranslation} from 'react-i18next';
-import {connect} from 'react-redux'
+import {connect, useDispatch} from 'react-redux'
 import {signUp} from '../../../actions/auth.actions';
-import withRouter from "../../../utils/with.router";
+import withRouter from "../../../hooks/with.router";
 import AlertComponent from "../../../commons/alert/alert.component";
 import {GoogleReCaptchaProvider, IWithGoogleReCaptchaProps, withGoogleReCaptcha} from 'react-google-recaptcha-v3';
 import {Auth} from "../../../interfaces/authenticate.model";
-import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsCommon} from "../../../interfaces/props.common.interface";
-import {IPropsAuth} from "../../../interfaces/authenticate.interface";
+import {IProps} from "../../../interfaces/props.common.interface";
+function RegisterComponent (props: IProps) {
 
-function RegisterComponent (props: IPropsAuth | Readonly<IPropsAuth>) {
-
-
+ const  dispatch= useDispatch();
    const handleSubmit = async (values: { login?: string; username?: string; password?: string; passConfirm?: string; token?: any; action?: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ login: string; username: string; password: string; passConfirm: string; }>> | undefined) => void) => {
 
-        const { executeRecaptcha } = (props as IWithGoogleReCaptchaProps)
+        // @ts-ignore
+       const { executeRecaptcha } = (props as IWithGoogleReCaptchaProps)
             .googleReCaptchaProps;
         if (!executeRecaptcha) {
             console.log('Recaptcha has not been loaded');
@@ -35,7 +33,7 @@ function RegisterComponent (props: IPropsAuth | Readonly<IPropsAuth>) {
             action:action ,
             token: token
         });
-        await props._signUp(auth, props);
+        await signUp(dispatch,auth, props);
     }
 
 
@@ -266,14 +264,6 @@ function RegisterComponent (props: IPropsAuth | Readonly<IPropsAuth>) {
 
 }
 
-const mapStateToProps = (state: IReduxState) => {
-    return {}
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _signUp: (auth: Auth, props: IPropsCommon) => signUp(auth, props, dispatch)
-    }
-}
 
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(withGoogleReCaptcha(RegisterComponent))));
+export default withTranslation()(withRouter(withGoogleReCaptcha(RegisterComponent)));
 

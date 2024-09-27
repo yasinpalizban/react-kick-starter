@@ -5,7 +5,7 @@ import {createSearchParams} from "react-router-dom";
 import {PermissionUser} from "../models/permission.user.model";
 import {IPermissionUser} from "../interfaces/permission.user.interface";
 import {IReduxDispatch} from "../interfaces/redux.type.interface";
-import {IPropsCommon} from "../interfaces/props.common.interface";
+import {IProps} from "../interfaces/props.common.interface";
 import {IGroup} from "../interfaces/group.interface";
 import {PERMISSION_USER_SERVICE} from "../configs/path.constants";
 import {TOAST_NEW} from "./toast.actions";
@@ -17,8 +17,8 @@ export const  USER_PERMISSION_PUT = 'USER_PERMISSION_PUT';
 export const  USER_PERMISSION_DELETE = 'USER_PERMISSION_DELETE';
 export const  USER_PERMISSION_SHOW = 'USER_PERMISSION_SHOW';
 
-export async function retrieve(argument: number | string | object|null, dispatch: IReduxDispatch):Promise<void> {
-    const result = await get<IPermissionUser>(PERMISSION_USER_SERVICE.base, argument);
+export async function retrieve(dispatch: IReduxDispatch,argument?: number | string | object):Promise<void> {
+    const result = await get<IPermissionUser>(PERMISSION_USER_SERVICE.base, argument!);
 
     dispatch({
         type: USER_PERMISSION_GET,
@@ -26,7 +26,7 @@ export async function retrieve(argument: number | string | object|null, dispatch
     });
 
 }
-export async function detail(argument: number |null, dispatch: IReduxDispatch):Promise<void> {
+export async function detail(dispatch: IReduxDispatch,argument: number ):Promise<void> {
     const result = await show<IPermissionUser>(PERMISSION_USER_SERVICE.base, argument);
 
     dispatch({
@@ -35,7 +35,7 @@ export async function detail(argument: number |null, dispatch: IReduxDispatch):P
     });
 
 }
-export async function save(permissionUser:PermissionUser, props:IPropsCommon, dispatch:IReduxDispatch) :Promise<void>{
+export async function save(dispatch: IReduxDispatch,permissionUser:PermissionUser, props:IProps) :Promise<void>{
 
     const result = await post<IGroup>(PERMISSION_USER_SERVICE.base, permissionUser);
 
@@ -56,7 +56,7 @@ export async function save(permissionUser:PermissionUser, props:IPropsCommon, di
 
 }
 
-export async function update(permissionUser:PermissionUser, props:IPropsCommon, dispatch:IReduxDispatch):Promise<void> {
+export async function update(dispatch: IReduxDispatch,permissionUser:PermissionUser, props:IProps):Promise<void> {
 
     const result = await put<IPermissionUser>(PERMISSION_USER_SERVICE.base, permissionUser);
 
@@ -84,7 +84,7 @@ export async function update(permissionUser:PermissionUser, props:IPropsCommon, 
 
 }
 
-export async function remove(id:number, index:number, dispatch:IReduxDispatch):Promise<void> {
+export async function remove(dispatch: IReduxDispatch,id:number, index:number):Promise<void> {
 
     const result = await _delete(PERMISSION_USER_SERVICE.base, id);
     dispatch({

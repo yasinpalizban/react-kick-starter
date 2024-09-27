@@ -1,21 +1,15 @@
 import {AlertService} from './alert.service';
-import {initStore} from '../../index';
 
 export class ErrorService {
-    private alertService: AlertService;
+    private alertService: AlertService= new AlertService();
 
-    constructor() {
-        this.alertService = new AlertService();
-    }
-
-    handleError(errorResponse:any) {
-
-        this.alertService.alertOption.body.splice(0, this.alertService.alertOption.body.length);
+    handleError(errorResponse:any) {;
+        this.alertService.alertOption?.body?.splice(0, this.alertService.alertOption?.body?.length);
         if (typeof errorResponse?.response?.data?.error === 'string') {
-            this.alertService.alertOption.body.push(errorResponse.response.data.error);
+            this.alertService.alertOption?.body?.push(errorResponse.response.data.error);
         } else {
             for (const key in errorResponse?.response?.data?.error) {
-                this.alertService.alertOption.body.push(errorResponse.response.data.error[key]);
+                this.alertService.alertOption?.body?.push(errorResponse.response.data.error[key]);
             }
         }
 

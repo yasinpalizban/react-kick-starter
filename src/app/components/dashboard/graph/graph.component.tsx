@@ -1,8 +1,8 @@
 import React, {Component, useEffect} from 'react';
 import './graph.component.scss';
-import {connect} from "react-redux";
+import {connect, useDispatch, useSelector} from "react-redux";
 import {Trans, withTranslation} from "react-i18next";
-import withRouter from "../../../utils/with.router";
+import withRouter from "../../../hooks/with.router";
 import {retrieve, save} from '../../../actions/graph.actions';
 import {faAsterisk, faCalendar, faChartArea, faList} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
@@ -12,17 +12,19 @@ import AlertComponent from "../../../commons/alert/alert.component";
 import {getDateByName} from "../../../utils/get.date.by.name";
 import {Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title} from 'chart.js';
 import {Pie, Bar} from 'react-chartjs-2';
-import {newAlert} from "../../../actions/alert.actions";
 import {alertError} from "../../../utils/alert.functions";
-import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {Graph} from "../../../models/graph.model";
-import {IPropsGraph} from "../../../interfaces/graph.interface";
+import { IReduxState} from "../../../interfaces/redux.type.interface";
+import {IGraph} from "../../../interfaces/graph.interface";
+import {IProps} from "../../../interfaces/props.common.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object";
 
 
-function GraphComponent (props: IPropsGraph ) {
+function GraphComponent (props: IProps ) {
+ const graphData:IResponseObject<IGraph[]> =  useSelector((item:IReduxState)=> item.graph);
+    const dispatch=useDispatch();
     useEffect(()=>{
         (async ()=>{
-            await props._retrieve(null);
+            await retrieve(dispatch);
         })();
     },[])
 
@@ -90,7 +92,7 @@ function GraphComponent (props: IPropsGraph ) {
             !values?.fromDate &&
             !values?.toDate) {
             const error = alertError(props.t('error.selectDate'));
-            props._alert(error);
+            alert(error);
             return;
         }
 
@@ -99,7 +101,7 @@ function GraphComponent (props: IPropsGraph ) {
         const toDate = values.toDate.length > 0 ? values.toDate : getDateByName('today');
 
 
-        await props._save({
+        await save(dispatch,{
             type: values._type,
             toDate: toDate.replace("\//", "-"),
             fromDate: fromDate.replace("\//", "-")
@@ -113,7 +115,7 @@ function GraphComponent (props: IPropsGraph ) {
         const colors:string[]= ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange','Pink', 'Brown', 'Gray','Black','Silver'];
         let indexColor= 0;
 
-        props.graphData.data?.map((key, i) => {
+        graphData.data?.map((key, i) => {
             labels.push(key.name);
             dataRows.push(Number(key.value));
             backgroundColor.push(colors[indexColor]);
@@ -405,18 +407,4 @@ function GraphComponent (props: IPropsGraph ) {
 
 }
 
-
-const mapStateToProps = (state:IReduxState) => {
-    return {
-        graphData: state.graph
-    }
-}
-const mapDispatchToProps = (dispatch:IReduxDispatch) => {
-    return {
-        _retrieve: (argument: string | number | object | null) => retrieve(argument,dispatch),
-        _save: (graph:Graph) => save(graph, dispatch),
-        _alert: (error:any) => newAlert(error, dispatch)
-    }
-}
-export default connect(mapStateToProps,
-    mapDispatchToProps)(withTranslation()(withRouter(GraphComponent)));
+export default withTranslation()(withRouter(GraphComponent));

@@ -1,10 +1,9 @@
-import React, {Component} from 'react';
+import React from 'react';
 import './header.component.scss';
 import {withTranslation} from "react-i18next";
-import withRouter from "../../../utils/with.router";
-import {IPropsHome, IStateHome} from "../../../interfaces/home.interface";
-
-function headerComponent (props: IPropsHome ) {
+import withRouter from "../../../hooks/with.router";
+import {IProps} from "../../../interfaces/props.common.interface";
+function headerComponent (props: IProps ) {
         return (
 
                 <header id="header" className="header d-flex align-items-center fixed-top">

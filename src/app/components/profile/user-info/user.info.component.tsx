@@ -1,31 +1,33 @@
-import React, {Component, createRef, useRef, useState} from 'react';
+import React, { useRef, useState} from 'react';
 import './user.info.component.scss';
 import {Trans, withTranslation} from "react-i18next";
 import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
 import {
-    faEnvelope,
-    faPhone,
     faUser,
     faVenusMars,
     faStickyNote
 } from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import AlertComponent from '../../../commons/alert/alert.component';
-import {retrieve, save} from "../../../actions/profile.actions";
-import {connect} from "react-redux";
+import { save} from "../../../actions/profile.actions";
+import { useDispatch, useSelector} from "react-redux";
 import avatar from '../../../../assets/images/icon/default-avatar.jpg';
 import {Profile} from "../../../models/profile.model";
-import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsProfile} from "../../../interfaces/profile.interface";
-import withRouter from "../../../utils/with.router";
-import {IPropsCommon} from "../../../interfaces/props.common.interface";
+import { IReduxState} from "../../../interfaces/redux.type.interface";
+import {IProfile} from "../../../interfaces/profile.interface";
+import withRouter from "../../../hooks/with.router";
+import {IResponseObject} from "../../../interfaces/iresponse.object";
+import {IProps} from "../../../interfaces/props.common.interface";
+import ErrorHintComponent from "../../../commons/error-hint/error-hint.component";
 
-function UserInfoComponent (props:IPropsProfile) {
+function UserInfoComponent (props:IProps) {
     const selectImage =  useRef<HTMLInputElement>(null);
     const [isNewImage, setNewImage] = useState(false);
     const [image,setImage] = useState(avatar)
     const formData: FormData =  new FormData();
+    const profile:IResponseObject<IProfile> = useSelector((item:IReduxState)=> item.profile);
+    const dispatch=useDispatch();
 
 
    const handleSubmit = async (values: { username: any; phone: any; email: any; firstName: any; lastName: any; gender: any; title: any; bio: any; }, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ username: any; phone: any; email: any; firstName: any; lastName: any; gender: any; title: any; bio: any; }>> | undefined) => void) => {
@@ -37,9 +39,9 @@ function UserInfoComponent (props:IPropsProfile) {
             bio: values.bio,
             title:values.title
         });
-       await props._save(profile, props)
+       await save(dispatch,profile, props)
         if (isNewImage) {
-            await props._save(formData, props)
+            await save(dispatch,formData, props)
         }
 
     }
@@ -60,7 +62,7 @@ function UserInfoComponent (props:IPropsProfile) {
     }
 
 
-        const {profile} = props;
+
         return (
             <Formik
                 initialValues={{
@@ -138,19 +140,7 @@ function UserInfoComponent (props:IPropsProfile) {
                                         <FontAwesomeIcon icon={faUser}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.email === 'required' ?
-                                                <div className="pull-right"><Trans
-                                                    i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.email === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-                                    </div>
+                                    <ErrorHintComponent  name='email' errors={errors}/>
 
                                 </div>
                             </div>
@@ -167,18 +157,7 @@ function UserInfoComponent (props:IPropsProfile) {
                                         <FontAwesomeIcon icon={faUser}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.phone === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.phone === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-                                    </div>
+                                    <ErrorHintComponent  name='phone' errors={errors}/>
 
                                 </div>
                             </div>
@@ -195,18 +174,7 @@ function UserInfoComponent (props:IPropsProfile) {
                                         <FontAwesomeIcon icon={faUser}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.firstName === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.firstName === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-                                    </div>
+                                    <ErrorHintComponent  name='firstName' errors={errors}/>
 
                                 </div>
                             </div>
@@ -221,18 +189,7 @@ function UserInfoComponent (props:IPropsProfile) {
                                         <FontAwesomeIcon icon={faUser}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.lastName === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.lastName === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-                                    </div>
+                                    <ErrorHintComponent  name='lastName' errors={errors}/>
 
                                 </div>
                             </div>
@@ -250,15 +207,7 @@ function UserInfoComponent (props:IPropsProfile) {
                                         <FontAwesomeIcon icon={faVenusMars}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.gender === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-
-                                    </div>
+                                    <ErrorHintComponent  name='gender' errors={errors}/>
 
                                 </div>
                             </div>
@@ -273,18 +222,7 @@ function UserInfoComponent (props:IPropsProfile) {
                                         <FontAwesomeIcon icon={faUser}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.title === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.title === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-                                    </div>
+                                    <ErrorHintComponent  name='title' errors={errors}/>
 
                                 </div>
                             </div>
@@ -303,18 +241,7 @@ function UserInfoComponent (props:IPropsProfile) {
                                         <FontAwesomeIcon icon={faStickyNote}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.bio === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.bio === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-                                    </div>
+                                    <ErrorHintComponent  name='bio' errors={errors}/>
 
                                 </div>
                             </div>
@@ -336,17 +263,6 @@ function UserInfoComponent (props:IPropsProfile) {
 }
 
 
-const mapStateToProps = (state: IReduxState) => {
-    return {
-        profile: state.profile
-    }
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _save: (profile: Profile|FormData,props:IPropsCommon) => save(profile, props,dispatch),
-        _retrieve: (argument: string | number | object | null) => retrieve(argument, dispatch),
-    }
-}
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(UserInfoComponent)));
+export default withTranslation()(withRouter(UserInfoComponent));

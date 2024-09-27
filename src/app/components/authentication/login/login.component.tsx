@@ -3,25 +3,25 @@ import {Formik, FormikState} from 'formik';
 import * as Yup from 'yup';
 import './login.component.scss';
 import {Trans, withTranslation} from 'react-i18next';
-import {connect} from 'react-redux'
+import {connect, useDispatch} from 'react-redux'
 import {signIn,isSignIn} from '../../../actions/auth.actions';
-import withRouter from "../../../utils/with.router";
+import withRouter from "../../../hooks/with.router";
 import AlertComponent from "../../../commons/alert/alert.component";
-import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
 import {Auth} from "../../../interfaces/authenticate.model";
-import {IPropsAuth} from "../../../interfaces/authenticate.interface";
+import {IProps} from "../../../interfaces/props.common.interface";
 
 
-function LoginComponent (props: IPropsAuth | Readonly<IPropsAuth>) {
+function LoginComponent (props: IProps) {
+    const dispatch =useDispatch();
     useEffect(() => {
         (async ()=>{
-            await props._isSignIn();
+            await isSignIn(dispatch);
         })();
     },[]);
 
    const handleSubmit = async (values: { login: string; password: string;  remember:boolean}, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: Partial<FormikState<{ login: string; password: string;remember:boolean }>> | undefined) => void) => {
          const auth = new Auth(values);
-        await props._signIn(auth);
+        await signIn(dispatch,auth);
     }
 
 
@@ -189,15 +189,6 @@ function LoginComponent (props: IPropsAuth | Readonly<IPropsAuth>) {
 
 }
 
-const mapStateToProps = (state:IReduxState) => {
-    return {}
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _signIn: (auth:Auth) => signIn(auth, dispatch),
-        _isSignIn: (auth:Auth) => isSignIn(dispatch)
-    }
-}
 
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(LoginComponent)));
+export default withTranslation()(withRouter(LoginComponent));
 

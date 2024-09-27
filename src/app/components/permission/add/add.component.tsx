@@ -6,25 +6,29 @@ import {Trans, withTranslation} from "react-i18next";
 import {Formik, FormikState, FormikValues} from 'formik';
 import * as Yup from 'yup';
 import {detail, save, update} from "../../../actions/permission.actions";
-import {connect} from "react-redux";
+import {connect, useDispatch, useSelector} from "react-redux";
 
 import AlertComponent from '../../../commons/alert/alert.component';
-import withRouter from "../../../utils/with.router";
+import withRouter from "../../../hooks/with.router";
 import { Permission } from "../../../models/permission.model";
 import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsCommon} from "../../../interfaces/props.common.interface";
-import {IPropsPermission} from "../../../interfaces/permission.interface";
+import {IProps} from "../../../interfaces/props.common.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object";
+import {IPermission} from "../../../interfaces/permission.interface";
+import ErrorHintComponent from "../../../commons/error-hint/error-hint.component";
 
 
-function AddComponent (props: IPropsPermission) {
+function AddComponent (props: IProps) {
+   const permission:IResponseObject<IPermission>   = useSelector((item:IReduxState)=> item.permissionSelect);
+    const dispatch=useDispatch();
+    const queryArgument  = useSelector((item: IReduxState) => item.queryArgument)
     useEffect(()=>{
         (async ()=>{
             if(+props.params.id){
-                await props._detail(+props.params.id);
+                await detail(dispatch,+props.params.id);
             }
-
         })();
-    },[])
+    },[]);
 
 
 
@@ -37,14 +41,13 @@ function AddComponent (props: IPropsPermission) {
        });
 
        if(+props.params.id){
-           await props._update(permission, props);
+           props={...props,queryArgument:queryArgument};
+           await update(dispatch,permission, props);
        }else {
-           await props._save(permission, props);
+           await save(dispatch,permission, props);
        }
        }
 
-
-        const {permission} =props;
         return (
             <Formik
                 initialValues={{
@@ -79,18 +82,7 @@ function AddComponent (props: IPropsPermission) {
                                         <FontAwesomeIcon icon={faStickyNote}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.name === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.name === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-                                    </div>
+                                    <ErrorHintComponent  name='name' errors={errors}/>
 
                                 </div>
                             </div>
@@ -107,18 +99,7 @@ function AddComponent (props: IPropsPermission) {
                                         <FontAwesomeIcon icon={faFileWord}/>
 
                                     </div>
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.description === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.description === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-                                    </div>
+                                    <ErrorHintComponent  name='description' errors={errors}/>
 
                                 </div>
                             </div>
@@ -138,15 +119,7 @@ function AddComponent (props: IPropsPermission) {
                                         <FontAwesomeIcon icon={faEye}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.active === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-
-                                    </div>
+                                    <ErrorHintComponent  name='active' errors={errors}/>
 
                                 </div>
                             </div>
@@ -168,20 +141,6 @@ function AddComponent (props: IPropsPermission) {
 }
 
 
-const mapStateToProps = (state: IReduxState) => {
-    return {
-        permission: state.permissionSelect,
-        queryArgument: state.queryArgument
-    }
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _save: (permission: Permission, props: IPropsCommon) => save(permission,props, dispatch),
-        _update: (permission: Permission, props: IPropsCommon) => update(permission, props, dispatch),
-        _detail: (argument:  number  | null) => detail(argument, dispatch),
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(AddComponent)));
+export default withTranslation()(withRouter(AddComponent));
 
 

@@ -1,6 +1,4 @@
-import {IPropsCommon} from "./props.common.interface";
-import {Auth} from "./authenticate.model";
-import {IGoogleRecaptchaProps} from 'react-google-recaptcha-v3';
+
 export interface IAuth {
   csrf?: string;
   success?: boolean;
@@ -43,18 +41,4 @@ export interface IAuth {
     phone: string,
   }
 }
-export interface IPropsAuth extends IPropsCommon {
-  _signIn(auth: Auth):  Promise<void>;
-  _isSignIn(): Promise<void>;
-  _signOut():Promise<void>;
-  _activateAccountViaEmail(auth: Auth, props:IPropsCommon): Promise<void>;
-  _sendActivateCodeViaEmail(auth: Auth, props:IPropsCommon): Promise<void>;
-  _forgot(auth: Auth, props:IPropsCommon): Promise<void>;
-  _signUp(auth: Auth, props:IPropsCommon): Promise<void>;
- _resetPasswordViaEmail(auth: Auth, props:IPropsCommon): Promise<void>;
-  _resetPasswordViaSms(auth: Auth, props:IPropsCommon): Promise<void>;
-  _activateAccountViaSms(auth: Auth, props:IPropsCommon): Promise<void>;
-  _sendActivateCodeViaSms(auth: Auth, props:IPropsCommon): Promise<void>;
-  googleReCaptchaProps?:IGoogleRecaptchaProps;
-  _resetAlert():()=>void;
-}
+

@@ -1,27 +1,70 @@
-import React, {Component, useEffect} from 'react';
+import React, { useEffect} from 'react';
 import './list.component.scss';
 import {Trans, withTranslation} from "react-i18next";
-import {connect} from "react-redux";
+import { useDispatch, useSelector} from "react-redux";
 import {retrieve, remove} from '../../../actions/permission.user.actions';
-import withRouter from '../../../utils/with.router';
-import ReactPaginate from 'react-paginate';
+import withRouter from '../../../hooks/with.router';
 import {createSearchParams} from "react-router-dom";
 import {newQueryArgument} from "../../../actions/query.argument.actions";
 import queryString from "query-string";
-import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsPermissionUser} from "../../../interfaces/permission.user.interface";
-import SearchingFiledComponent from "../../../commons/search-field/searching.filed.component";
+import { IReduxState} from "../../../interfaces/redux.type.interface";
+import {IPermissionUser} from "../../../interfaces/permission.user.interface";
 import ModalComponent from "../../../commons/modal/modal.component";
 import AuthCommonComponent from "../../../guards/auth.common.component";
 import BasicListHooks from "../../../hooks/basic.list.hooks";
 import {PermissionType} from "../../../enums/permission.enum";
+import {IResponseObject} from "../../../interfaces/iresponse.object";
+import {IProps} from "../../../interfaces/props.common.interface";
+import {SortOrder, TableColumn} from "react-data-table-component/dist/DataTable/types";
+import SearchingFiledComponent from "../../../commons/searching-filed/searching.filed.component";
+import DataTable from "react-data-table-component";
 
-function ListComponent (props: IPropsPermissionUser ){
+function ListComponent (props: IProps ){
     const baseListHooks=BasicListHooks();
-   const sortData = [
-        {id: 'id', text: 'Id',},
-        {id: 'groupId', text: 'Group',},
-        {id: 'permissionId', text: 'Permission'}
+    const permissionUserList:IResponseObject<IPermissionUser[]> =  useSelector((item:IReduxState)=> item.permissionUser);
+    const dispatch= useDispatch();
+   const columns: TableColumn<IPermissionUser>[] = [
+       {
+           name: '#',
+           cell: (row, index: number) => index + 1,
+           width: "50px"
+       },
+       {
+           name: 'Username',
+           selector: (row) => row.username,
+           sortable: true,
+       },
+       {
+           name: 'Permission',
+           selector: (row) => row.permission,
+
+       },
+       {
+           name: 'actions',
+           selector: (row) => row.actions,
+
+       },
+       {
+           name: "Actions",
+           button: true,
+           cell: (item, i) => (
+               <div className="table-data-feature">
+                   <AuthCommonComponent onClick={onEditItem} index={i} id={item.id} label={props.t('common.edit')}
+                                        permissionName={baseListHooks.data.permissionName}
+                                        permissionType={PermissionType.Put}>
+                   </AuthCommonComponent>
+
+                   <AuthCommonComponent onClick={onOpenModal} index={i} id={item.id} label={props.t('common.remove')}
+                                        permissionName={baseListHooks.data.permissionName}
+                                        permissionType={PermissionType.Delete}>
+                   </AuthCommonComponent>
+                   <AuthCommonComponent onClick={onDetailItem} index={i} id={item.id} label={props.t('common.detail')}
+                                        permissionName={baseListHooks.data.permissionName}
+                                        permissionType={PermissionType.Get}>
+                   </AuthCommonComponent>
+               </div>
+           ),
+       }
     ];
     useEffect(()=>{
         (async ()=>{
@@ -31,9 +74,9 @@ function ListComponent (props: IPropsPermissionUser ){
 
     const initData=async ()=> {
         if (props.location.search) {
-            await props._retrieve(props.location.search);
+            await retrieve(dispatch,props.location.search);
         } else {
-            await props._retrieve(null);
+            await retrieve(dispatch);
         }
 
     }
@@ -43,7 +86,7 @@ function ListComponent (props: IPropsPermissionUser ){
         const id = event.currentTarget.getAttribute('data-value');
         const path = '../edit/' + id;
         const queryArgument = queryString.parse(props.location.search);
-        props._newQueryArgument(queryArgument);
+        newQueryArgument(dispatch,queryArgument);
         props.navigate(path);
     }
   const  onDetailItem = (event:any) => {
@@ -60,20 +103,27 @@ function ListComponent (props: IPropsPermissionUser ){
             modalRef: true,
             deleteId: id,
             deleteIndex: index,
-            deleteItem: props.permissionUserList.data![index].username
+            deleteItem: permissionUserList.data![index].username
         });
 
     }
    const onModalConfirm = async () => {
-        await props._remove(baseListHooks.data.deleteId!, baseListHooks.data.deleteIndex!);
+        await remove(dispatch,baseListHooks.data.deleteId!, baseListHooks.data.deleteIndex!);
        baseListHooks.setData({
             modalRef: false,
         });
     }
-  const  onChangePaginate = (event:any) => {
-        const params = {
-            page: event.selected + 1,
-        };
+    const onChangePerPaginate = (limit: number, page: number) => {
+        navigation({page: page.toString(), limit: limit.toString()});
+        baseListHooks.setPage(limit);
+    }
+    const onChangePaginate = (page: number) => {
+        navigation({page: page.toString(), limit: baseListHooks.data.pageSize.toString()});
+    }
+    const onSort = (selectedColumn: TableColumn<IPermissionUser>, sortDirection: SortOrder) => {
+        navigation({'sort': selectedColumn.name?.toString().toLowerCase()!, 'order': sortDirection});
+    }
+    const navigation = (params: { page?: string, limit?: string; sort?: string, order?: string }) => {
         const createSearchParam = createSearchParams(params);
         props.navigate(
             {
@@ -81,97 +131,28 @@ function ListComponent (props: IPropsPermissionUser ){
                 search: `?${createSearchParam}`,
             },
         );
+        initData().then();
     }
 
 
-        const {permissionUserList} = props;
-
-        return (<>
+    return (<>
 
 
-            <div className="table-responsive table-responsive-data2">
-
-                <SearchingFiledComponent onClickSearch={initData} sortData={sortData}/>
-
-                <table className="table table-data2">
-                    <thead>
-                    <tr>
-
-                        <th>#</th>
-                        <th><Trans i18nKey="filed.permissionId"></Trans></th>
-                        <th><Trans i18nKey="filed.userName"></Trans></th>
-                        <th><Trans i18nKey="filed.actions"></Trans></th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {
-                        permissionUserList?.data?.map((item:any, i:number) => {
-
-                            return (
-                                <>
-                                    <tr key={i+'user-permission1'} className="tr-shadow">
-
-                                        <td>{i + 1}</td>
-                                        <td>
-                                            <span className="block-email">{item.permission} </span>
-                                        </td>
-                                        <td>
-                                            <span className="block-email">{item.username} </span>
-                                        </td>
-                                        <td>
-                                            <span className="block-email">{item.actions} </span>
-                                        </td>
-
-                                        <td>
-                                            <div className="table-data-feature">
-
-                                                <AuthCommonComponent onClick={onEditItem} index={i} id={item.id} label={props.t('common.edit')} permissionName={baseListHooks.data.permissionName}
-                                                                     permissionType={PermissionType.Put}>
-                                                </AuthCommonComponent>
-
-                                                <AuthCommonComponent onClick={onOpenModal} index={i} id={item.id} label={props.t('common.remove')} permissionName={baseListHooks.data.permissionName}
-                                                                     permissionType={PermissionType.Delete}>
-                                                </AuthCommonComponent>
-                                                <AuthCommonComponent onClick={onDetailItem} index={i} id={item.id} label={props.t('common.detail')} permissionName={baseListHooks.data.permissionName}
-                                                                     permissionType={PermissionType.Get}>
-                                                </AuthCommonComponent>
-
-
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr key={i+'user-permission2'} className="spacer"></tr>
-                                </>
-
-
-                            )
-                                ;
-                        })
-
-                    }
-                    </tbody>
-                </table>
-            </div>
-            <div className="row mt-3">
-                <div className="col-12 col-md-12 col-xs-12">
-
-                    <ReactPaginate
-                        containerClassName="pagination  justify-content-center"
-                        pageLinkClassName="page-link"
-                        previousClassName="page-link"
-                        nextClassName="page-link"
-                        nextLabel={props.t('common.next')}
-                        onPageChange={onChangePaginate}
-                        pageRangeDisplayed={baseListHooks.data.pageSize}
-                        pageCount={permissionUserList.pager?.pageCount!}
-                        previousLabel={props.t('common.previous')}
-                        activeClassName="page-item active"
-
-                    />
-                </div>
-            </div>
-
+        <div className="table-responsive table-responsive-data2">
+            <SearchingFiledComponent onClickSearch={initData} searchFiled={columns}/>.
+            <DataTable
+                columns={columns}
+                data={permissionUserList?.data!}
+                pagination
+                paginationServer
+                paginationTotalRows={permissionUserList.pager?.total!}
+                paginationDefaultPage={permissionUserList.pager?.pageCount!}
+                onChangeRowsPerPage={onChangePerPaginate}
+                onChangePage={onChangePaginate}
+                sortServer
+                onSort={onSort}
+            />
+        </div>
             <ModalComponent show={baseListHooks.data.modalRef}
                             title={baseListHooks.data.deleteItem}
                             onClickConfirm={onModalConfirm}
@@ -182,20 +163,10 @@ function ListComponent (props: IPropsPermissionUser ){
 }
 
 
-const mapStateToProps = (state: IReduxState) => {
-    return {permissionUserList: state.permissionUser}
-}
-const mapDispatchToProps = (dispatch: IReduxDispatch) => {
-    return {
-        _retrieve: (argument: string | number | object | null) => retrieve(argument, dispatch),
-        _remove: (id: number, index: number) => remove(id, index, dispatch),
-        _newQueryArgument: (queryArgument: any) => newQueryArgument(queryArgument, dispatch)
-
-    }
-}
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(ListComponent)));
+
+export default withTranslation()(withRouter(ListComponent));
 
 
 

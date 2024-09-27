@@ -1,6 +1,7 @@
-import React, {Component} from 'react';
+import React, {Component, useContext} from 'react';
 import {AuthContext} from "../contexts/auth.context";
 import {isValidToPassAuth} from "../utils/is.valid.to.pass.auth";
+import {IAuth} from "../interfaces/authenticate.interface";
 
 interface IAuthAction {
     children?: any;
@@ -8,23 +9,14 @@ interface IAuthAction {
     permissionName: string;
 }
 
-class AuthActionComponent extends Component<IAuthAction, any> {
-    static contextType = AuthContext;
-
-
-    constructor(props: IAuthAction) {
-        super(props);
-    }
-
-    render() {
-
-        if (isValidToPassAuth(this.props.permissionName!, this.props.permissionType!, this.context!)) {
-            return (this.props.children);
+function AuthActionComponent(props: IAuthAction) {
+    const contextType:IAuth =  useContext(AuthContext);
+    if (isValidToPassAuth(props.permissionName!, props.permissionType!,contextType!)) {
+            return (props.children);
         } else {
             return (<> </>);
         }
 
-    }
 }
 
 export default AuthActionComponent;

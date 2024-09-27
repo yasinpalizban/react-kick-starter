@@ -6,27 +6,30 @@ import {Trans, withTranslation} from "react-i18next";
 import {Formik, FormikState, FormikValues} from 'formik';
 import * as Yup from 'yup';
 import {detail, save, update} from "../../../actions/setting.actions";
-import {connect} from "react-redux";
+import {connect, useDispatch, useSelector} from "react-redux";
 import AlertComponent from '../../../commons/alert/alert.component';
-import withRouter from "../../../utils/with.router";
+import withRouter from "../../../hooks/with.router";
 import {Setting} from "../../../models/setting.model";
-import {IReduxDispatch, IReduxState} from "../../../interfaces/redux.type.interface";
-import {IPropsCommon} from "../../../interfaces/props.common.interface";
-import {IPropsSetting} from "../../../interfaces/setting.interface";
+import {IReduxState} from "../../../interfaces/redux.type.interface";
+import {IProps} from "../../../interfaces/props.common.interface";
+import { ISetting} from "../../../interfaces/setting.interface";
+import {IResponseObject} from "../../../interfaces/iresponse.object";
+import ErrorHintComponent from "../../../commons/error-hint/error-hint.component";
 
 
-function AddComponent (props: IPropsSetting ) {
-    useEffect(() => {
+function AddComponent (props: IProps ) {
+    const setting:IResponseObject<ISetting>= useSelector((item:IReduxState)=> item.settingSelect);
+    const dispatch=useDispatch();
+    const queryArgument  = useSelector((item: IReduxState) => item.queryArgument)
+    useEffect(()=>{
         (async ()=>{
-            if(+props.params.id)
-            {
-                await props._detail(+props.params.id);
+            if(+props.params.id){
+                await detail(dispatch,+props.params.id);
+                props={...props,queryArgument:queryArgument};
             }
         })();
-    },[]);
+    },[])
  const   handleSubmit = async (values: FormikValues, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextState?: (Partial<FormikState<{ key: string; value: string; description: string; status: string }>> | undefined)) => void) => {
-
-
      const setting = new Setting({
          id: +props.params.id,
          value:values.value.toUpperCase(),
@@ -34,16 +37,13 @@ function AddComponent (props: IPropsSetting ) {
          status: values.status=='1',
      });
      if(+props.params.id){
-         await props._update(setting, props);
+         props={...props,queryArgument:queryArgument};
+         await update(dispatch,setting, props);
      }else{
-         await props._save(setting, props);
+         await save(dispatch,setting, props);
      }
-
-
-
     }
 
-    const {setting} = props;
         return (
             <Formik
                 initialValues={{
@@ -81,18 +81,7 @@ function AddComponent (props: IPropsSetting ) {
                                         <FontAwesomeIcon icon={faFileWord}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.key === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.key === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-                                    </div>
+                                    <ErrorHintComponent  name='key' errors={errors}/>
 
                                 </div>
                             </div>
@@ -106,19 +95,7 @@ function AddComponent (props: IPropsSetting ) {
                                         <FontAwesomeIcon icon={faFileWord}/>
 
                                     </div>
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.value === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.value === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-
-                                    </div>
+                                    <ErrorHintComponent  name='value' errors={errors}/>
 
                                 </div>
                             </div>
@@ -135,18 +112,7 @@ function AddComponent (props: IPropsSetting ) {
                                         <FontAwesomeIcon icon={faAddressBook}/>
 
                                     </div>
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.description === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-                                        {errors.description === 'maxlength' ?
-                                            <div className="pull-right"><Trans i18nKey="common.canNotBe"></Trans>
-                                            </div> : ''
-                                        }
-                                    </div>
+                                    <ErrorHintComponent  name='description' errors={errors}/>
 
                                 </div>
                             </div>
@@ -165,15 +131,7 @@ function AddComponent (props: IPropsSetting ) {
                                         <FontAwesomeIcon icon={faEye}/>
                                     </div>
 
-                                    <div className="invalid-feedback ">
-
-                                        {
-                                            errors.status === 'required' ?
-                                                <div className="pull-right"><Trans i18nKey="common.required"></Trans>
-                                                </div> : ''
-                                        }
-
-                                    </div>
+                                    <ErrorHintComponent  name='active' errors={errors}/>
 
                                 </div>
                             </div>
@@ -194,21 +152,6 @@ function AddComponent (props: IPropsSetting ) {
 
 }
 
-
-const mapStateToProps = (state:IReduxState) => {
-    return {
-        setting: state.settingSelect,
-        queryArgument: state.queryArgument
-    }
-}
-const mapDispatchToProps = (dispatch:IReduxDispatch) => {
-    return {
-        _save: (setting: Setting, props: IPropsCommon) => save(setting,props, dispatch),
-        _update: (setting: Setting, props: IPropsCommon) => update(setting, props, dispatch),
-        _detail: (argument:  number | null) => detail(argument, dispatch),
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(withTranslation()(withRouter(AddComponent)));
+export default withTranslation()(withRouter(AddComponent));
 
 
